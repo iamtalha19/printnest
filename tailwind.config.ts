@@ -13,6 +13,9 @@ const config: Config = {
         secondary: "#1E293B",
         accent: "#F59E0B",
         light: "#F8FAFC",
+        brandPink: '#ff6b6b',
+        brandPurple: '#6366f1',
+        brandTeal: '#06b6d4',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'sans-serif'],
