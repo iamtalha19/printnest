@@ -27,7 +27,7 @@ export default function Navbar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   return (
-    <header className="w-full font-sans bg-linear-to-r from-[#FFF5F2] via-[#F5F9FF] to-[#DBEAFE] shadow-sm sticky top-0 z-50">
+    <header className="w-full font-sans bg-linear-to-r from-[#FFF5F2] via-[#F5F9FF] to-[#DBEAFE] shadow-sm">
       <div className="container mx-auto px-4 pt-6 pb-4 flex flex-col lg:flex-row items-center justify-between gap-6 relative">
         <Link href="/" className="shrink-0">
           <Image

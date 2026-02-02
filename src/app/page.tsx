@@ -15,7 +15,6 @@ import Footer from "@/app/components/Footer";
 export default function Home() {
   return (
     <main className="min-h-screen font-sans text-slate-800">
-      <Navbar />
       <Hero />
       <Social />
       <About />
@@ -27,7 +26,6 @@ export default function Home() {
       <Price />
       <Testimonials />
       <Blog />
-      <Footer />
     </main>
   );
 }

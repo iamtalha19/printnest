@@ -15,12 +15,12 @@ export default function Social() {
         </div>
 
         <div className="relative flex items-center justify-center py-4 mb-10 w-full max-w-4xl mx-auto">
-          <div className="flex-grow border-t border-slate-200"></div>
-          <span className="flex-shrink-0 mx-4 text-slate-300">
+          <div className="grow border-t border-slate-200"></div>
+          <span className="shrink-0 mx-4 text-slate-300">
             <Sparkles size={20} strokeWidth={2.5} fill="currentColor" />
           </span>
 
-          <div className="flex-grow border-t border-slate-200"></div>
+          <div className="grow border-t border-slate-200"></div>
         </div>
 
         <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 lg:gap-20">
