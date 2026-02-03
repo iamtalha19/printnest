@@ -7,7 +7,8 @@ import {
   Mail,
   Phone,
 } from "lucide-react";
-import { footerData } from "@/app/data/footer";
+import db from "@/app/db.json";
+const footerData = db.footer;
 
 export default function Footer() {
   const { newsletter, brand, columns, contact, bottom } = footerData;

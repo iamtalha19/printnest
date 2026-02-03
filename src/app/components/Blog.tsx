@@ -1,11 +1,12 @@
 import Image from "next/image";
-import { latestNewsData, BlogPost } from "@/app/data/blog";
+import db from "@/app/db.json";
+const latestNewsData = db.blog;
 
 export default function LatestNews() {
   const { sectionInfo, posts } = latestNewsData;
 
   return (
-    <section className="py-20 px-6 bg-white">
+    <section id="blog" className="scroll-mt-24 py-20 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-12">
           <div>
@@ -39,7 +40,7 @@ export default function LatestNews() {
   );
 }
 
-function BlogCard({ post }: { post: BlogPost }) {
+function BlogCard({ post }: { post: any }) {
   return (
     <article className="group cursor-pointer">
       <div className="relative overflow-hidden rounded-2xl mb-5 aspect-4/3 bg-gray-100">

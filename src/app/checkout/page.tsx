@@ -13,7 +13,21 @@ import {
   Banknote,
   ChevronLeft,
 } from "lucide-react";
-import { CheckoutData, checkoutConfig } from "@/app/data/checkout";
+import db from "@/app/db.json";
+const checkoutConfig = db.checkout;
+
+interface CheckoutData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  apartment: string;
+  city: string;
+  province: string;
+  postcode: string;
+  phone: string;
+  paymentMethod: "cod" | "bank";
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -42,11 +56,14 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!formRef.current?.checkValidity()) {
       const firstInvalid = formRef.current?.querySelector(
         ":invalid",
       ) as HTMLElement;
-      if (firstInvalid) firstInvalid.focus();
+      if (firstInvalid) {
+        firstInvalid.focus();
+      }
       return;
     }
 
@@ -59,7 +76,9 @@ export default function CheckoutPage() {
 
       const response = await fetch("/api/place-order", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(payload),
       });
 
@@ -117,6 +136,7 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
 function CheckoutHeader() {
   return (
     <header className="flex flex-col items-center mb-10 pt-16">
@@ -352,11 +372,17 @@ function PaymentOption({
   return (
     <div
       onClick={onSelect}
-      className={`border rounded-xl p-4 cursor-pointer transition-all ${isSelected ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500" : "border-slate-200 hover:border-slate-300"}`}
+      className={`border rounded-xl p-4 cursor-pointer transition-all ${
+        isSelected
+          ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
+          : "border-slate-200 hover:border-slate-300"
+      }`}
     >
       <div className="flex items-center gap-3">
         <div
-          className={`w-5 h-5 rounded-full border flex items-center justify-center ${isSelected ? "border-blue-600" : "border-slate-400"}`}
+          className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+            isSelected ? "border-blue-600" : "border-slate-400"
+          }`}
         >
           {isSelected && (
             <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />

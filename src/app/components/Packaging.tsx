@@ -1,5 +1,6 @@
 import React from "react";
-import { packagingHeroData } from "@/app/data/packaging";
+import db from "@/app/db.json";
+const packagingHeroData = db.packaging;
 
 export default function PackagingHero() {
   const { header, video } = packagingHeroData;

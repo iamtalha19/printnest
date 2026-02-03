@@ -1,5 +1,6 @@
-import { howItWorksData } from "@/app/data/howitworks";
-import { Play } from "lucide-react";
+import db from "@/app/db.json";
+const howItWorksData = db.howitworks;
+import { Play, MousePointer2, PencilLine, Printer, HelpCircle } from "lucide-react";
 
 export default function HowItWorks() {
   const {
@@ -75,8 +76,23 @@ export default function HowItWorks() {
     </section>
   );
 }
+
+const iconMap: Record<string, any> = {
+  MousePointer2,
+  PencilLine,
+  Printer,
+};
+
+function resolveIcon(icon: any) {
+  if (!icon) return HelpCircle;
+  if (typeof icon === "string") {
+    return (iconMap as any)[icon] ?? HelpCircle;
+  }
+  return icon;
+}
+
 function StepCard({ data }: { data: any }) {
-  const Icon = data.icon;
+  const Icon = resolveIcon(data.icon);
   const { bg, hoverBorder, hoverShadow, iconBg, iconShadow } = data.theme;
 
   return (

@@ -1,11 +1,16 @@
 import React from "react";
-import { whyChooseUsData, FeatureItem } from "@/app/data/whyus";
+import db from "@/app/db.json";
+const whyChooseUsData = db.whyus;
+import { Printer, Settings2, Headset, PenTool, HelpCircle } from "lucide-react";
 
 export default function WhyChooseUs() {
   const { header, features } = whyChooseUsData;
 
   return (
-    <section className="py-20 px-4 bg-[#f8fbff] font-sans">
+    <section
+      id="services"
+      className="scroll-mt-24 py-20 px-4 bg-[#f8fbff] font-sans"
+    >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="text-blue-500 font-bold tracking-widest text-xs uppercase">
@@ -30,8 +35,24 @@ export default function WhyChooseUs() {
     </section>
   );
 }
-const FeatureCard = ({ item }: { item: FeatureItem }) => {
-  const Icon = item.icon;
+
+const iconMap: Record<string, any> = {
+  Printer,
+  Settings2,
+  Headset,
+  PenTool,
+};
+
+function resolveIcon(icon: any) {
+  if (!icon) return HelpCircle;
+  if (typeof icon === "string") {
+    return (iconMap as any)[icon] ?? HelpCircle;
+  }
+  return icon;
+}
+
+const FeatureCard = ({ item }: { item: any }) => {
+  const Icon = resolveIcon(item.icon);
 
   return (
     <div className="relative bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center p-8 text-center transition-transform hover:scale-105 duration-300 h-full overflow-hidden">

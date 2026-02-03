@@ -6,7 +6,8 @@ import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import { addToCart, removeFromCart } from "@/app/redux/CartSlice";
 import { ChevronRight, ChevronDown } from "lucide-react";
-import { cartData } from "@/app/data/cart";
+import db from "@/app/db.json";
+const cartData = db.cart;
 
 type CartItemType = {
   id: string;

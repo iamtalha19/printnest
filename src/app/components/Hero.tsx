@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { heroData } from "@/app/data/hero";
+import db from "@/app/db.json";
+const heroData = db.hero;
 import { ArrowRight } from "lucide-react";
 
 export default function Hero() {

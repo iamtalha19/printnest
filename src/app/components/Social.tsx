@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { socialData } from "@/app/data/social";
+import db from "@/app/db.json";
+const socialData = db.social;
 import { Sparkles } from "lucide-react";
 
 export default function Social() {

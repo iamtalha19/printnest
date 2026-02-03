@@ -17,11 +17,11 @@ export const navbarData = {
     wishlist: { badge: null },
   },
   navigation: [
-    { label: "Home", href: "/", active: true, hasDropdown: true },
-    { label: "About Us", href: "/about", active: false, hasDropdown: false },
-    { label: "Services", href: "/services", active: false, hasDropdown: true },
-    { label: "Pages", href: "/pages", active: false, hasDropdown: true },
-    { label: "Shop", href: "/shop", active: false, hasDropdown: true },
-    { label: "Contact Us", href: "/contact", active: false, hasDropdown: false },
+    { label: "Home", href: "/", active: true },
+    { label: "About", href: "/#about", active: false },
+    { label: "Services", href: "/#services", active: false },
+    { label: "Products", href: "/#products", active: false },
+    { label: "Blog", href: "/#blog", active: false },
+    { label: "Contact", href: "/#testimonials", active: false },
   ],
 };

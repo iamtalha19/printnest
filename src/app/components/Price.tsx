@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { Check } from "lucide-react";
-import { pricingData } from "@/app/data/price";
+import db from "@/app/db.json";
+const pricingData = db.price;
 
 export default function PricingSection() {
   const [isAnnual, setIsAnnual] = useState(false);

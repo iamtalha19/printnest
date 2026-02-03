@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
-import { testimonialsData, Testimonial } from "@/app/data/testimonial";
+import db from "@/app/db.json";
+const testimonialsData = db.testimonials;
 
 export default function Testimonials() {
   const { header, testimonials } = testimonialsData;
@@ -20,7 +21,10 @@ export default function Testimonials() {
   const progressPercentage = ((currentIndex + itemsToShow) / totalItems) * 100;
 
   return (
-    <section className="py-24 px-6 bg-[#f8fbff] overflow-hidden font-sans">
+    <section
+      id="testimonials"
+      className="scroll-mt-24 py-24 px-6 bg-[#f8fbff] overflow-hidden font-sans"
+    >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <span className="text-[#3b82f6] font-bold tracking-[0.2em] text-xs uppercase mb-4 block">
@@ -70,7 +74,7 @@ export default function Testimonials() {
     </section>
   );
 }
-function TestimonialCard({ item }: { item: Testimonial }) {
+function TestimonialCard({ item }: { item: any }) {
   return (
     <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-xl transition-all duration-300 group">
       <div className="flex items-center gap-4 mb-8">

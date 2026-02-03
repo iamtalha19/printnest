@@ -1,7 +1,8 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { productsData } from "@/app/data/products";
+import db from "@/app/db.json";
+const productsData = db.products;
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/app/redux/CartSlice";
@@ -121,7 +122,10 @@ export default function FeaturedProducts() {
   }, []);
 
   return (
-    <section className="py-20 lg:py-28 bg-white overflow-hidden relative">
+    <section
+      id="products"
+      className="scroll-mt-24 py-20 lg:py-28 bg-white overflow-hidden relative"
+    >
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col lg:flex-row justify-between items-end mb-12 gap-8">
           <div>

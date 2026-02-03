@@ -1,11 +1,15 @@
 import Image from "next/image";
-import { aboutData } from "@/app/data/about";
+import db from "@/app/db.json";
+const aboutData = db.about;
 // Import Lucide icons
 import { Check, ArrowRight } from "lucide-react";
 
 export default function About() {
   return (
-    <section className="py-20 lg:py-28 bg-white overflow-hidden">
+    <section
+      id="about"
+      className="scroll-mt-24 py-20 lg:py-28 bg-white overflow-hidden"
+    >
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="relative">

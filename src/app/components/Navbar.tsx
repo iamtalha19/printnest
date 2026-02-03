@@ -11,7 +11,8 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { navbarData } from "@/app/data/navbar";
+import db from "@/app/db.json";
+const navbarData = db.navbar;
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/app/redux/Store";
 import { removeFromCart } from "@/app/redux/CartSlice";
@@ -200,24 +201,20 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-      <div className="container mx-auto px-4 pb-4 mt-9">
-        <nav className="flex flex-wrap items-center justify-center gap-x-10 gap-y-2">
-          {navbarData.navigation.map((item, index) => (
-            <Link
-              key={index}
-              href={item.href}
-              className={`flex items-center gap-1.5 text-[16px] transition-colors duration-200 ${
-                item.active
-                  ? "text-slate-900 font-medium"
-                  : "text-slate-600 hover:text-[#3B82F6]"
-              }`}
-            >
-              {item.label}
-              {item.hasDropdown && (
-                <ChevronDown className="w-4 h-4 mt-0.5 opacity-60" />
-              )}
-            </Link>
-          ))}
+      <div className="container mx-auto px-4 py-8">
+        <nav>
+          <ul className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
+            {navbarData.navigation.map((item, index) => (
+              <li key={index}>
+                <Link
+                  href={item.href}
+                  className="text-[18px] text-[#333333] hover:text-blue-800 transition-colors duration-200 font-medium"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </nav>
       </div>
     </header>

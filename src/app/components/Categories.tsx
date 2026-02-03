@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { categoriesData } from "@/app/data/categories";
+import db from "@/app/db.json";
+const categoriesData = db.categories;
 export default function Categories() {
   return (
     <section className="py-20 lg:py-28 bg-white overflow-hidden">
