@@ -1,5 +1,6 @@
 import Image from "next/image";
 import db from "@/app/db.json";
+import { ChevronDown } from "lucide-react";
 
 export default function Hero() {
   const heroData = db.hero;
@@ -138,6 +139,28 @@ export default function Hero() {
             className="w-full"
           />
         </div>
+      </div>
+      <div className="absolute right-6 lg:bottom-3 lg:right-[10%] z-40 hidden md:flex items-center justify-center w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-[#ff6b6b] border-10 border-white hover:scale-110 transition-transform duration-300 cursor-pointer">
+        <ChevronDown
+          className="absolute text-white w-8 h-8 z-10"
+          strokeWidth={3}
+        />
+        <svg
+          className="absolute inset-0 w-full h-full animate-[spin_10s_linear_infinite]"
+          viewBox="0 0 100 100"
+        >
+          <defs>
+            <path
+              id="textCircle"
+              d="M 50, 50 m -36, 0 a 36,36 0 1,1 72,0 a 36,36 0 1,1 -72,0"
+            />
+          </defs>
+          <text className="text-[10px] uppercase fill-white tracking-[0.15em]">
+            <textPath href="#textCircle" startOffset="0%">
+              scroll down / scroll down / scroll down /
+            </textPath>
+          </text>
+        </svg>
       </div>
     </section>
   );
