@@ -115,15 +115,15 @@ export default function Hero() {
         </div>
       </div>
       <div className="relative w-full max-w-4xl mx-auto h-85 lg:h-120 mt-4 z-30 pointer-events-none select-none">
-        <div className="absolute top-2 right-[7%] w-[45%] z-10 transition-transform duration-500 hover:scale-105">
+        <div className="absolute top-16 right-[9%] w-[40%] z-10 transition-transform duration-500 hover:scale-105">
           <img
             src={assets.products.right}
             alt="Custom Sweatshirt Right"
             className="w-full"
-            style={{ transform: "rotate(6deg)" }}
+            style={{ transform: "rotate(4deg)" }}
           />
         </div>
-        <div className="absolute top-34 left-[12%] w-[40%] z-10 transition-transform duration-500 hover:scale-105">
+        <div className="absolute top-34 left-[11%] w-[40%] z-10 transition-transform duration-500 hover:scale-105">
           <img
             src={assets.products.left}
             alt="Custom Sweatshirt Left"
