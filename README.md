@@ -23,7 +23,6 @@ Table of Contents
 - [Deployment](#deployment)
 - [Contributing](#contributing)
 - [Troubleshooting / FAQ](#troubleshooting--faq)
-- [License](#license)
 
 ---
 
@@ -266,11 +265,3 @@ Q: How to add new products?
 - Edit `src/app/db.json` and add a product entry, then refresh the page.
 
 ---
-
-## License
-
-MIT — feel free to use this as a template or learning project.
-
----
-
-If you'd like, I can add badges (CI, Coverage), a `CONTRIBUTING.md`, or a prettier/formatting guide next — tell me which you prefer and I'll add it. 🙌
