@@ -24,7 +24,6 @@
       }
     ]
   },
-
   "blog": {
     "sectionInfo": {
       "label": "// Latest News //",
@@ -69,7 +68,6 @@
       }
     ]
   },
-
   "cart": {
     "breadcrumbs": {
       "home": "Home",
@@ -94,15 +92,20 @@
       "couponLabel": "Add coupons",
       "couponPlaceholder": "Select a coupon",
       "coupons": [
-        { "code": "DISCOUNT20", "label": "Winter Sale - 20% OFF" },
-        { "code": "WELCOME10", "label": "New User - 10% OFF" }
+        {
+          "code": "DISCOUNT20",
+          "label": "Winter Sale - 20% OFF"
+        },
+        {
+          "code": "WELCOME10",
+          "label": "New User - 10% OFF"
+        }
       ],
       "totalLabel": "Estimated total",
       "checkoutButtonText": "Proceed to Checkout",
       "checkoutUrl": "/checkout"
     }
   },
-
   "categories": {
     "sectionLabel": "// TOP CATEGORIES //",
     "headingMain": "Personalize High-Quality",
@@ -137,20 +140,42 @@
       }
     ]
   },
-
   "checkout": {
     "provinces": [
-      { "code": "PB", "name": "Punjab" },
-      { "code": "SD", "name": "Sindh" },
-      { "code": "KP", "name": "Khyber Pakhtunkhwa" },
-      { "code": "BA", "name": "Balochistan" },
-      { "code": "IS", "name": "Islamabad" },
-      { "code": "GB", "name": "Gilgit-Baltistan" },
-      { "code": "JK", "name": "Azad Kashmir" }
+      {
+        "code": "PB",
+        "name": "Punjab"
+      },
+      {
+        "code": "SD",
+        "name": "Sindh"
+      },
+      {
+        "code": "KP",
+        "name": "Khyber Pakhtunkhwa"
+      },
+      {
+        "code": "BA",
+        "name": "Balochistan"
+      },
+      {
+        "code": "IS",
+        "name": "Islamabad"
+      },
+      {
+        "code": "GB",
+        "name": "Gilgit-Baltistan"
+      },
+      {
+        "code": "JK",
+        "name": "Azad Kashmir"
+      }
     ],
-    "breadcrumbs": { "home": "Home", "current": "Checkout" }
+    "breadcrumbs": {
+      "home": "Home",
+      "current": "Checkout"
+    }
   },
-
   "footer": {
     "newsletter": {
       "titlePart1": "Join Now for Special Deals",
@@ -164,44 +189,95 @@
       "logo": "https://themexriver.com/wp/printnest/wp-content/uploads/2026/01/logo-2.svg",
       "description": "Stay connected for updates, exclusive deals, helpful tips, & printing inspiration.",
       "socials": [
-        { "name": "Facebook", "url": "#" },
-        { "name": "Twitter", "url": "#" },
-        { "name": "Instagram", "url": "#" },
-        { "name": "Linkedin", "url": "#" }
+        {
+          "name": "Facebook",
+          "url": "#"
+        },
+        {
+          "name": "Twitter",
+          "url": "#"
+        },
+        {
+          "name": "Instagram",
+          "url": "#"
+        },
+        {
+          "name": "Linkedin",
+          "url": "#"
+        }
       ]
     },
     "columns": [
       {
         "title": "Useful Links",
         "links": [
-          { "label": "About Us", "url": "#" },
-          { "label": "Our Blog", "url": "#" },
-          { "label": "Start a Return", "url": "#" },
-          { "label": "Our Products", "url": "#" }
+          {
+            "label": "About Us",
+            "url": "#"
+          },
+          {
+            "label": "Our Blog",
+            "url": "#"
+          },
+          {
+            "label": "Start a Return",
+            "url": "#"
+          },
+          {
+            "label": "Our Products",
+            "url": "#"
+          }
         ]
       },
       {
         "title": "Information",
         "links": [
-          { "label": "Our Services", "url": "#" },
-          { "label": "Pricing Plan", "url": "#" },
-          { "label": "Faq", "url": "#" },
-          { "label": "Our Products", "url": "#" }
+          {
+            "label": "Our Services",
+            "url": "#"
+          },
+          {
+            "label": "Pricing Plan",
+            "url": "#"
+          },
+          {
+            "label": "Faq",
+            "url": "#"
+          },
+          {
+            "label": "Our Products",
+            "url": "#"
+          }
         ]
       },
       {
         "title": "Other Pages",
         "links": [
-          { "label": "My Account", "url": "#" },
-          { "label": "Shipping", "url": "#" },
-          { "label": "Contact & Support", "url": "#" },
-          { "label": "Privacy Policy", "url": "#" }
+          {
+            "label": "My Account",
+            "url": "#"
+          },
+          {
+            "label": "Shipping",
+            "url": "#"
+          },
+          {
+            "label": "Contact & Support",
+            "url": "#"
+          },
+          {
+            "label": "Privacy Policy",
+            "url": "#"
+          }
         ]
       }
     ],
     "contact": {
       "title": "Keep In Touch",
-      "address": ["2118 Thornridge Cir. Syracuse,", "Connecticut 35624"],
+      "address": [
+        "2118 Thornridge Cir. Syracuse,",
+        "Connecticut 35624"
+      ],
       "email": "tranthuy.nute@gmail.com",
       "phone": "(252) 555-0126",
       "phoneLink": "2525550126"
@@ -217,7 +293,6 @@
       ]
     }
   },
-
   "hero": {
     "assets": {
       "background": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/h1-bg-clr.webp",
@@ -226,6 +301,16 @@
         "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/author-2.webp",
         "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/author-3.webp"
       ],
+      "floating": [
+        {
+          "name": "cap",
+          "url": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/h1-illus-1.webp"
+        },
+        {
+          "name": "prism",
+          "url": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/h1-illus-3.webp"
+        }
+      ],
       "products": {
         "left": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/h1-img-1.webp",
         "center": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/h1-img-2.webp",
@@ -233,21 +318,30 @@
       }
     },
     "content": {
-      "statsLeft": { "count": "1.5k+", "label": "Orders shipped in 2025" },
+      "statsLeft": {
+        "count": "1.5k+",
+        "label": "Orders shipped in 2025"
+      },
       "heroText": {
         "titlePart1": "Custom T-Shirts That",
         "titlePart2": "Define",
         "highlight": "Your Style",
-        "description": "Express yourself with high-quality custom shirts tailored to reflect your unique personality and style.",
+        "descriptionPart1": "Express yourself with high-quality custom shirts tailored to reflect your",
+        "descriptionPart2": "unique personality and style.",
         "buttonLabel": "Shop Now"
       },
       "statsRight": [
-        { "value": "95%", "label": "Satisfaction Rate" },
-        { "value": "14+", "label": "Years of Experience" }
+        {
+          "value": "95%",
+          "label": "Satisfaction Rate"
+        },
+        {
+          "value": "14+",
+          "label": "Years of Experience"
+        }
       ]
     }
   },
-
   "howitworks": {
     "sectionLabel": "// HOW IT WORKS //",
     "headingMain": "Step-by-Step Process to Bring Your",
@@ -306,9 +400,9 @@
       "videoText": "Watch Video"
     }
   },
-
   "navbar": {
     "assets": {
+      "background": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/h1-bg-clr.webp",
       "logo": {
         "src": "https://themexriver.com/wp/printnest/wp-content/uploads/2026/01/logo-1.svg",
         "alt": "PrintNest Logo",
@@ -316,26 +410,60 @@
         "height": 45
       }
     },
-    "search": { "placeholder": "Search" },
+    "search": {
+      "placeholder": "Search"
+    },
     "actions": {
-      "cart": { "badge": null },
-      "user": { "badge": null },
-      "wishlist": { "badge": null }
+      "cart": {
+        "badge": null
+      },
+      "user": {
+        "badge": null
+      },
+      "wishlist": {
+        "badge": null
+      }
     },
     "navigation": [
-      { "label": "Home", "href": "/", "active": true },
-      { "label": "About", "href": "/#about", "active": false },
-      { "label": "Services", "href": "/#services", "active": false },
-      { "label": "Products", "href": "/#products", "active": false },
-      { "label": "Blog", "href": "/#blog", "active": false },
-      { "label": "Contact", "href": "/#testimonials", "active": false }
+      {
+        "label": "Home",
+        "href": "/",
+        "active": true
+      },
+      {
+        "label": "About",
+        "href": "/#about",
+        "active": false
+      },
+      {
+        "label": "Services",
+        "href": "/#services",
+        "active": false
+      },
+      {
+        "label": "Products",
+        "href": "/#products",
+        "active": false
+      },
+      {
+        "label": "Blog",
+        "href": "/#blog",
+        "active": false
+      },
+      {
+        "label": "Contact",
+        "href": "/#testimonials",
+        "active": false
+      }
     ]
   },
-
   "packaging": {
     "header": {
       "label": "// Social Channels //",
-      "title": { "main": "Packaging Solutions", "highlight": "That Work" },
+      "title": {
+        "main": "Packaging Solutions",
+        "highlight": "That Work"
+      },
       "description": "Reliable, custom packaging designed to protect, impress, & elevate your brand image.",
       "buttonText": "View More"
     },
@@ -344,7 +472,6 @@
       "poster": ""
     }
   },
-
   "price": {
     "header": {
       "label": "// PRICING & PLAN //",
@@ -353,13 +480,19 @@
       "description": "Select from best plans, ensuring a perfect match. Need more or less? Customize your subscription for a seamless fit!",
       "ctaText": "Contact Us"
     },
-    "toggles": { "monthly": "Monthly", "annual": "Annually" },
+    "toggles": {
+      "monthly": "Monthly",
+      "annual": "Annually"
+    },
     "plans": [
       {
         "id": "starter",
         "name": "Starter",
         "description": "Ideal for growing teams needing essential features at affordable rates.",
-        "price": { "monthly": 250, "yearly": 750 },
+        "price": {
+          "monthly": 250,
+          "yearly": 750
+        },
         "features": [
           "Free licensed icons",
           "Task delivered one-by-one",
@@ -373,7 +506,10 @@
         "id": "premium",
         "name": "Premium",
         "description": "Unlock advanced features, support, and maximum scalability growth.",
-        "price": { "monthly": 375, "yearly": 975 },
+        "price": {
+          "monthly": 375,
+          "yearly": 975
+        },
         "features": [
           "Free licensed icons",
           "Task delivered one-by-one",
@@ -385,7 +521,6 @@
       }
     ]
   },
-
   "products": {
     "sectionLabel": "// FEATURED PRODUCTS //",
     "headingMain": "Exceptional Print Items",
@@ -436,7 +571,6 @@
       }
     ]
   },
-
   "social": {
     "title": "Loved by over 100,000 brands",
     "logos": [
@@ -462,7 +596,6 @@
       }
     ]
   },
-
   "testimonials": {
     "header": {
       "label": "// CLIENT'S FEEDBACK //",
@@ -520,7 +653,6 @@
       }
     ]
   },
-
   "whyus": {
     "header": {
       "label": "// Why Choose Us //",
@@ -532,25 +664,37 @@
         "icon": "Printer",
         "title": "Premium Print Quality",
         "description": "We use top-tier materials and high-resolution printing for a finish every time.",
-        "theme": { "iconBg": "bg-purple-400", "accent": "bg-purple-200" }
+        "theme": {
+          "iconBg": "bg-purple-400",
+          "accent": "bg-purple-200"
+        }
       },
       {
         "icon": "Settings2",
         "title": "Customization Options",
         "description": "From t-shirts to photo books, choose your product, design, colors, and finishes.",
-        "theme": { "iconBg": "bg-teal-400", "accent": "bg-teal-200" }
+        "theme": {
+          "iconBg": "bg-teal-400",
+          "accent": "bg-teal-200"
+        }
       },
       {
         "icon": "Headset",
         "title": "Expert Support Team",
         "description": "Friendly customer service ready to assist with design orders, & more.",
-        "theme": { "iconBg": "bg-pink-400", "accent": "bg-pink-200" }
+        "theme": {
+          "iconBg": "bg-pink-400",
+          "accent": "bg-pink-200"
+        }
       },
       {
         "icon": "PenTool",
         "title": "Modern Design Tools",
         "description": "Easy-to-use online design tools to help you personalize product in minutes.",
-        "theme": { "iconBg": "bg-amber-400", "accent": "bg-amber-200" }
+        "theme": {
+          "iconBg": "bg-amber-400",
+          "accent": "bg-amber-200"
+        }
       }
     ]
   }

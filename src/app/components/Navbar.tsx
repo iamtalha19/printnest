@@ -2,15 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Search,
-  ShoppingCart,
-  User,
-  Heart,
-  ChevronDown,
-  Trash2,
-  X,
-} from "lucide-react";
+import { Search, ShoppingCart, User, Heart, Trash2, X } from "lucide-react";
 import db from "@/app/db.json";
 const navbarData = db.navbar;
 import { useSelector, useDispatch } from "react-redux";
@@ -28,7 +20,7 @@ export default function Navbar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   return (
-    <header className="w-full font-sans bg-linear-to-r from-[#FFF5F2] via-[#F5F9FF] to-[#DBEAFE] shadow-sm">
+    <header className="absolute top-0 left-0 w-full z-50 font-sans bg-transparent pl-30 pr-30">
       <div className="container mx-auto px-4 pt-6 pb-4 flex flex-col lg:flex-row items-center justify-between gap-6 relative">
         <Link href="/" className="shrink-0">
           <Image
