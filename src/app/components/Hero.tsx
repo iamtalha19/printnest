@@ -11,7 +11,7 @@ export default function Hero() {
           src={assets.background}
           alt="Hero Background"
           fill
-          className="object-cover object-center"
+          className="object-bottom"
           priority
           quality={90}
         />
@@ -68,6 +68,16 @@ export default function Hero() {
                   className="object-contain"
                 />
               </div>
+              <div className="hidden lg:block absolute -left-73 top-125 w-13 h-13 z-10">
+                <Image
+                  src={
+                    assets.floating.find((f) => f.name === "prism1")?.url || ""
+                  }
+                  alt="Prism1"
+                  fill
+                  className="object-contain"
+                />
+              </div>
               <h1 className="text-[28px] md:text-[34px] lg:text-[52px] font-bold tracking-tight leading-[1.1] drop-shadow-xl text-black">
                 {content.heroText.titlePart1} <br className="hidden md:block" />
                 {content.heroText.titlePart2}
@@ -104,28 +114,28 @@ export default function Hero() {
           </div>
         </div>
       </div>
-      <div className="relative w-full max-w-5xl mx-auto h-96 lg:h-128 mt-4 z-30 pointer-events-none select-none">
-        <div className="absolute top-12 right-[10%] w-[30%] z-10 transition-transform duration-500 hover:scale-105">
+      <div className="relative w-full max-w-4xl mx-auto h-85 lg:h-120 mt-4 z-30 pointer-events-none select-none">
+        <div className="absolute top-2 right-[7%] w-[45%] z-10 transition-transform duration-500 hover:scale-105">
           <img
             src={assets.products.right}
             alt="Custom Sweatshirt Right"
-            className="w-full drop-shadow-2xl"
-            style={{ transform: "rotate(12deg)" }}
+            className="w-full"
+            style={{ transform: "rotate(6deg)" }}
           />
         </div>
-        <div className="absolute top-16 left-[10%] w-[30%] z-10 transition-transform duration-500 hover:scale-105">
+        <div className="absolute top-34 left-[12%] w-[40%] z-10 transition-transform duration-500 hover:scale-105">
           <img
             src={assets.products.left}
             alt="Custom Sweatshirt Left"
-            className="w-full drop-shadow-2xl"
-            style={{ transform: "rotate(-12deg)" }}
+            className="w-full"
+            style={{ transform: "rotate(1deg)" }}
           />
         </div>
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[40%] z-20 transition-transform duration-500 hover:scale-105">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[45%] z-20 transition-transform duration-500 hover:scale-105">
           <img
             src={assets.products.center}
             alt="Custom T-Shirt Center"
-            className="w-full drop-shadow-[0_35px_35px_rgba(0,0,0,0.5)]"
+            className="w-full"
           />
         </div>
       </div>
