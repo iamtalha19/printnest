@@ -8,7 +8,7 @@ export default function Social() {
 
   return (
     <section className="py-16 bg-white w-full">
-      <div className="container mx-auto max-w-6xl">
+      <div className="container mx-auto max-w-6xl px-4">
         <div className="text-center mb-8">
           <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
             {title}
@@ -21,18 +21,18 @@ export default function Social() {
           </span>
           <div className="grow border-t border-slate-200"></div>
         </div>
-        <div className="flex flex-wrap gap-12 md:gap-16 lg:gap-24">
+        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 lg:gap-16 group">
           {logos.map((brand, index) => (
             <div
               key={index}
-              className="relative w-40 h-12 md:w-44 md:h-16 transition-opacity duration-300"
+              className="relative w-36 h-10 md:w-44 md:h-14 transition-all duration-300 group-hover:opacity-50 hover:opacity-100! hover:scale-110 cursor-pointer"
             >
               <Image
                 src={brand.url}
                 alt={`${brand.name} logo`}
                 fill
                 className="object-contain"
-                sizes="(max-width: 768px) 128px, 144px"
+                sizes="(max-width: 768px) 144px, 176px"
               />
             </div>
           ))}
