@@ -26,9 +26,8 @@ export default function CartPage() {
   );
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-800">
+    <div className="min-h-screen pt-50 bg-white font-sans text-slate-800">
       <CartHeader />
-
       <div className="max-w-7xl mx-auto px-4 lg:px-8 pb-32">
         {cartItems.length === 0 ? (
           <EmptyCart />

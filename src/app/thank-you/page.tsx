@@ -6,7 +6,7 @@ import { CheckCircle, ShoppingBag } from "lucide-react";
 
 export default function ThankYouPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 mt-50 font-sans">
       <div className="bg-white max-w-md w-full rounded-2xl shadow-xl p-8 text-center border border-slate-100 animate-in fade-in zoom-in duration-300">
         <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
           <CheckCircle className="w-10 h-10 text-green-600" strokeWidth={3} />

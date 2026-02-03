@@ -95,7 +95,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-800 pb-20">
+    <div className="min-h-screen bg-white font-sans text-slate-800 pt-50 pb-20">
       <CheckoutHeader />
 
       <form

@@ -1,12 +1,11 @@
 import Image from "next/image";
 import db from "@/app/db.json";
-import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
   const heroData = db.hero;
   const { assets, content } = heroData;
   return (
-    <section className="relative w-full overflow-hidden bg-slate-50 min-h-screen flex flex-col justify-between font-sans">
+    <section className="relative w-full overflow-hidden bg-slate-50 min-h-screen flex flex-col justify-between font-sans pl-30 pr-30">
       <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
         <Image
           src={assets.background}
@@ -21,7 +20,6 @@ export default function Hero() {
         className="absolute bottom-0 left-0 w-full h-24 lg:h-56 bg-white z-10"
         style={{ clipPath: "ellipse(55% 90% at 50% 100%)" }}
       ></div>
-
       <div className="container mx-auto px-4 pt-60 relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           <div className="lg:col-span-2 flex flex-col items-center lg:items-start space-y-4 order-2 lg:order-1 lg:mt-24 animate-in slide-in-from-left-4 duration-700">
