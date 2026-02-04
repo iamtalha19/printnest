@@ -23,8 +23,6 @@ export default function ShopPage() {
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
   const { cartItems } = useSelector((state: RootState) => state.cart);
   const allProducts = db.shop.productShop;
-
-  // --- STATE ---
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("Default Sorting");
   const [isSortOpen, setIsSortOpen] = useState(false);
@@ -33,10 +31,7 @@ export default function ShopPage() {
     message: string;
     type: "add" | "remove";
   }>({ show: false, message: "", type: "add" });
-
-  // --- SORTING LOGIC ---
   const sortedProducts = useMemo(() => {
-    // Create a copy to avoid mutating original data
     let products = [...allProducts];
 
     switch (sortBy) {
@@ -53,26 +48,20 @@ export default function ShopPage() {
           return priceB - priceA;
         });
       case "Sort By Latest":
-        return products.sort((a, b) => b.id - a.id); // Assuming higher ID is newer
+        return products.sort((a, b) => b.id - a.id);
       default:
-        return products; // Default (by ID ascending usually)
+        return products;
     }
   }, [allProducts, sortBy]);
-
-  // --- PAGINATION LOGIC ---
   const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentProducts = sortedProducts.slice(
     startIndex,
     startIndex + ITEMS_PER_PAGE,
   );
-
-  // Scroll to top on page change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
-
-  // --- HANDLERS ---
   const showToast = (message: string, type: "add" | "remove") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
@@ -122,7 +111,6 @@ export default function ShopPage() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-800">
-      {/* Background Header */}
       <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-linear-to-b from-amber-50/50 via-teal-50/30 to-white z-10 mix-blend-multiply" />
         <Image
@@ -139,7 +127,6 @@ export default function ShopPage() {
         <ShopHeader currentPage={currentPage} />
 
         <div className="max-w-7xl mx-auto mt-20 px-4 lg:px-8 pb-32">
-          {/* --- TOOLBAR --- */}
           <div className="flex flex-col sm:flex-row justify-between items-center mb-12 px-6 py-3 bg-white rounded-full border border-slate-200 shadow-sm relative z-30">
             <p className="text-sm font-semibold text-slate-500 pl-2">
               Showing {startIndex + 1}–
@@ -154,8 +141,6 @@ export default function ShopPage() {
               >
                 {sortBy} <ChevronDown size={14} />
               </button>
-
-              {/* Dropdown Menu */}
               {isSortOpen && (
                 <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-100 rounded-lg shadow-xl overflow-hidden py-1 z-40">
                   {[
@@ -171,7 +156,7 @@ export default function ShopPage() {
                       onClick={() => {
                         setSortBy(option);
                         setIsSortOpen(false);
-                        setCurrentPage(1); // Reset to page 1 on sort
+                        setCurrentPage(1);
                       }}
                       className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-slate-50 hover:text-purple-600 transition-colors ${
                         sortBy === option
@@ -186,8 +171,6 @@ export default function ShopPage() {
               )}
             </div>
           </div>
-
-          {/* --- PRODUCT GRID --- */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {currentProducts.map((product: any) => (
               <SimpleProductCard
@@ -202,11 +185,8 @@ export default function ShopPage() {
               />
             ))}
           </div>
-
-          {/* --- PAGINATION CONTROLS --- */}
           {totalPages > 1 && (
             <div className="mt-16 flex justify-center items-center gap-3">
-              {/* Previous Button (Optional, but good UX) */}
               {currentPage > 1 && (
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
@@ -215,8 +195,6 @@ export default function ShopPage() {
                   <ChevronRight size={18} />
                 </button>
               )}
-
-              {/* Page Numbers */}
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (page) => (
                   <button
@@ -232,8 +210,6 @@ export default function ShopPage() {
                   </button>
                 ),
               )}
-
-              {/* Next Button */}
               {currentPage < totalPages && (
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
@@ -301,14 +277,12 @@ function SimpleProductCard({ product, onAddToCart, isInCart }: any) {
             className="object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
           />
         </div>
-
-        {/* --- HOVER OVERLAY BUTTONS --- */}
         <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/5">
           {isInCart ? (
             <>
               <button
                 onClick={onAddToCart}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-xs font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-xs font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
               >
                 <ShoppingBag size={14} fill="currentColor" />
                 Add to cart
@@ -316,7 +290,7 @@ function SimpleProductCard({ product, onAddToCart, isInCart }: any) {
               </button>
               <Link
                 href="/cart"
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-xs font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-xs font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
               >
                 View cart
               </Link>
@@ -324,7 +298,7 @@ function SimpleProductCard({ product, onAddToCart, isInCart }: any) {
           ) : (
             <button
               onClick={onAddToCart}
-              className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-sm font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+              className="flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-sm font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
             >
               <ShoppingBag size={16} fill="currentColor" />
               Add to cart
