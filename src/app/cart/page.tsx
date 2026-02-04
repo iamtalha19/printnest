@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
-import { addToCart, removeFromCart } from "@/app/redux/CartSlice";
+import { addToCart, removeFromCart, deleteItem } from "@/app/redux/CartSlice";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import db from "@/app/db.json";
 
@@ -170,10 +170,10 @@ function CartItem({ item }: { item: CartItemType }) {
               </button>
             </div>
             <button
-              onClick={() => dispatch(removeFromCart(item.id))}
+              onClick={() => dispatch(deleteItem(item.id))}
               className="text-xs font-bold text-slate-400 border-b border-slate-300 pb-0.5 hover:text-red-500 hover:border-red-300 transition-all"
             >
-              Remove item
+              Remove all item
             </button>
           </div>
         </div>

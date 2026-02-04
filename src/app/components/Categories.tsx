@@ -1,8 +1,60 @@
-import Image from "next/image";
-import db from "@/app/db.json";
+"use client";
 
-const categoriesData = db.categories;
+import Image from "next/image";
+import { useEffect, useState } from "react";
+
+interface Category {
+  id: number;
+  title: string;
+  image: string;
+  link: string;
+}
+
+interface CategoriesData {
+  sectionLabel: string;
+  headingMain: string;
+  headingHighlight: string;
+  description: string;
+  btnText: string;
+  btnLink: string;
+  categories: Category[];
+}
+
 export default function Categories() {
+  const [categoriesData, setCategoriesData] = useState<CategoriesData | null>(
+    null,
+  );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api/categories");
+        const data = await response.json();
+        setCategoriesData(data);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-20 lg:py-28 bg-white overflow-hidden">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="text-center">Loading...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!categoriesData) {
+    return null;
+  }
   return (
     <section className="py-20 lg:py-28 bg-white overflow-hidden">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -33,10 +85,10 @@ export default function Categories() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {categoriesData.categories.map((category) => (
+          {categoriesData.categories.map((category: Category) => (
             <a
               key={category.id}
-              href={category.link}
+              href={`/category/${category.title.toLowerCase().replace(/\s+/g, "-")}`}
               className="group flex flex-col items-center"
             >
               <div className="relative w-full aspect-4/5 rounded-4xl overflow-hidden mb-8 z-0 shadow-sm transition-transform duration-500 group-hover:-translate-y-2">

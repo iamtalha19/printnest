@@ -1,5 +1,7 @@
 import Image from "next/image";
 import db from "@/app/db.json";
+import Link from "next/link";
+
 const latestNewsData = db.blog;
 
 export default function LatestNews() {
@@ -41,42 +43,46 @@ export default function LatestNews() {
 }
 
 function BlogCard({ post }: { post: any }) {
+  const slug = post.title.toLowerCase().replace(/\s+/g, "-");
+
   return (
-    <article className="group cursor-pointer">
-      <div className="relative overflow-hidden rounded-2xl mb-5 aspect-4/3 bg-gray-100">
-        <Image
-          src={post.image}
-          alt={post.title}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-      </div>
-      <div>
-        <h3 className="text-lg font-bold text-gray-900 mb-4 leading-snug group-hover:text-rose-400 transition-colors">
-          {post.title}
-        </h3>
-        <div className="w-full h-px bg-gray-200 mb-4" />
-        <div className="flex items-center gap-3">
-          <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-            <Image
-              src={post.author.avatar}
-              alt={post.author.name}
-              fill
-              className="object-cover"
-              sizes="40px"
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold text-gray-900">
-              {post.author.name}
-            </span>
-            <span className="text-xs text-gray-500">
-              {post.date} · {post.readTime}
-            </span>
+    <Link href={`/blog/${slug}`}>
+      <article className="group cursor-pointer">
+        <div className="relative overflow-hidden rounded-2xl mb-5 aspect-4/3 bg-gray-100">
+          <Image
+            src={post.image}
+            alt={post.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </div>
+        <div>
+          <h3 className="text-lg font-bold text-gray-900 mb-4 leading-snug group-hover:text-rose-400 transition-colors">
+            {post.title}
+          </h3>
+          <div className="w-full h-px bg-gray-200 mb-4" />
+          <div className="flex items-center gap-3">
+            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200">
+              <Image
+                src={post.author.avatar}
+                alt={post.author.name}
+                fill
+                className="object-cover"
+                sizes="40px"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold text-gray-900">
+                {post.author.name}
+              </span>
+              <span className="text-xs text-gray-500">
+                {post.date} · {post.readTime}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
-    </article>
+      </article>
+    </Link>
   );
 }
