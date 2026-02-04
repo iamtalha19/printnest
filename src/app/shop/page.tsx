@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,22 +14,65 @@ import Toast from "@/app/components/products/Toast";
 const pageConfig = {
   title: "Shop",
   backgroundImage: db.shop.backgroundImage,
-  breadcrumbs: db.shop.breadcrumbs,
 };
+
+const ITEMS_PER_PAGE = 16;
 
 export default function ShopPage() {
   const dispatch = useDispatch();
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
-  // Get cart items to check status
   const { cartItems } = useSelector((state: RootState) => state.cart);
-  const products = db.shop.productShop;
+  const allProducts = db.shop.productShop;
 
+  // --- STATE ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState("Default Sorting");
+  const [isSortOpen, setIsSortOpen] = useState(false);
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
     type: "add" | "remove";
   }>({ show: false, message: "", type: "add" });
 
+  // --- SORTING LOGIC ---
+  const sortedProducts = useMemo(() => {
+    // Create a copy to avoid mutating original data
+    let products = [...allProducts];
+
+    switch (sortBy) {
+      case "Sort By Price: Low To High":
+        return products.sort((a, b) => {
+          const priceA = parseFloat(String(a.price).replace(/[^0-9.]/g, ""));
+          const priceB = parseFloat(String(b.price).replace(/[^0-9.]/g, ""));
+          return priceA - priceB;
+        });
+      case "Sort By Price: High To Low":
+        return products.sort((a, b) => {
+          const priceA = parseFloat(String(a.price).replace(/[^0-9.]/g, ""));
+          const priceB = parseFloat(String(b.price).replace(/[^0-9.]/g, ""));
+          return priceB - priceA;
+        });
+      case "Sort By Latest":
+        return products.sort((a, b) => b.id - a.id); // Assuming higher ID is newer
+      default:
+        return products; // Default (by ID ascending usually)
+    }
+  }, [allProducts, sortBy]);
+
+  // --- PAGINATION LOGIC ---
+  const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentProducts = sortedProducts.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
+  );
+
+  // Scroll to top on page change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
+  // --- HANDLERS ---
   const showToast = (message: string, type: "add" | "remove") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
@@ -71,8 +114,15 @@ export default function ShopPage() {
     );
   };
 
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-800">
+      {/* Background Header */}
       <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-linear-to-b from-amber-50/50 via-teal-50/30 to-white z-10 mix-blend-multiply" />
         <Image
@@ -86,50 +136,114 @@ export default function ShopPage() {
       </div>
 
       <div className="relative z-10 pt-40">
-        <ShopHeader />
+        <ShopHeader currentPage={currentPage} />
 
         <div className="max-w-7xl mx-auto mt-20 px-4 lg:px-8 pb-32">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-12 px-6 py-3 bg-white rounded-full border border-slate-200 shadow-sm">
+          {/* --- TOOLBAR --- */}
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-12 px-6 py-3 bg-white rounded-full border border-slate-200 shadow-sm relative z-30">
             <p className="text-sm font-semibold text-slate-500 pl-2">
-              Showing 1-16 Of {products.length} Results
+              Showing {startIndex + 1}–
+              {Math.min(startIndex + ITEMS_PER_PAGE, sortedProducts.length)} Of{" "}
+              {sortedProducts.length} Results
             </p>
-            <div className="flex items-center gap-2 pr-2">
-              <span className="text-sm font-medium text-slate-500">
-                Sort By:
-              </span>
-              <div className="relative group">
-                <button className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-purple-600 transition-colors">
-                  Default Sorting <ChevronDown size={14} />
-                </button>
-              </div>
+
+            <div className="relative">
+              <button
+                onClick={() => setIsSortOpen(!isSortOpen)}
+                className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-purple-600 transition-colors px-4 py-2"
+              >
+                {sortBy} <ChevronDown size={14} />
+              </button>
+
+              {/* Dropdown Menu */}
+              {isSortOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-100 rounded-lg shadow-xl overflow-hidden py-1 z-40">
+                  {[
+                    "Default Sorting",
+                    "Sort By Popularity",
+                    "Sort By Average Rating",
+                    "Sort By Latest",
+                    "Sort By Price: Low To High",
+                    "Sort By Price: High To Low",
+                  ].map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => {
+                        setSortBy(option);
+                        setIsSortOpen(false);
+                        setCurrentPage(1); // Reset to page 1 on sort
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-slate-50 hover:text-purple-600 transition-colors ${
+                        sortBy === option
+                          ? "bg-purple-50 text-purple-600"
+                          : "text-slate-600"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
+
+          {/* --- PRODUCT GRID --- */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {products.map((product: any) => (
+            {currentProducts.map((product: any) => (
               <SimpleProductCard
                 key={product.id}
                 product={product}
                 isWishlisted={wishlistItems.some(
                   (item) => item.id === product.id,
                 )}
-                // Check if product is already in cart
                 isInCart={cartItems.some((item: any) => item.id === product.id)}
                 onAddToCart={() => handleAddToCart(product)}
                 onToggleWishlist={() => handleToggleWishlist(product)}
               />
             ))}
           </div>
-          <div className="mt-16 flex justify-center items-center gap-3">
-            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-900 text-white font-bold shadow-md hover:bg-blue-800 transition-all">
-              1
-            </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold hover:bg-purple-100 hover:text-purple-600 transition-all">
-              2
-            </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold hover:bg-purple-100 hover:text-purple-600 transition-all">
-              <ChevronRight size={18} />
-            </button>
-          </div>
+
+          {/* --- PAGINATION CONTROLS --- */}
+          {totalPages > 1 && (
+            <div className="mt-16 flex justify-center items-center gap-3">
+              {/* Previous Button (Optional, but good UX) */}
+              {currentPage > 1 && (
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold hover:bg-purple-100 hover:text-purple-600 transition-all rotate-180"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              )}
+
+              {/* Page Numbers */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`w-10 h-10 flex items-center justify-center rounded-full font-bold transition-all shadow-md ${
+                      currentPage === page
+                        ? "bg-blue-900 text-white hover:bg-blue-800"
+                        : "bg-slate-100 text-slate-500 hover:bg-purple-100 hover:text-purple-600"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
+
+              {/* Next Button */}
+              {currentPage < totalPages && (
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold hover:bg-purple-100 hover:text-purple-600 transition-all"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -143,7 +257,7 @@ export default function ShopPage() {
   );
 }
 
-function ShopHeader() {
+function ShopHeader({ currentPage }: { currentPage: number }) {
   return (
     <div className="w-full pb-10 flex flex-col items-center justify-center">
       <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4">
@@ -152,13 +266,24 @@ function ShopHeader() {
       <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10"></div>
       <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
         <Link href="/" className="hover:text-purple-600 transition-colors">
-          {pageConfig.breadcrumbs.home}
+          Home
         </Link>
         <div className="flex text-purple-400">
           <ChevronRight size={14} strokeWidth={2.5} />
           <ChevronRight size={14} className="-ml-2" strokeWidth={2.5} />
         </div>
-        <span className="text-slate-900">{pageConfig.breadcrumbs.current}</span>
+        <Link href="/shop" className="hover:text-purple-600 transition-colors">
+          Shop
+        </Link>
+        {currentPage > 1 && (
+          <>
+            <div className="flex text-purple-400">
+              <ChevronRight size={14} strokeWidth={2.5} />
+              <ChevronRight size={14} className="-ml-2" strokeWidth={2.5} />
+            </div>
+            <span className="text-slate-900">Page {currentPage}</span>
+          </>
+        )}
       </div>
     </div>
   );
@@ -180,7 +305,6 @@ function SimpleProductCard({ product, onAddToCart, isInCart }: any) {
         {/* --- HOVER OVERLAY BUTTONS --- */}
         <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/5">
           {isInCart ? (
-            // State: Item is in Cart (Show two buttons)
             <>
               <button
                 onClick={onAddToCart}
@@ -198,7 +322,6 @@ function SimpleProductCard({ product, onAddToCart, isInCart }: any) {
               </Link>
             </>
           ) : (
-            // State: Default (Show single button)
             <button
               onClick={onAddToCart}
               className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-sm font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
@@ -223,11 +346,6 @@ function SimpleProductCard({ product, onAddToCart, isInCart }: any) {
               ${product.oldPrice}
             </span>
           )}
-        </div>
-        <div className="flex justify-center gap-1 mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-          <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-          <div className="w-2 h-2 rounded-full bg-teal-400"></div>
         </div>
       </div>
     </div>
