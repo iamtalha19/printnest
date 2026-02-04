@@ -2,52 +2,448 @@
 
 [![Next.js](https://img.shields.io/badge/Next.js-v16.1.6-black)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React-19.2.3-blue)](https://reactjs.org)
+[![Redux](https://img.shields.io/badge/Redux%20Toolkit-purple)](https://redux-toolkit.js.org)
+[![Tailwind](https://img.shields.io/badge/Tailwind%20CSS-cyan)](https://tailwindcss.com)
+[![Framer Motion](https://img.shields.io/badge/Framer%20Motion-orange)](https://www.framer.com/motion/)
 
-> A modern, responsive Next.js storefront demo focused on custom printing and on-demand merchandise (T-shirts, hoodies, business cards, packaging and more).
+> A modern, fully-featured Next.js print-on-demand store with dynamic routing, API-driven content, cart management, and smooth animations.
 
 ---
 
-Table of Contents
+## 📋 Table of Contents
 
 - [Overview](#overview)
 - [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Getting Started (Local)](#getting-started-local)
-- [Environment Variables](#environment-variables)
+- [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
-- [Core Concepts & Components](#core-concepts--components)
-- [API & Orders](#api--orders)
+- [Getting Started](#getting-started)
+- [API Endpoints](#api-endpoints)
+- [Dynamic Routes](#dynamic-routes)
+- [Redux Store](#redux-store)
 - [Styling & Animations](#styling--animations)
-- [Testing & Linting](#testing--linting)
 - [Deployment](#deployment)
-- [Contributing](#contributing)
-- [Troubleshooting / FAQ](#troubleshooting--faq)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
-## Overview
+## 🎯 Overview
 
-Printnest is a demo Next.js storefront showcasing a modern UI for ordering printed products. It demonstrates common e-commerce patterns: product listings, cart/wishlist interactions, a checkout flow (server-side order handling), and UI polish using Tailwind CSS and Framer Motion.
+Printnest is a full-featured e-commerce store for print-on-demand products. It showcases modern Next.js patterns including:
 
-The project is ideal as a starter template or a reference for building a lightweight e-commerce frontend with serverless-ish order handling.
-
----
-
-## Features
-
-- 🏷️ Product listing with product cards and quick-view modal
-- 🛒 Cart with add/remove and quantity logic (Redux Toolkit)
-- 💖 Wishlist (toggle) using Redux Toolkit
-- ✉️ Server-side order handling via `/api/place-order` which saves to `orders.json` and sends email confirmations (nodemailer)
-- 💨 Smooth animations via Framer Motion
-- 🎨 Fully responsive layout with Tailwind CSS
-- 🔍 Search input, account, and helpful UI components (Navbar, Hero, Footer)
+- **Dynamic Routing** with `[slug]` parameters for categories, blog posts, and products
+- **API-driven Content** fetched from centralized JSON data
+- **State Management** using Redux Toolkit for cart and wishlist
+- **Smooth Animations** with Framer Motion and CSS transitions
+- **Responsive Design** with Tailwind CSS
+- **Server-side Order Handling** with order persistence and email notifications
 
 ---
 
-## Prerequisites
+## ✨ Features
 
-- Node.js 18+ (recommended)
+### Core E-Commerce
+
+- 🏷️ **Product Listings** with quick-view modal and comparison drawer
+- 🛒 **Shopping Cart** with quantity adjustment and item removal
+- 💖 **Wishlist** with persistent storage via Redux
+- 📦 **Multiple Categories** - T-shirts, Business Cards, Hoodies, Packaging
+- 🔍 **Blog Section** with individual post pages
+- 📱 **Fully Responsive** across all device sizes
+
+### User Experience
+
+- ✅ **Smooth Animations** using Framer Motion variants
+- 🎨 **Modern UI** with Tailwind CSS and gradient effects
+- 🔔 **Toast Notifications** for cart/wishlist actions
+- 📍 **Breadcrumb Navigation** for easy orientation
+- ⚡ **Fast Load Times** with Next.js optimization
+
+### Technical Features
+
+- 🔄 **Dynamic Slug-based Routing** for SEO-friendly URLs
+- 📡 **RESTful API Endpoints** for all data sections
+- 💾 **Redux Toolkit** for centralized state management
+- 🎯 **TypeScript Support** with proper interfaces
+- 📊 **Order Management** with order persistence and tracking
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer                  | Technologies     |
+| ---------------------- | ---------------- |
+| **Frontend Framework** | Next.js 16.1.6   |
+| **UI Library**         | React 19.2.3     |
+| **Styling**            | Tailwind CSS 3.x |
+| **Animations**         | Framer Motion    |
+| **State Management**   | Redux Toolkit    |
+| **Form Handling**      | HTML5 Forms      |
+| **Icons**              | Lucide React     |
+| **Database**           | JSON (in-memory) |
+| **Type Safety**        | TypeScript       |
+
+---
+
+## 📁 Project Structure
+
+```
+printnest/
+├── src/app/
+│   ├── api/                           # API Routes
+│   │   ├── about/route.ts
+│   │   ├── blog/route.ts
+│   │   ├── categories/route.ts
+│   │   ├── products/route.ts
+│   │   ├── place-order/route.ts
+│   │   └── [other sections]/
+│   │
+│   ├── components/                    # Reusable Components
+│   │   ├── About.tsx
+│   │   ├── Blog.tsx
+│   │   ├── Categories.tsx
+│   │   ├── Products.tsx
+│   │   ├── Navbar.tsx
+│   │   ├── Footer.tsx
+│   │   ├── products/
+│   │   │   ├── ProductCard.tsx
+│   │   │   ├── QuickViewModal.tsx
+│   │   │   ├── CompareDrawer.tsx
+│   │   │   └── Toast.tsx
+│   │   └── [other components]/
+│   │
+│   ├── pages/                         # Dynamic Pages
+│   │   ├── cart/page.tsx
+│   │   ├── checkout/page.tsx
+│   │   ├── category/[slug]/page.tsx
+│   │   ├── blog/[slug]/page.tsx
+│   │   ├── product/[slug]/page.tsx
+│   │   └── [other pages]/
+│   │
+│   ├── redux/                         # Redux Store
+│   │   ├── Store.ts
+│   │   ├── CartSlice.tsx
+│   │   ├── WishListSlice.tsx
+│   │   └── Provider.tsx
+│   │
+│   ├── utils/                         # Helper Functions
+│   │   ├── animations.ts              # Framer Motion variants
+│   │   └── helpers.ts                 # Utility functions
+│   │
+│   ├── data/                          # Static Data & Endpoints
+│   │   └── [various data files]
+│   │
+│   ├── db.json                        # Central Data Source
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
+│
+├── public/                            # Static Assets
+├── package.json
+├── tsconfig.json
+├── tailwind.config.ts
+├── next.config.ts
+└── README.md
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18.0 or higher
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd printnest
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Run development server**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Open in browser**
+   ```
+   http://localhost:3000
+   ```
+
+### Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+---
+
+## 📡 API Endpoints
+
+All endpoints serve JSON data from `src/app/db.json`:
+
+| Endpoint            | Data Section              |
+| ------------------- | ------------------------- |
+| `/api/about`        | About company information |
+| `/api/blog`         | Blog posts and articles   |
+| `/api/cart`         | Cart page content         |
+| `/api/categories`   | Product categories        |
+| `/api/checkout`     | Checkout form data        |
+| `/api/footer`       | Footer links and info     |
+| `/api/hero`         | Hero banner content       |
+| `/api/howitworks`   | How-it-works section      |
+| `/api/navbar`       | Navigation menu           |
+| `/api/packaging`    | Packaging information     |
+| `/api/price`        | Pricing plans             |
+| `/api/products`     | Product catalog           |
+| `/api/social`       | Social media links        |
+| `/api/testimonials` | Customer testimonials     |
+| `/api/whyus`        | Why choose us section     |
+| `/api/place-order`  | Order submission (POST)   |
+
+### Example API Usage
+
+```typescript
+// Fetch categories
+const response = await fetch("/api/categories");
+const data = await response.json();
+console.log(data.categories);
+```
+
+---
+
+## 🔗 Dynamic Routes
+
+### Categories
+
+- **Route**: `/category/[slug]`
+- **Example**: `/category/t-shirts`
+- **Source**: Categories data from `/api/categories`
+
+### Blog Posts
+
+- **Route**: `/blog/[slug]`
+- **Example**: `/blog/how-to-choose-the-right-material-for-your-prints`
+- **Source**: Posts from `/api/blog`
+
+### Products
+
+- **Route**: `/product/[slug]`
+- **Example**: `/product/print-mug`
+- **Source**: Products from `/api/products`
+
+**Slug Format**: Title is converted to lowercase with spaces replaced by hyphens.
+
+```typescript
+// Example conversion
+"T-shirts" → "t-shirts"
+"Print Mug" → "print-mug"
+```
+
+---
+
+## 🏪 Redux Store
+
+### CartSlice
+
+Manages shopping cart state with Redux Toolkit:
+
+```typescript
+// Actions
+- addToCart(item)          // Add item or increase quantity
+- removeFromCart(itemId)   // Decrease quantity by 1
+- deleteItem(itemId)       // Remove entire item from cart
+- initializeCart(state)    // Initialize from localStorage
+
+// State
+{
+  cartItems: CartItem[]
+  totalQuantity: number
+  totalAmount: number
+}
+```
+
+### WishListSlice
+
+Manages wishlist state:
+
+```typescript
+// Actions
+- toggleWishlist(item)     // Add or remove from wishlist
+
+// State
+{
+  items: WishlistItem[]
+}
+```
+
+---
+
+## 🎨 Styling & Animations
+
+### Tailwind CSS
+
+The project uses Tailwind CSS for responsive design and consistent styling:
+
+- Utility-first CSS framework
+- Mobile-first responsive design
+- Custom gradients and colors
+- Rounded borders and shadows
+
+### Framer Motion
+
+Smooth animations on page elements:
+
+**Key Animation Variants:**
+
+- `fadeUp` - Fade in with upward movement
+- `slideInLeft` / `slideInRight` - Slide animations from sides
+- `staggerContainer` / `staggerItem` - Staggered list animations
+- `scaleIn` - Scale zoom effect
+- `rotateIn` - Rotation effect
+
+**Example:**
+
+```tsx
+<motion.div initial="hidden" whileInView="visible" variants={fadeUp}>
+  Content here
+</motion.div>
+```
+
+---
+
+## 📦 Cart Features
+
+### Add to Cart
+
+- Click product "Add to cart" button
+- Toast notification confirms action
+- Item added to Redux store
+- Persisted in localStorage
+
+### Manage Cart
+
+- **Increase Quantity**: Click `+` button
+- **Decrease Quantity**: Click `-` button
+- **Delete Item**: Click red `×` button (top corner) or "Remove item" text
+- **View Totals**: Automatic calculation of subtotals and totals
+
+---
+
+## 🎯 Key Components
+
+### Categories Component
+
+- Fetches from `/api/categories`
+- Dynamic slug-based links
+- Responsive grid layout
+
+### Blog Component
+
+- Lists blog posts with metadata
+- Links to individual post pages
+- Author info and read time
+
+### Products Component
+
+- Horizontal scrolling carousel
+- Quick view modal
+- Compare drawer
+- Wishlist toggle
+- Add to cart functionality
+
+### Cart Page
+
+- Item display with images
+- Quantity adjustment
+- Delete buttons (corner + text)
+- Order summary
+- Checkout button
+
+---
+
+## 🌐 Deployment
+
+### Deploy to Vercel
+
+```bash
+npm install -g vercel
+vercel
+```
+
+### Deploy to Other Platforms
+
+The project works on any Node.js hosting:
+
+- Netlify
+- Railway
+- Heroku
+- AWS Amplify
+- DigitalOcean
+
+---
+
+## 🔧 Troubleshooting
+
+### Q: Items not persisting in cart?
+
+**A:** Make sure localStorage is enabled in your browser. The cart state is auto-saved.
+
+### Q: Dynamic routes not working?
+
+**A:** Ensure the `[slug]` directory structure matches exactly: `/app/category/[slug]/page.tsx`
+
+### Q: API endpoints returning errors?
+
+**A:** Verify `src/app/db.json` exists and contains valid JSON data for the requested section.
+
+### Q: Animations not smooth?
+
+**A:** Make sure Framer Motion is installed: `npm install framer-motion`
+
+---
+
+## 📝 License
+
+This project is open source and available under the MIT License.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+---
+
+## 📞 Support
+
+For issues, questions, or suggestions:
+
+- Open an issue on GitHub
+- Check existing documentation
+- Review code comments for implementation details
+
+---
+
+**Happy printing!** 🖨️✨
+
 - npm (or yarn/pnpm)
 
 Check Node version:
