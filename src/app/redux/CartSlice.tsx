@@ -1,3 +1,4 @@
+"use client";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface CartItem {
@@ -25,6 +26,11 @@ export const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+    initializeCart: (state, action: PayloadAction<CartState>) => {
+      state.cartItems = action.payload.cartItems;
+      state.totalQuantity = action.payload.totalQuantity;
+      state.totalAmount = action.payload.totalAmount;
+    },
     addToCart: (
       state,
       action: PayloadAction<
@@ -53,6 +59,10 @@ export const cartSlice = createSlice({
         existingItem.quantity += quantityToAdd;
         existingItem.totalPrice += newItem.price * quantityToAdd;
       }
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("cartState", JSON.stringify(state));
+      }
     },
 
     removeFromCart: (state, action: PayloadAction<number | string>) => {
@@ -70,6 +80,10 @@ export const cartSlice = createSlice({
           existingItem.totalPrice -= existingItem.price;
         }
       }
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("cartState", JSON.stringify(state));
+      }
     },
 
     deleteItem: (state, action: PayloadAction<number | string>) => {
@@ -80,9 +94,14 @@ export const cartSlice = createSlice({
         state.totalAmount -= existingItem.totalPrice;
         state.cartItems = state.cartItems.filter((item) => item.id !== id);
       }
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("cartState", JSON.stringify(state));
+      }
     },
   },
 });
 
-export const { addToCart, removeFromCart, deleteItem } = cartSlice.actions;
+export const { addToCart, removeFromCart, deleteItem, initializeCart } =
+  cartSlice.actions;
 export default cartSlice.reducer;
