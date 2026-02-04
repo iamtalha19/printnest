@@ -1,114 +1,163 @@
+"use client";
 import Image from "next/image";
 import db from "@/app/db.json";
-const aboutData = db.about;
-// Import Lucide icons
-import { Check, ArrowRight } from "lucide-react";
+import { Check } from "lucide-react";
+import { motion } from "framer-motion";
+
+const BlindsImage = ({
+  src,
+  alt,
+  className,
+  delay = 0,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  imageClassName?: string;
+  delay?: number;
+}) => {
+  const bars = [0, 1, 2, 3, 4];
+  return (
+    <div className={`relative overflow-hidden shadow-2xl ${className}`}>
+      <Image src={src} alt={alt} fill priority />
+      <div className="absolute inset-0 flex flex-col z-10">
+        {bars.map((_, i) => (
+          <motion.div
+            key={i}
+            className="flex-1 w-full bg-gray-200 border-b border-white/50"
+            initial={{ opacity: 1, scaleY: 1 }}
+            whileInView={{ opacity: 0, scaleY: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{
+              duration: 0.2,
+              delay: delay + i * 0.15,
+              ease: "linear",
+            }}
+            style={{ originY: 0 }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const RevealText = ({
+  children,
+  className = "",
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+}) => {
+  return (
+    <div className={`overflow-hidden relative ${className}`}>
+      <motion.div
+        initial={{ y: "100%" }}
+        whileInView={{ y: 0 }}
+        viewport={{ once: true }}
+        transition={{
+          duration: 0.8,
+          delay: delay,
+          ease: [0.16, 1, 0.3, 1],
+        }}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+};
 
 export default function About() {
+  const aboutData = db.about;
+
   return (
     <section
       id="about"
-      className="scroll-mt-24 py-20 lg:py-28 bg-white overflow-hidden"
+      className="scroll-mt-24 py-20 lg:py-28 bg-[#F6F9FF] overflow-hidden"
     >
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          <div className="relative">
-            <div className="absolute -bottom-10 -left-10 z-0 opacity-40">
-              <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
-                <pattern
-                  id="dots"
-                  x="0"
-                  y="0"
-                  width="20"
-                  height="20"
-                  patternUnits="userSpaceOnUse"
-                >
-                  <circle
-                    cx="2"
-                    cy="2"
-                    r="2"
-                    className="text-blue-200"
-                    fill="currentColor"
-                  />
-                </pattern>
-                <rect width="100" height="100" fill="url(#dots)" />
-              </svg>
+          <div className="relative flex gap-8 lg:gap-10 items-start">
+            <div className="w-[55%] relative z-10">
+              <BlindsImage
+                src={aboutData.mainImage}
+                alt="Main Feature"
+                className="w-full h-155 object-cover rounded-t-full rounded-bl-full shadow-lg"
+                delay={0}
+              />
             </div>
-
-            <div className="flex items-center gap-6 relative z-10">
-              <div className="w-[55%] relative">
-                <div className="relative h-120 w-full rounded-t-[10rem] rounded-b-4xl overflow-hidden shadow-2xl">
-                  <Image
-                    src={aboutData.mainImage}
-                    alt="Main Feature"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+            <div className="w-[45%] flex flex-col gap-6 lg:gap-8 z-10">
+              <div className="w-full aspect-square">
+                <BlindsImage
+                  src={aboutData.secondaryImages[0]}
+                  alt="Detail 1"
+                  className="w-full h-80 object-cover rounded-t-full rounded-br-full shadow-lg"
+                  delay={0.3}
+                />
               </div>
-              <div className="w-[45%] flex flex-col gap-6">
-                <div className="relative h-40 w-full rounded-[3rem] overflow-hidden shadow-xl border-4 border-white">
-                  <Image
-                    src={aboutData.secondaryImages[0]}
-                    alt="Detail 1"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="relative h-64 w-full rounded-t-[8rem] rounded-b-4xl overflow-hidden shadow-xl border-4 border-white bg-orange-100">
-                  <Image
-                    src={aboutData.secondaryImages[1]}
-                    alt="Detail 2"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+              <div className="w-full aspect-square">
+                <BlindsImage
+                  src={aboutData.secondaryImages[1]}
+                  alt="Detail 2"
+                  className="w-full h-80 object-cover rounded-t-full rounded-bl-full shadow-lg"
+                  delay={0.6}
+                />
               </div>
             </div>
           </div>
           <div>
             <div className="mb-10">
-              <p className="text-sm font-bold text-blue-600 uppercase tracking-widest mb-4">
-                {aboutData.sectionLabel}
-              </p>
-              <h2 className="text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-6">
-                {aboutData.headingFirst}{" "}
-                <span className="text-[#FF7F7F] underline decoration-4 underline-offset-4 decoration-[#FF7F7F]/30">
-                  {aboutData.headingHighlight}
-                </span>
-              </h2>
-              <p className="text-lg text-slate-600 leading-relaxed">
-                {aboutData.description}
-              </p>
+              <RevealText className="mb-4" delay={0.2}>
+                <p className="text-sm font-medium text-blue-900 uppercase tracking-widest">
+                  {aboutData.sectionLabel}
+                </p>
+              </RevealText>
+              <RevealText className="mb-6" delay={0.4}>
+                <h2 className="text-4xl lg:text-5xl font-medium text-black leading-tight">
+                  {aboutData.headingFirst}{" "}
+                  <span className="text-[#FF7F7F] underline decoration-4 underline-offset-4 decoration-[#FF7F7F]">
+                    {aboutData.headingHighlight}
+                  </span>
+                </h2>
+              </RevealText>
+              <RevealText delay={0.6}>
+                <p className="text-lg text-slate-600 leading-relaxed">
+                  {aboutData.description}
+                </p>
+              </RevealText>
             </div>
 
             <div className="space-y-8 mb-10">
               {aboutData.features.map((item, idx) => (
-                <div key={idx} className="flex group">
-                  <div className="shrink-0 mr-6">
-                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md group-hover:bg-slate-900 transition-colors duration-300">
-                      <Check size={24} strokeWidth={3} />
+                <RevealText key={idx} delay={0.8 + idx * 0.2}>
+                  <div className="flex group">
+                    <div className="shrink-0 mr-6">
+                      <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md group-hover:bg-slate-900 transition-colors duration-300">
+                        <Check size={24} strokeWidth={3} />
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold text-slate-900 mb-2">
+                        {item.title}
+                      </h4>
+                      <p className="text-slate-500 leading-relaxed text-sm lg:text-base">
+                        {item.desc}
+                      </p>
                     </div>
                   </div>
-                  <div>
-                    <h4 className="text-xl font-bold text-slate-900 mb-2">
-                      {item.title}
-                    </h4>
-                    <p className="text-slate-500 leading-relaxed text-sm lg:text-base">
-                      {item.desc}
-                    </p>
-                  </div>
-                </div>
+                </RevealText>
               ))}
             </div>
-
-            <button className="group flex items-center gap-3 px-10 py-4 text-white font-bold rounded-full bg-linear-to-r from-blue-500 to-cyan-400 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
+            <motion.button
+              className="group flex items-center gap-3 mb-15 px-10 py-4 rounded-full cursor-pointer text-lg font-bold text-white transition-all duration-200 ease-in-out bg-linear-to-r from-blue-600 to-cyan-500 shadow-[5px_5px_0px_0px_rgba(167,139,250,1)] hover:shadow-none hover:translate-x-0.75 hover:translate-y-0.75"
+              initial={{ scale: 0.8, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 1.4, type: "spring" }}
+            >
               See Our Products
-              <ArrowRight
-                size={20}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>

@@ -21,7 +21,7 @@ export default function CompareDrawer({
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[60] bg-white animate-in slide-in-from-bottom duration-300 flex flex-col">
+    <div className="fixed inset-0 z-60 bg-white animate-in slide-in-from-bottom duration-300 flex flex-col">
       <div className="h-16 border-b border-slate-200 flex items-center justify-between px-6 lg:px-12 bg-white">
         <div className="flex items-center gap-2 text-slate-800 font-bold tracking-widest text-sm uppercase">
           <Settings size={18} />
@@ -52,9 +52,9 @@ export default function CompareDrawer({
           <X size={24} className="text-slate-500" />
         </button>
       </div>
-      <div className="flex-grow overflow-y-auto bg-[#FAFAFA] p-4 lg:p-12">
+      <div className="grow overflow-y-auto bg-[#FAFAFA] p-4 lg:p-12">
         <div className="max-w-7xl mx-auto bg-white shadow-sm border border-slate-100 rounded-xl overflow-hidden">
-          <div className="grid grid-cols-4 border-b border-slate-100 min-h-[200px]">
+          <div className="grid grid-cols-4 border-b border-slate-100 min-h-50">
             <div className="col-span-1 p-6 flex items-center text-slate-500 font-medium">
               Image
             </div>
@@ -80,7 +80,7 @@ export default function CompareDrawer({
               ></div>
             ))}
           </div>
-          <div className="grid grid-cols-4 border-b border-slate-100 min-h-[80px]">
+          <div className="grid grid-cols-4 border-b border-slate-100 min-h-20">
             <div className="col-span-1 p-6 flex items-center text-slate-500 font-medium">
               Price
             </div>
@@ -99,7 +99,7 @@ export default function CompareDrawer({
               ></div>
             ))}
           </div>
-          <div className="grid grid-cols-4 border-b border-slate-100 min-h-[100px]">
+          <div className="grid grid-cols-4 border-b border-slate-100 min-h-25">
             <div className="col-span-1 p-6 flex items-center text-slate-500 font-medium">
               Add to cart
             </div>
@@ -123,7 +123,7 @@ export default function CompareDrawer({
               ></div>
             ))}
           </div>
-          <div className="grid grid-cols-4 min-h-[150px]">
+          <div className="grid grid-cols-4 min-h-37.5">
             <div className="col-span-1 p-6 text-slate-500 font-medium">
               Description
             </div>

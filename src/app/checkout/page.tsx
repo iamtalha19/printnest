@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
-import { RootState } from "@/app/redux/Store";
+
 import {
   ChevronRight,
   ChevronDown,
@@ -32,9 +32,10 @@ interface CheckoutData {
 export default function CheckoutPage() {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
-  const { cartItems } = useSelector((state: RootState) => state.cart);
+  const { cartItems } = useSelector((state: any) => state.cart);
+
   const subtotal = cartItems.reduce(
-    (acc, item) => acc + item.price * (item.quantity || 1),
+    (acc: number, item: any) => acc + item.price * (item.quantity || 1),
     0,
   );
 
@@ -95,69 +96,83 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-800 pt-50 pb-20">
-      <CheckoutHeader />
+    <div className="relative min-h-screen bg-white font-sans text-slate-800">
+      <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
+        <Image
+          src={checkoutConfig.backgroundImage}
+          alt="Hero Background"
+          fill
+          className="object-fill opacity-100"
+          priority
+        />
+        <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent" />
+      </div>
 
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit}
-        className="max-w-7xl mx-auto px-4 lg:px-8"
-      >
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
-          <div className="lg:col-span-7 space-y-10">
-            <ContactSection email={formData.email} update={updateData} />
+      <div className="relative z-10 pt-40">
+        <CheckoutHeader />
 
-            <BillingSection data={formData} update={updateData} />
+        <div className="max-w-7xl mx-auto mt-30 px-4 lg:px-8 pb-32">
+          <form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start"
+          >
+            <div className="lg:col-span-7 space-y-10">
+              <ContactSection email={formData.email} update={updateData} />
 
-            <PaymentSection
-              selectedMethod={formData.paymentMethod}
-              update={updateData}
-            />
-            <div className="pt-6 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
-              <Link
-                href="/cart"
-                className="flex items-center gap-2 text-slate-600 font-bold hover:text-slate-900 transition-colors"
-              >
-                <ChevronLeft size={16} /> Return to Cart
-              </Link>
-              <button
-                type="submit"
-                className="w-full sm:w-auto px-10 py-4 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white font-bold text-lg shadow-lg shadow-purple-200 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer"
-              >
-                Place Order
-              </button>
+              <BillingSection data={formData} update={updateData} />
+
+              <PaymentSection
+                selectedMethod={formData.paymentMethod}
+                update={updateData}
+              />
+
+              <div className="pt-6 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
+                <Link
+                  href="/cart"
+                  className="flex items-center gap-2 text-slate-600 font-bold hover:text-slate-900 transition-colors"
+                >
+                  <ChevronLeft size={16} /> Return to Cart
+                </Link>
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto px-10 py-4 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white font-bold text-lg shadow-lg shadow-purple-200 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                >
+                  Place Order
+                </button>
+              </div>
             </div>
-          </div>
-          <div className="lg:col-span-5">
-            <OrderSummary cartItems={cartItems} subtotal={subtotal} />
-          </div>
+            <div className="lg:col-span-5">
+              <OrderSummary cartItems={cartItems} subtotal={subtotal} />
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
 
 function CheckoutHeader() {
   return (
-    <header className="flex flex-col items-center mb-10 pt-16">
-      <div className="text-center">
-        <h1 className="text-5xl font-bold text-slate-900 tracking-tight">
-          Checkout
-        </h1>
-        <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2 rounded-full shadow-sm border border-slate-100 mt-4">
-          <Link href="/" className="hover:text-blue-600 transition-colors">
-            {checkoutConfig.breadcrumbs.home}
-          </Link>
-          <div className="flex text-blue-400">
-            <ChevronRight size={14} strokeWidth={2.5} />
-            <ChevronRight size={14} className="-ml-2" strokeWidth={2.5} />
-          </div>
-          <span className="text-slate-900">
-            {checkoutConfig.breadcrumbs.current}
-          </span>
+    <div className="w-full pb-20 mt-50 flex flex-col items-center justify-center">
+      <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4">
+        Checkout
+      </h1>
+      <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10"></div>
+
+      <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
+        <Link href="/" className="hover:text-blue-600 transition-colors">
+          {checkoutConfig.breadcrumbs.home}
+        </Link>
+        <div className="flex text-blue-400">
+          <ChevronRight size={14} strokeWidth={2.5} />
+          <ChevronRight size={14} className="-ml-2" strokeWidth={2.5} />
         </div>
+        <span className="text-slate-900">
+          {checkoutConfig.breadcrumbs.current}
+        </span>
       </div>
-    </header>
+    </div>
   );
 }
 
@@ -196,7 +211,7 @@ function BillingSection({
   update: (d: Partial<CheckoutData>) => void;
 }) {
   const InputClass =
-    "w-full border border-slate-300 rounded-md px-4 py-3 focus:outline-none focus:border-blue-500";
+    "w-full border border-slate-300 rounded-md px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-700 placeholder:text-slate-400";
   const LabelClass =
     "text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block";
 
@@ -288,7 +303,7 @@ function BillingSection({
               onChange={(e) => update({ province: e.target.value })}
             >
               <option value="">Select...</option>
-              {checkoutConfig.provinces.map((p) => (
+              {checkoutConfig.provinces.map((p: any) => (
                 <option key={p.code} value={p.code}>
                   {p.name}
                 </option>
@@ -408,7 +423,7 @@ function OrderSummary({
   subtotal: number;
 }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-6 lg:p-8 shadow-sm sticky top-24">
+    <div className="bg-white border border-slate-200 rounded-lg p-6 lg:p-8 shadow-sm sticky top-40">
       <h3 className="text-lg font-bold text-slate-700 mb-6">Order summary</h3>
       <div className="space-y-6 mb-6">
         {cartItems.map((item) => (

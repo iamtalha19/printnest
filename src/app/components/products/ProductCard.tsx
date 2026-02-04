@@ -9,7 +9,7 @@ export default function ProductCard({
   onAddToCart,
 }: any) {
   return (
-    <div className="relative min-w-70 md:min-w-[300px] bg-white hover:bg-[#F9FAFF] border border-slate-100 rounded-4xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 snap-center group overflow-hidden">
+    <div className="relative min-w-70 md:min-w-75 bg-white hover:bg-[#F9FAFF] border border-slate-100 rounded-4xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 snap-center group overflow-hidden">
       <div className="absolute top-4 right-4 z-20 flex flex-col gap-3 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out delay-75">
         <button
           onClick={(e) => {

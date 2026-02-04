@@ -7,7 +7,7 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: any) {
   if (!product) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white w-full max-w-4xl rounded-[2rem] overflow-hidden shadow-2xl flex flex-col lg:flex-row relative animate-in zoom-in-95 duration-200">
+      <div className="bg-white w-full max-w-4xl rounded-4xl overflow-hidden shadow-2xl flex flex-col lg:flex-row relative animate-in zoom-in-95 duration-200">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 z-50 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"

@@ -1,6 +1,12 @@
 import db from "@/app/db.json";
 const howItWorksData = db.howitworks;
-import { Play, MousePointer2, PencilLine, Printer, HelpCircle } from "lucide-react";
+import {
+  Play,
+  MousePointer2,
+  PencilLine,
+  Printer,
+  HelpCircle,
+} from "lucide-react";
 
 export default function HowItWorks() {
   const {

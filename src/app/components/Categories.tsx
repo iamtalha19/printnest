@@ -1,5 +1,6 @@
 import Image from "next/image";
 import db from "@/app/db.json";
+
 const categoriesData = db.categories;
 export default function Categories() {
   return (
@@ -7,26 +8,24 @@ export default function Categories() {
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col lg:flex-row justify-between items-end mb-16 gap-8">
           <div className="max-w-2xl">
-            <p className="text-sm font-bold text-blue-600 uppercase tracking-widest mb-4">
+            <p className="text-sm font-medium text-blue-900 uppercase tracking-widest mb-4">
               {categoriesData.sectionLabel}
             </p>
-            <h2 className="text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight">
+            <h2 className="text-4xl lg:text-5xl font-medium text-black leading-tight">
               {categoriesData.headingMain} <br />
               <span className="relative inline-block text-[#FF7F7F]">
                 {categoriesData.headingHighlight}
-
-                <span className="absolute left-0 bottom-1 w-full h-1 bg-[#FF7F7F]/30 rounded-full"></span>
+                <span className="absolute left-0 bottom-1 w-full h-1 bg-[#FF7F7F] rounded-full"></span>
               </span>
             </h2>
           </div>
-
-          <div className="max-w-md text-left lg:text-right flex flex-col items-start lg:items-end gap-6">
-            <p className="text-slate-600 text-lg leading-relaxed">
+          <div className="max-w-md flex flex-col items-start lg:items-end gap-6">
+            <p className="text-black text-base leading-relaxed ml-20">
               {categoriesData.description}
             </p>
             <a
               href={categoriesData.btnLink}
-              className="inline-block px-8 py-3 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+              className="inline-block px-8 py-3 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 mr-55"
             >
               {categoriesData.btnText}
             </a>

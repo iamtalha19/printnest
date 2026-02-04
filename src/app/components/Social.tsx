@@ -1,8 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import db from "@/app/db.json";
-const socialData = db.social;
+import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 
+const socialData = db.social;
 export default function Social() {
   const { title, logos } = socialData;
 
@@ -21,20 +24,38 @@ export default function Social() {
           </span>
           <div className="grow border-t border-slate-200"></div>
         </div>
-        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 lg:gap-16 group">
+        <div className="flex flex-wrap gap-8 md:gap-12 lg:gap-16">
           {logos.map((brand, index) => (
-            <div
+            <motion.div
               key={index}
-              className="relative w-36 h-10 md:w-44 md:h-14 transition-all duration-300 group-hover:opacity-50 hover:opacity-100! hover:scale-110 cursor-pointer"
+              className="relative w-36 h-10 md:w-44 md:h-14 cursor-pointer"
+              initial={{ opacity: 1, rotate: 0 }}
+              whileHover={{
+                opacity: [0, 1],
+                rotate: [0, -10, 10, 0],
+              }}
+              transition={{
+                opacity: {
+                  duration: 1.5,
+                  ease: "easeOut",
+                },
+                rotate: {
+                  delay: 0.5,
+                  duration: 1.0,
+                  ease: "easeInOut",
+                },
+              }}
             >
-              <Image
-                src={brand.url}
-                alt={`${brand.name} logo`}
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 144px, 176px"
-              />
-            </div>
+              <div className="relative w-full h-full transition-opacity duration-300 group-hover:opacity-50 hover:opacity-100!">
+                <Image
+                  src={brand.url}
+                  alt={`${brand.name} logo`}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 144px, 176px"
+                />
+              </div>
+            </motion.div>
           ))}
         </div>
       </div>

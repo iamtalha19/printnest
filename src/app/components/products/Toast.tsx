@@ -9,7 +9,7 @@ interface ToastProps {
 export default function Toast({ show, message, type, onClose }: ToastProps) {
   return (
     <div
-      className={`fixed bottom-5 right-5 z-[100] transform transition-all duration-500 ease-in-out ${show ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"}`}
+      className={`fixed bottom-5 right-5 z-100 transform transition-all duration-500 ease-in-out ${show ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"}`}
     >
       <div
         className={`flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl border ${type === "add" ? "bg-white border-green-100 text-slate-800" : "bg-white border-red-100 text-slate-800"}`}

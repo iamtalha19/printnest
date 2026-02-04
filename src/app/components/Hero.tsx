@@ -189,7 +189,7 @@ export default function Hero() {
             viewport={{ once: true }}
             variants={slideRight}
           >
-            <div className="bg-white/10 backdrop-blur-lg border border-white/20 text-white rounded-3xl p-8 w-full max-w-65 shadow-2xl relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+            <div className="bg-white/10 backdrop-blur-lg border border-white/20 text-white rounded-3xl p-8 w-full max-w-50 shadow-2xl relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
               <div className="space-y- relative z-10">
                 {content.statsRight.map((stat, index) => (
                   <div key={index}>

@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { addToCart, removeFromCart } from "@/app/redux/CartSlice";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import db from "@/app/db.json";
+
 const cartData = db.cart;
 
 type CartItemType = {
@@ -26,45 +27,59 @@ export default function CartPage() {
   );
 
   return (
-    <div className="min-h-screen pt-50 bg-white font-sans text-slate-800">
-      <CartHeader />
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 pb-32">
-        {cartItems.length === 0 ? (
-          <EmptyCart />
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-            <div className="lg:col-span-8">
-              <div className="flex justify-between border-b border-slate-200 pb-4 mb-8">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                  {cartData.columns.product}
-                </span>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                  {cartData.columns.total}
-                </span>
-              </div>
+    <div className="relative min-h-screen bg-white font-sans text-slate-800">
+      <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
+        <Image
+          src={cartData.backgroundImage}
+          alt="Hero Background"
+          fill
+          className="object-fill opacity-100"
+          priority
+        />
+        <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent" />
+      </div>
 
-              <div className="space-y-12">
-                {cartItems.map((item: CartItemType) => (
-                  <CartItem key={item.id} item={item} />
-                ))}
+      <div className="relative z-10 pt-40">
+        <CartHeader />
+        <div className="max-w-7xl mx-auto mt-30 px-4 lg:px-8 pb-32">
+          {cartItems.length === 0 ? (
+            <EmptyCart />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+              <div className="lg:col-span-8">
+                <div className="flex justify-between border-b border-slate-200 pb-4 mb-8">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    {cartData.columns.product}
+                  </span>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    {cartData.columns.total}
+                  </span>
+                </div>
+                <div className="space-y-12">
+                  {cartItems.map((item: CartItemType) => (
+                    <CartItem key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+              <div className="lg:col-span-4">
+                <CartSummary totalAmount={totalAmount} />
               </div>
             </div>
-            <div className="lg:col-span-4">
-              <CartSummary totalAmount={totalAmount} />
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
 }
+
 function CartHeader() {
   return (
-    <div className="w-full pt-16 pb-20 flex flex-col items-center justify-center space-y-6">
-      <h1 className="text-5xl font-bold text-slate-900 tracking-tight">
+    <div className="w-full pb-20 mt-50 flex flex-col items-center justify-center">
+      <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4">
         {cartData.breadcrumbs.current}
       </h1>
-      <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2 rounded-full shadow-sm border border-slate-100">
+      <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10"></div>
+      <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
         <Link href="/" className="hover:text-blue-600 transition-colors">
           {cartData.breadcrumbs.home}
         </Link>
@@ -101,16 +116,16 @@ function CartItem({ item }: { item: CartItemType }) {
   return (
     <div className="group">
       <div className="flex flex-col sm:flex-row gap-8">
-        <div className="relative w-32 h-40 bg-slate-50 rounded-lg overflow-hidden shrink-0">
+        <div className="relative w-32 h-40 bg-white border border-slate-100 rounded-xl overflow-hidden shrink-0 shadow-sm">
           {item.image ? (
             <Image
               src={item.image}
               alt={item.name}
               fill
-              className="object-contain"
+              className="object-contain p-2"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100">
+            <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-50">
               {cartData.placeholders.noImageText}
             </div>
           )}
@@ -118,10 +133,10 @@ function CartItem({ item }: { item: CartItemType }) {
         <div className="flex-1 flex flex-col">
           <div className="flex justify-between items-start mb-2">
             <div>
-              <h3 className="text-slate-500 text-sm mb-1 font-medium">
+              <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">
                 {cartData.placeholders.category}
               </h3>
-              <p className="font-bold text-slate-900 text-lg mb-2">
+              <p className="font-bold text-slate-900 text-lg mb-1">
                 {item.name}
               </p>
               <span className="text-slate-500 font-medium text-sm block mb-3">
@@ -136,45 +151,44 @@ function CartItem({ item }: { item: CartItemType }) {
           <p className="text-slate-500 text-sm leading-relaxed mb-6 max-w-lg hidden sm:block">
             {cartData.placeholders.description}
           </p>
-          <div className="flex flex-wrap items-center gap-6">
-            <div className="flex items-center border border-slate-300 rounded px-1 py-1 w-32 justify-between">
+          <div className="flex flex-wrap items-center gap-6 mt-auto">
+            <div className="flex items-center border border-slate-300 rounded px-1 py-1 w-28 justify-between bg-white">
               <button
                 onClick={() => dispatch(removeFromCart(item.id))}
-                className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-red-500 font-bold text-lg transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 font-bold text-lg transition-colors"
               >
                 -
               </button>
-              <span className="font-semibold text-slate-700">
+              <span className="font-semibold text-slate-700 text-sm">
                 {item.quantity}
               </span>
               <button
                 onClick={() => dispatch(addToCart({ ...item, quantity: 1 }))}
-                className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-blue-600 font-bold text-lg transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-blue-600 font-bold text-lg transition-colors"
               >
                 +
               </button>
             </div>
             <button
               onClick={() => dispatch(removeFromCart(item.id))}
-              className="text-sm font-bold text-slate-900 underline underline-offset-4 decoration-slate-300 hover:text-red-500 hover:decoration-red-300 transition-all"
+              className="text-xs font-bold text-slate-400 border-b border-slate-300 pb-0.5 hover:text-red-500 hover:border-red-300 transition-all"
             >
               Remove item
             </button>
           </div>
         </div>
-        <div className="hidden sm:block text-right min-w-20">
+        <div className="hidden sm:block text-right min-w-20 pt-1">
           <span className="font-bold text-slate-900 text-lg">${subTotal}</span>
         </div>
       </div>
-      <div className="h-px w-full bg-slate-200 mt-10"></div>
+      <div className="h-px w-full bg-slate-100 mt-10"></div>
     </div>
   );
 }
-
 function CartSummary({ totalAmount }: { totalAmount: number }) {
   return (
     <div className="bg-white pl-0 lg:pl-8">
-      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8">
+      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8 border-b border-slate-200 pb-4">
         {cartData.summary.title}
       </h3>
       <div className="mb-10">
@@ -182,7 +196,7 @@ function CartSummary({ totalAmount }: { totalAmount: number }) {
           {cartData.summary.couponLabel}
         </label>
         <div className="relative border-b border-slate-200 hover:border-slate-400 transition-colors">
-          <select className="w-full appearance-none bg-transparent py-3 pr-8 text-slate-500 focus:outline-none cursor-pointer text-sm">
+          <select className="w-full appearance-none bg-transparent py-3 pr-8 text-slate-500 focus:outline-none cursor-pointer text-sm font-medium">
             <option>{cartData.summary.couponPlaceholder}</option>
             {cartData.summary.coupons.map((coupon) => (
               <option key={coupon.code} value={coupon.code}>
@@ -204,7 +218,6 @@ function CartSummary({ totalAmount }: { totalAmount: number }) {
           ${totalAmount.toFixed(2)}
         </span>
       </div>
-
       <Link
         href={cartData.summary.checkoutUrl}
         className="block w-full text-center py-4 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white font-bold text-lg shadow-lg shadow-purple-200 hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
