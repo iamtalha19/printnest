@@ -117,13 +117,13 @@ export default function ShopPage() {
           src={pageConfig.backgroundImage}
           alt="Shop Background"
           fill
-          className="object-cover opacity-60"
+          className="object-fill opacity-80"
           priority
         />
         <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
       </div>
 
-      <div className="relative z-10 pt-40">
+      <div className="relative z-10 pt-80">
         <ShopHeader currentPage={currentPage} />
 
         <div className="max-w-7xl mx-auto mt-20 px-4 lg:px-8 pb-32">
