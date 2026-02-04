@@ -1,6 +1,5 @@
 # 🖨️ Printnest — Next.js Print Store
 
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-v16.1.6-black)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React-19.2.3-blue)](https://reactjs.org)
 
