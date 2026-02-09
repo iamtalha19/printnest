@@ -1,9 +1,12 @@
+"use client";
+
 import React from "react";
 import db from "@/app/db.json";
-const whyChooseUsData = db.whyus;
 import { Printer, Settings2, Headset, PenTool, HelpCircle } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function WhyChooseUs() {
+  const whyChooseUsData = db.whyus;
   const { header, features } = whyChooseUsData;
 
   return (
@@ -13,16 +16,28 @@ export default function WhyChooseUs() {
     >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <span className="text-blue-500 font-bold tracking-widest text-xs uppercase">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-base text-blue-800 uppercase mb-3"
+          >
             {header.label}
-          </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mt-4">
+          </motion.p>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-2xl lg:text-5xl font-medium text-slate-900 leading-tight"
+          >
             {header.titleMain} <br />
-            <span className="relative inline-block mt-2">
-              <span className="text-red-400">{header.titleHighlight}</span>
-              <span className="absolute -bottom-2 left-0 w-full h-1 bg-red-200 rounded-full"></span>
+            <span className="text-[#FF7F7F] border-b-4 border-[#FF7F7F] pb-1">
+              {header.titleHighlight}
             </span>
-          </h2>
+          </motion.h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
@@ -53,24 +68,53 @@ function resolveIcon(icon: any) {
 
 const FeatureCard = ({ item }: { item: any }) => {
   const Icon = resolveIcon(item.icon);
+  const iconVariants: any = {
+    initial: { opacity: 1, rotate: 0 },
+    hover: {
+      opacity: [0, 1],
+      rotate: [0, -10, 10, 0],
+      transition: {
+        opacity: {
+          duration: 1.5,
+          ease: "easeOut",
+        },
+        rotate: {
+          delay: 0.5,
+          duration: 1.0,
+          ease: "easeInOut",
+        },
+      },
+    },
+  };
 
   return (
-    <div className="relative bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center p-8 text-center transition-transform hover:scale-105 duration-300 h-full overflow-hidden">
+    <motion.div
+      className="relative bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center p-8 text-center h-full overflow-hidden cursor-pointer"
+      initial="initial"
+      whileHover="hover"
+      variants={{
+        initial: { scale: 1 },
+        hover: { scale: 1.05 },
+      }}
+      transition={{ duration: 0.3 }}
+    >
       <div
-        className={`w-full h-24 absolute top-0 left-0 rounded-t-2xl opacity-20 ${item.theme.accent}`}
-        style={{ clipPath: "ellipse(70% 50% at 50% 0%)" }}
+        className={`w-full h-24 absolute top-0 left-0 rounded-t-2xl opacity-40 ${item.theme.accent}`}
+        style={{ clipPath: "ellipse(70% 80% at 50% 0%)" }}
       />
-      <div
-        className={`relative z-10 p-4 rounded-full mb-6 ${item.theme.iconBg} text-white shadow-lg`}
+      <motion.div
+        className={`relative z-10 p-4 rounded-full border-6 mb-6 ${item.theme.iconBg} text-white`}
+        variants={iconVariants}
       >
         <Icon size={32} strokeWidth={1.5} />
-      </div>
+      </motion.div>
+
       <h3 className="text-xl font-bold text-gray-800 mb-3 leading-tight">
         {item.title}
       </h3>
       <p className="text-gray-500 leading-relaxed text-sm">
         {item.description}
       </p>
-    </div>
+    </motion.div>
   );
 };

@@ -108,6 +108,11 @@
     }
   },
   "categories": {
+    "backgroundImage": "https://themexriver.com/wp/printnest/wp-content/uploads/2026/01/breadcrumb-bg.webp",
+"breadcrumbs":{
+      "home": "Home",
+      "current": "Products"
+    },
     "sectionLabel": "// TOP CATEGORIES //",
     "headingMain": "Personalize High-Quality",
     "headingHighlight": "Print Categories",
@@ -349,7 +354,7 @@
     }
   },
   "howitworks": {
-    "sectionLabel": "// HOW IT WORKS //",
+    "sectionLabel": "// HOW DOES IT WORKS //",
     "headingMain": "Step-by-Step Process to Bring Your",
     "headingHighlight": "Custom Ideas to Life",
     "assets": {
@@ -531,6 +536,7 @@
     "sectionLabel": "// FEATURED PRODUCTS //",
     "headingMain": "Exceptional Print Items",
     "headingHighlight": "Tailored to You",
+    "description": "High-quality custom prints tailored to match your style and needs",
     "headerBtnText": "See Our Products",
     "headerBtnLink": "/shop",
     "featuredImage": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/p1-man-1.webp",

@@ -7,11 +7,17 @@ export default function PackagingHero() {
 
   return (
     <section className="relative bg-white min-h-screen font-sans">
-      <div className="bg-linear-to-r from-rose-500 via-purple-900 to-indigo-950 pt-16 pb-48 lg:pb-64 px-6">
-        <div className="max-w-7xl mx-auto">
+      <div
+        className="pt-16 pb-48 lg:pb-64 px-6 bg-cover bg-center bg-no-repeat relative"
+        style={{
+          backgroundImage:
+            "url('https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/v1-bg-clr.webp')",
+        }}
+      >
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col lg:flex-row justify-between items-start gap-8">
             <div className="lg:w-1/2">
-              <span className="inline-block text-xs font-semibold tracking-widest text-white/70 uppercase mb-4">
+              <span className="inline-block text-s font-medium text-white uppercase mb-4">
                 {header.label}
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
@@ -33,6 +39,7 @@ export default function PackagingHero() {
           </div>
         </div>
       </div>
+
       <div className="relative px-6 -mt-32 lg:-mt-48 max-w-7xl mx-auto z-10">
         <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-black">
           <div className="relative w-full aspect-video lg:aspect-21/9">

@@ -1,4 +1,3 @@
-import Navbar from "@/app/components/Navbar";
 import Hero from "@/app/components/Hero";
 import Social from "@/app/components/Social";
 import About from "@/app/components/About";
@@ -10,7 +9,6 @@ import Packaging from "@/app/components/Packaging";
 import Price from "@/app/components/Price";
 import Testimonials from "@/app/components/Testimonials";
 import Blog from "@/app/components/Blog";
-import Footer from "@/app/components/Footer";
 
 export default function Home() {
   return (

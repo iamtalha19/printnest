@@ -101,7 +101,7 @@ export default function About() {
                   src={aboutData.secondaryImages[1]}
                   alt="Detail 2"
                   className="w-full h-80 object-cover rounded-t-full rounded-bl-full shadow-lg"
-                  delay={0.6}
+                  delay={0.5}
                 />
               </div>
             </div>

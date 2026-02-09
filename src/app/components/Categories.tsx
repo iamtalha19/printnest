@@ -1,7 +1,53 @@
 "use client";
 
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+
+const BlindsImage = ({
+  src,
+  alt,
+  className = "",
+  imgClassName = "",
+  delay = 0,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  imgClassName?: string;
+  delay?: number;
+}) => {
+  const bars = [0, 1, 2, 3, 4];
+  return (
+    <div className={`relative overflow-hidden h-full w-full ${className}`}>
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        priority
+        className={imgClassName}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      />
+      <div className="absolute inset-0 flex flex-col z-20 pointer-events-none">
+        {bars.map((_, i) => (
+          <motion.div
+            key={i}
+            className="flex-1 w-full bg-slate-200 border-b border-white/50"
+            initial={{ opacity: 1, scaleY: 1 }}
+            whileInView={{ opacity: 0, scaleY: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{
+              duration: 0.2,
+              delay: delay + i * 0.1,
+              ease: "linear",
+            }}
+            style={{ originY: 0 }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 interface Category {
   id: number;
@@ -56,59 +102,88 @@ export default function Categories() {
     return null;
   }
   return (
-    <section className="py-20 lg:py-28 bg-white overflow-hidden">
+    <section className="py-20 lg:py-28 bg-slate-50 overflow-hidden">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col lg:flex-row justify-between items-end mb-16 gap-8">
           <div className="max-w-2xl">
-            <p className="text-sm font-medium text-blue-900 uppercase tracking-widest mb-4">
+            <motion.p
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-sm font-medium text-blue-900 uppercase tracking-widest mb-4"
+            >
               {categoriesData.sectionLabel}
-            </p>
-            <h2 className="text-4xl lg:text-5xl font-medium text-black leading-tight">
+            </motion.p>
+            <motion.h2
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="text-4xl lg:text-5xl font-medium text-black leading-tight"
+            >
               {categoriesData.headingMain} <br />
               <span className="relative inline-block text-[#FF7F7F]">
                 {categoriesData.headingHighlight}
                 <span className="absolute left-0 bottom-1 w-full h-1 bg-[#FF7F7F] rounded-full"></span>
               </span>
-            </h2>
+            </motion.h2>
           </div>
-          <div className="max-w-md flex flex-col items-start lg:items-end gap-6">
-            <p className="text-black text-base leading-relaxed ml-20">
+          <div className="max-w-md flex flex-col items-start gap-6">
+            <motion.p
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="text-black text-xl font-light"
+            >
               {categoriesData.description}
-            </p>
-            <a
+            </motion.p>
+
+            <motion.a
               href={categoriesData.btnLink}
-              className="inline-block px-8 py-3 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 mr-55"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="group flex items-center gap-3 mb-15 px-10 py-4 rounded-full cursor-pointer text-lg font-bold text-white transition-all duration-200 ease-in-out bg-linear-to-r from-blue-600 to-cyan-500 shadow-[5px_5px_0px_0px_rgba(167,139,250,1)] hover:shadow-none hover:translate-x-0.75 hover:translate-y-0.75"
             >
               {categoriesData.btnText}
-            </a>
+            </motion.a>
           </div>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {categoriesData.categories.map((category: Category) => (
-            <a
-              key={category.id}
-              href={`/category/${category.title.toLowerCase().replace(/\s+/g, "-")}`}
-              className="group flex flex-col items-center"
-            >
-              <div className="relative w-full aspect-4/5 rounded-4xl overflow-hidden mb-8 z-0 shadow-sm transition-transform duration-500 group-hover:-translate-y-2">
-                <Image
-                  src={category.image}
-                  alt={category.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+          {categoriesData.categories.map(
+            (category: Category, index: number) => (
+              <a
+                key={category.id}
+                href={`/category/${category.title
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")}`}
+                className="group flex flex-col items-center"
+              >
+                <div className="relative w-full h-100 group-hover:h-110 rounded-4xl overflow-hidden shadow-sm transition-all duration-500 ease-in-out group-hover:shadow-2xl group-hover:shadow-blue-900/20 bg-white">
+                  <BlindsImage
+                    src={category.image}
+                    alt={category.title}
+                    delay={index * 0.15}
+                    className="w-full h-full"
+                    imgClassName="object-cover transition-transform duration-700 ease-out group-hover:scale-125"
+                  />
 
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
-              </div>
-
-              <div className="relative z-10 w-[85%] bg-slate-50/90 backdrop-blur-md py-4 rounded-full shadow-lg border border-white group-hover:border-blue-200 group-hover:ring-2 group-hover:ring-blue-100 transition-all duration-300 text-center">
-                <span className="text-lg font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
-                  {category.title}
-                </span>
-              </div>
-            </a>
-          ))}
+                  <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-300 pointer-events-none"></div>
+                </div>
+                <div className="relative z-10 w-full flex justify-center mt-6 transition-all duration-500 ease-out group-hover:-translate-y-24">
+                  <div className="bg-white/95 backdrop-blur-sm px-8 py-3 w-[80%] text-center rounded-full group-hover:scale-105 transition-all duration-300 hover:bg-linear-to-r from-blue-500 to-cyan-400 text-slate-800 hover:text-white">
+                    <span className="text-lg font-bold px-4 py-2">
+                      {category.title}
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ),
+          )}
         </div>
       </div>
     </section>

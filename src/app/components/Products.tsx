@@ -8,10 +8,56 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/app/redux/CartSlice";
 import { toggleWishlist } from "@/app/redux/WishListSlice";
 import { RootState } from "@/app/redux/Store";
+import { motion } from "framer-motion";
 import Toast from "@/app/components/products/Toast";
 import ProductCard from "@/app/components/products/ProductCard";
 import QuickViewModal from "@/app/components/products/QuickViewModal";
 import CompareDrawer from "@/app/components/products/CompareDrawer";
+
+const BlindsImage = ({
+  src,
+  alt,
+  className = "",
+  imgClassName = "",
+  delay = 0,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  imgClassName?: string;
+  delay?: number;
+}) => {
+  const bars = [0, 1, 2, 3, 4];
+  return (
+    <div className={`relative overflow-hidden h-full w-full ${className}`}>
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        priority
+        className={imgClassName}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      />
+      <div className="absolute inset-0 flex flex-col z-20 pointer-events-none">
+        {bars.map((_, i) => (
+          <motion.div
+            key={i}
+            className="flex-1 w-full bg-slate-200 border-b border-white/50"
+            initial={{ opacity: 1, scaleY: 1 }}
+            whileInView={{ opacity: 0, scaleY: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{
+              duration: 0.2,
+              delay: delay + i * 0.1,
+              ease: "linear",
+            }}
+            style={{ originY: 0 }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default function FeaturedProducts() {
   const dispatch = useDispatch();
@@ -129,30 +175,59 @@ export default function FeaturedProducts() {
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col lg:flex-row justify-between items-end mb-12 gap-8">
           <div>
-            <p className="text-sm font-bold text-blue-500 uppercase tracking-widest mb-3">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-base text-blue-800 uppercase mb-3"
+            >
               {productsData.sectionLabel}
-            </p>
-            <h2 className="text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight">
+            </motion.p>
+
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-2xl lg:text-5xl font-medium text-slate-900 leading-tight"
+            >
               {productsData.headingMain} <br />
-              <span className="text-[#FF7F7F] border-b-4 border-[#FF7F7F]/30 pb-1">
+              <span className="text-[#FF7F7F] border-b-4 border-[#FF7F7F] pb-1">
                 {productsData.headingHighlight}
               </span>
-            </h2>
+            </motion.h2>
           </div>
-          <a
-            href={productsData.headerBtnLink}
-            className="hidden lg:block px-8 py-3 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-          >
-            {productsData.headerBtnText}
-          </a>
+          <div className="max-w-md flex flex-col items-start gap-6">
+            <motion.p
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="text-black font-light"
+            >
+              {productsData.description}
+            </motion.p>
+
+            <motion.a
+              href={productsData.headerBtnLink}
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="group flex items-center gap-3 mb-15 px-10 py-4 rounded-full cursor-pointer text-lg font-bold text-white transition-all duration-200 ease-in-out bg-linear-to-r from-blue-600 to-cyan-500 shadow-[5px_5px_0px_0px_rgba(167,139,250,1)] hover:shadow-none hover:translate-x-0.75 hover:translate-y-0.75"
+            >
+              {productsData.headerBtnText}
+            </motion.a>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-12 gap-8 items-start">
           <div className="hidden lg:block lg:col-span-4 relative h-125 lg:h-150 rounded-[2.5rem] overflow-hidden shadow-2xl group">
-            <Image
+            <BlindsImage
               src={productsData.featuredImage}
               alt="Featured"
-              fill
+              delay={0}
               className="object-cover transition-transform duration-700 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
