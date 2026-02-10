@@ -151,6 +151,7 @@ export default function About() {
             </div>
             <motion.button
               className="relative group cursor-pointer outline-none border-none bg-transparent p-0"
+              onClick={() => (window.location.href = aboutData.headerBtnLink)}
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               viewport={{ once: true }}

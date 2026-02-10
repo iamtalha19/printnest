@@ -105,9 +105,29 @@ export default function HowItWorks() {
               }}
               className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6"
             >
-              <button className="group flex items-center gap-3 px-10 py-4 rounded-full cursor-pointer text-lg font-bold text-white transition-all duration-200 ease-in-out bg-linear-to-r from-blue-600 to-cyan-500 shadow-[5px_5px_0px_0px_rgba(160,130,250,1)] hover:shadow-none hover:translate-x-0.75 hover:translate-y-0.75">
-                {footerContent.btnText}
-              </button>
+              <motion.button
+                className="relative group cursor-pointer outline-none border-none bg-transparent p-0"
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4, type: "spring" }}
+              >
+                <span
+                  className="absolute inset-0 rounded-full border-2 border-transparent translate-x-1.5 translate-y-1.5 transition-transform duration-200 ease-in-out group-hover:translate-x-0 group-hover:translate-y-0 [background:linear-gradient(white,white)_padding-box,linear-gradient(to_right,#7f22fe,#26C6DA)_border-box] mask[linear-gradient(#fff_0_0)_padding-box,linear-gradient(#fff_0_0)] mask-exclude"
+                  style={{
+                    background:
+                      "linear-gradient(to right, #7f22fe, #26C6DA) border-box",
+                    WebkitMask:
+                      "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
+                    WebkitMaskComposite: "destination-out",
+                    maskComposite: "exclude",
+                  }}
+                  aria-hidden="true"
+                />
+                <span className="relative block px-10 py-4 rounded-full bg-linear-to-r from-[#7f22fe] to-[#26C6DA] text-lg font-bold text-white transition-transform duration-200 ease-in-out group-active:scale-95">
+                  {footerContent.btnText}
+                </span>
+              </motion.button>
 
               <button className="flex items-center gap-3 group cursor-pointer">
                 <div className="w-14 h-14 flex items-center justify-center relative">

@@ -22,31 +22,31 @@ export default function PricingSection() {
 
   const itemVariants: any = {
     hidden: { opacity: 0, y: -30 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
+      transition: { duration: 0.6, ease: "easeOut" },
     },
   };
 
   return (
     <section className="py-24 px-6 ml-20 mr-20 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <motion.div 
+        <motion.div
           className="flex flex-col items-start"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
         >
-          <motion.span 
+          <motion.span
             variants={itemVariants}
             className="text-blue-800 tracking-widest text-s uppercase mb-4 block"
           >
             {header.label}
           </motion.span>
-          
-          <motion.h2 
+
+          <motion.h2
             variants={itemVariants}
             className="text-[40px] font-medium text-[#111827] leading-[1.1] mb-6"
           >
@@ -56,15 +56,15 @@ export default function PricingSection() {
               <span className="absolute -bottom-1 left-0 w-full h-0.75 bg-[#ff6b6b] rounded-full"></span>
             </span>
           </motion.h2>
-          
-          <motion.p 
+
+          <motion.p
             variants={itemVariants}
             className="text-gray-500 mb-10 max-w-xs leading-relaxed"
           >
             {header.description}
           </motion.p>
-          
-          <motion.div 
+
+          <motion.div
             variants={itemVariants}
             className="flex items-center gap-4 mb-10"
           >
@@ -89,13 +89,28 @@ export default function PricingSection() {
             </span>
           </motion.div>
 
-          <motion.button 
-            variants={itemVariants}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="group flex items-center gap-3 px-10 py-4 rounded-full cursor-pointer text-lg font-bold text-white transition-all duration-200 ease-in-out bg-linear-to-r from-blue-600 to-cyan-500 shadow-[5px_5px_0px_0px_rgba(160,130,250,1)] hover:shadow-none hover:translate-x-0.75 hover:translate-y-0.75"
+          <motion.button
+            className="relative group cursor-pointer outline-none border-none bg-transparent p-0"
+            initial={{ scale: 0.8, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4, type: "spring" }}
           >
-            {header.ctaText}
+            <span
+              className="absolute inset-0 rounded-full border-2 border-transparent translate-x-1.5 translate-y-1.5 transition-transform duration-200 ease-in-out group-hover:translate-x-0 group-hover:translate-y-0 [background:linear-gradient(white,white)_padding-box,linear-gradient(to_right,#7f22fe,#26C6DA)_border-box] mask[linear-gradient(#fff_0_0)_padding-box,linear-gradient(#fff_0_0)] mask-exclude"
+              style={{
+                background:
+                  "linear-gradient(to right, #7f22fe, #26C6DA) border-box",
+                WebkitMask:
+                  "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
+                WebkitMaskComposite: "destination-out",
+                maskComposite: "exclude",
+              }}
+              aria-hidden="true"
+            />
+            <span className="relative block px-10 py-4 rounded-full bg-linear-to-r from-[#7f22fe] to-[#26C6DA] text-lg font-bold text-white transition-transform duration-200 ease-in-out group-active:scale-95">
+              {header.ctaText}
+            </span>
           </motion.button>
         </motion.div>
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
