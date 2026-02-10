@@ -1,46 +1,71 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import db from "@/app/db.json";
-const testimonialsData = db.testimonials;
+import { motion } from "framer-motion";
 
 export default function Testimonials() {
+  const testimonialsData = db.testimonials;
   const { header, testimonials } = testimonialsData;
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsToShow = 3;
   const totalItems = testimonials.length;
   const maxIndex = totalItems - itemsToShow;
+
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
   };
+
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [currentIndex]);
 
   const progressPercentage = ((currentIndex + itemsToShow) / totalItems) * 100;
 
   return (
     <section
       id="testimonials"
-      className="scroll-mt-24 py-24 px-6 bg-[#f8fbff] overflow-hidden font-sans"
+      className="scroll-mt-24 py-24 px-6 pl-20 pr-20 bg-[#f8fbff] overflow-hidden font-sans"
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <span className="text-[#3b82f6] font-bold tracking-[0.2em] text-xs uppercase mb-4 block">
+          <motion.span
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="text-[#3b82f6] font-bold tracking-[0.2em] text-xs uppercase mb-4 block"
+          >
             {header.label}
-          </span>
-          <h2 className="text-5xl font-extrabold text-[#111827]">
+          </motion.span>
+
+          <motion.h2
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+            className="text-5xl font-extrabold text-[#111827]"
+          >
             {header.titleMain} <br />
             <span className="text-[#ff6b6b] relative inline-block mt-2">
               {header.titleHighlight}
               <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-[#ff6b6b]"></span>
             </span>
-          </h2>
+          </motion.h2>
         </div>
+
         <div className="relative mb-16 overflow-hidden">
           <div
-            className="flex transition-transform duration-500 ease-in-out"
+            className="flex transition-transform duration-700 ease-in-out"
             style={{
               transform: `translateX(-${currentIndex * (100 / totalItems)}%)`,
               width: `${(totalItems / itemsToShow) * 100}%`,
@@ -74,6 +99,7 @@ export default function Testimonials() {
     </section>
   );
 }
+
 function TestimonialCard({ item }: { item: any }) {
   return (
     <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-xl transition-all duration-300 group">

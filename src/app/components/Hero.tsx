@@ -21,6 +21,7 @@ export default function Hero() {
     hidden: { opacity: 0, x: -50 },
     visible: {
       opacity: 1,
+      y: 0,
       x: 0,
       transition: {
         duration: 0.8,
@@ -173,13 +174,21 @@ export default function Hero() {
               {content.heroText.descriptionPart2}
             </motion.p>
             <motion.button
-              className="group flex items-center gap-3 mb-15 px-10 py-4 rounded-full cursor-pointer text-lg font-bold text-white transition-all duration-200 ease-in-out bg-linear-to-r from-blue-600 to-cyan-500 shadow-[5px_5px_0px_0px_rgba(167,139,250,1)] hover:shadow-none hover:translate-x-0.75 hover:translate-y-0.75"
+              className="relative group cursor-pointer outline-none border-none bg-transparent p-0"
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.4, type: "spring" }}
             >
-              {content.heroText.buttonLabel}
+              <span
+                className="absolute inset-0 rounded-full p-[2px] bg-linear-to-r from-[#7f22fe] to-[#26C6DA] translate-x-1.5 translate-y-1.5 transition-transform duration-200 ease-in-out group-hover:translate-x-0 group-hover:translate-y-0"
+                aria-hidden="true"
+              >
+                <span className="block w-full h-full bg-white rounded-full" />
+              </span>
+              <span className="relative block px-10 py-4 rounded-full bg-linear-to-r from-[#7f22fe] to-[#26C6DA] text-lg font-bold text-white transition-transform duration-200 ease-in-out group-active:scale-95">
+                {content.heroText.buttonLabel}
+              </span>
             </motion.button>
           </div>
           <motion.div
@@ -190,7 +199,7 @@ export default function Hero() {
             variants={slideRight}
           >
             <div className="bg-white/10 backdrop-blur-lg border border-white/20 text-white rounded-3xl p-8 w-full max-w-50 shadow-2xl relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-              <div className="space-y- relative z-10">
+              <div className="space-y-4 relative z-10">
                 {content.statsRight.map((stat, index) => (
                   <div key={index}>
                     <h3 className="text-4xl font-bold tracking-tight drop-shadow-sm">
@@ -209,10 +218,10 @@ export default function Hero() {
       <div className="relative w-full max-w-4xl mx-auto h-85 lg:h-120 mt-4 z-30 pointer-events-none select-none">
         <motion.div
           className="absolute top-16 right-[9%] w-[40%] z-10 transition-transform duration-500 hover:scale-105"
-          initial={{ opacity: 0, y: 100, rotate: 4 }}
-          whileInView={{ opacity: 1, y: 0, rotate: 4 }}
+          initial={{ opacity: 0, x: -200, rotate: 4 }}
+          whileInView={{ opacity: 1, x: 0, rotate: 4 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 1.5, delay: 0.6, ease: "easeOut" }}
         >
           <img
             src={assets.products.right}
@@ -222,10 +231,10 @@ export default function Hero() {
         </motion.div>
         <motion.div
           className="absolute top-34 left-[11%] w-[40%] z-10 transition-transform duration-500 hover:scale-105"
-          initial={{ opacity: 0, y: 100, rotate: 1 }}
-          whileInView={{ opacity: 1, y: 0, rotate: 1 }}
+          initial={{ opacity: 0, x: 200, rotate: 1 }}
+          whileInView={{ opacity: 1, x: 0, rotate: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          transition={{ duration: 1.5, delay: 0.6, ease: "easeOut" }}
         >
           <img
             src={assets.products.left}
@@ -235,10 +244,10 @@ export default function Hero() {
         </motion.div>
         <motion.div
           className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[45%] z-20 transition-transform duration-500 hover:scale-105"
-          initial={{ opacity: 0, y: 150 }}
+          initial={{ opacity: 0, y: 100 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0 }}
+          transition={{ duration: 1.5, delay: 0, ease: "easeOut" }}
         >
           <img
             src={assets.products.center}

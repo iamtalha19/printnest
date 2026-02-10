@@ -105,7 +105,7 @@ export default function HowItWorks() {
               }}
               className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6"
             >
-              <button className="group flex items-center gap-3 mb-15 px-10 py-4 rounded-full cursor-pointer text-lg font-bold text-white transition-all duration-200 ease-in-out bg-linear-to-r from-blue-600 to-cyan-500 shadow-[5px_5px_0px_0px_rgba(160,130,250,1)] hover:shadow-none hover:translate-x-0.75 hover:translate-y-0.75">
+              <button className="group flex items-center gap-3 px-10 py-4 rounded-full cursor-pointer text-lg font-bold text-white transition-all duration-200 ease-in-out bg-linear-to-r from-blue-600 to-cyan-500 shadow-[5px_5px_0px_0px_rgba(160,130,250,1)] hover:shadow-none hover:translate-x-0.75 hover:translate-y-0.75">
                 {footerContent.btnText}
               </button>
 

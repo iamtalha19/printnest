@@ -4,12 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { Search, ShoppingCart, User, Heart, Trash2, X } from "lucide-react";
 import db from "@/app/db.json";
-const navbarData = db.navbar;
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/app/redux/Store";
 import { removeFromCart } from "@/app/redux/CartSlice";
 import { toggleWishlist } from "@/app/redux/WishListSlice";
 export default function Navbar() {
+  const navbarData = db.navbar;
   const dispatch = useDispatch();
   const { cartItems, totalQuantity } = useSelector(
     (state: RootState) => state.cart,
@@ -195,12 +195,12 @@ export default function Navbar() {
       </div>
       <div className="container mx-auto px-4 py-8">
         <nav>
-          <ul className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
+          <ul className="flex flex-wrap items-center justify-center gap-5 md:gap-10">
             {navbarData.navigation.map((item, index) => (
               <li key={index}>
                 <Link
                   href={item.href}
-                  className="text-[18px] text-[#333333] hover:text-blue-800 transition-colors duration-200 font-medium"
+                  className="text-[18px] text-[#333333] hover:text-blue-800 transition-colors duration-200"
                 >
                   {item.label}
                 </Link>

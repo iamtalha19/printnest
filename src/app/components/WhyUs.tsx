@@ -40,7 +40,7 @@ export default function WhyChooseUs() {
           </motion.h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((feature, index) => (
+          {features.map((feature: any, index: number) => (
             <div key={index} className="relative pt-4">
               <FeatureCard item={feature} />
             </div>
@@ -86,7 +86,10 @@ const FeatureCard = ({ item }: { item: any }) => {
       },
     },
   };
-
+  const bgVariants = {
+    initial: { height: "6rem" },
+    hover: { height: "5rem" },
+  };
   return (
     <motion.div
       className="relative bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center p-8 text-center h-full overflow-hidden cursor-pointer"
@@ -98,9 +101,11 @@ const FeatureCard = ({ item }: { item: any }) => {
       }}
       transition={{ duration: 0.3 }}
     >
-      <div
-        className={`w-full h-24 absolute top-0 left-0 rounded-t-2xl opacity-40 ${item.theme.accent}`}
+      <motion.div
+        className={`w-full absolute top-0 left-0 rounded-t-2xl opacity-60 ${item.theme.accent}`}
         style={{ clipPath: "ellipse(70% 80% at 50% 0%)" }}
+        variants={bgVariants}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
       />
       <motion.div
         className={`relative z-10 p-4 rounded-full border-6 mb-6 ${item.theme.iconBg} text-white`}

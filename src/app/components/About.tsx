@@ -16,7 +16,7 @@ const BlindsImage = ({
   imageClassName?: string;
   delay?: number;
 }) => {
-  const bars = [0, 1, 2, 3, 4];
+  const bars = Array.from({ length: 31 }, (_, i) => i);
   return (
     <div className={`relative overflow-hidden shadow-2xl ${className}`}>
       <Image src={src} alt={alt} fill priority />
@@ -27,10 +27,10 @@ const BlindsImage = ({
             className="flex-1 w-full bg-gray-200 border-b border-white/50"
             initial={{ opacity: 1, scaleY: 1 }}
             whileInView={{ opacity: 0, scaleY: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
+            viewport={{ once: true, amount: 0.3 }}
             transition={{
-              duration: 0.2,
-              delay: delay + i * 0.15,
+              duration: 0.1,
+              delay: delay + i * 0.1,
               ease: "linear",
             }}
             style={{ originY: 0 }}
@@ -74,7 +74,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="scroll-mt-24 py-20 lg:py-28 bg-[#F6F9FF] overflow-hidden"
+      className="scroll-mt-24 py-20 lg:py-28 pl-20 pr-20 bg-[#F6F9FF] overflow-hidden"
     >
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
