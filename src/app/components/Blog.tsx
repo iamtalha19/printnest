@@ -110,16 +110,27 @@ export default function LatestNews() {
             </motion.p>
 
             <motion.button
-              custom={3}
-              initial="hidden"
-              whileInView="visible"
+              className="relative group cursor-pointer outline-none border-none bg-transparent p-0"
+              initial={{ scale: 0.8, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
               viewport={{ once: true }}
-              variants={headerVariants}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-linear-to-r from-indigo-500 to-teal-400 text-white font-semibold px-8 py-3 rounded-full hover:shadow-lg transition-all duration-300 shadow-md inline-flex items-center gap-2 cursor-pointer"
+              transition={{ delay: 0.4, type: "spring" }}
             >
-              {sectionInfo.buttonText}
+              <span
+                className="absolute inset-0 rounded-full border-2 border-transparent translate-x-1.5 translate-y-1.5 transition-transform duration-200 ease-in-out group-hover:translate-x-0 group-hover:translate-y-0 [background:linear-gradient(white,white)_padding-box,linear-gradient(to_right,#7f22fe,#26C6DA)_border-box] mask[linear-gradient(#fff_0_0)_padding-box,linear-gradient(#fff_0_0)] mask-exclude"
+                style={{
+                  background:
+                    "linear-gradient(to right, #7f22fe, #26C6DA) border-box",
+                  WebkitMask:
+                    "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
+                  WebkitMaskComposite: "destination-out",
+                  maskComposite: "exclude",
+                }}
+                aria-hidden="true"
+              />
+              <span className="relative block px-10 py-4 rounded-full bg-linear-to-r from-[#7f22fe] to-[#26C6DA] text-lg font-bold text-white transition-transform duration-200 ease-in-out group-active:scale-95">
+                {sectionInfo.buttonText}
+              </span>
             </motion.button>
           </div>
         </div>

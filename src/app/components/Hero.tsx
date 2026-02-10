@@ -181,11 +181,17 @@ export default function Hero() {
               transition={{ delay: 0.4, type: "spring" }}
             >
               <span
-                className="absolute inset-0 rounded-full p-[2px] bg-linear-to-r from-[#7f22fe] to-[#26C6DA] translate-x-1.5 translate-y-1.5 transition-transform duration-200 ease-in-out group-hover:translate-x-0 group-hover:translate-y-0"
+                className="absolute inset-0 rounded-full border-2 border-transparent translate-x-1.5 translate-y-1.5 transition-transform duration-200 ease-in-out group-hover:translate-x-0 group-hover:translate-y-0 [background:linear-gradient(white,white)_padding-box,linear-gradient(to_right,#7f22fe,#26C6DA)_border-box] mask[linear-gradient(#fff_0_0)_padding-box,linear-gradient(#fff_0_0)] mask-exclude"
+                style={{
+                  background:
+                    "linear-gradient(to right, #7f22fe, #26C6DA) border-box",
+                  WebkitMask:
+                    "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
+                  WebkitMaskComposite: "destination-out",
+                  maskComposite: "exclude",
+                }}
                 aria-hidden="true"
-              >
-                <span className="block w-full h-full bg-white rounded-full" />
-              </span>
+              />
               <span className="relative block px-10 py-4 rounded-full bg-linear-to-r from-[#7f22fe] to-[#26C6DA] text-lg font-bold text-white transition-transform duration-200 ease-in-out group-active:scale-95">
                 {content.heroText.buttonLabel}
               </span>
