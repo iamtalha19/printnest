@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import nodemailer from "nodemailer";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+import { addOrder } from "@/app/lib/db";
 
+const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key-change-this";
+
+// Configure Nodemailer
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -11,38 +15,37 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { customer, items, totalAmount } = await request.json();
-    const filePath = path.join(process.cwd(), "orders.json");
+    const { customer, items, totalAmount } = await req.json();
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+    let userId = "guest"; 
 
-    let ordersData = [];
-    if (fs.existsSync(filePath)) {
-      const fileContent = fs.readFileSync(filePath, "utf-8");
+    if (token) {
       try {
-        ordersData = JSON.parse(fileContent);
-      } catch (e) {
-        ordersData = [];
+        const decoded = jwt.verify(token, SECRET_KEY) as { id: string };
+        userId = decoded.id;
+      } catch (error) {
+        console.log("Token invalid, processing as guest");
       }
     }
-
-    const orderId = Date.now();
+    const orderId = Date.now().toString();
     const newOrder = {
       id: orderId,
-      submittedAt: new Date().toISOString(),
-      status: "pending",
-      customer,
-      items,
-      totalAmount,
+      userId: userId,
+      date: new Date().toLocaleString(),
+      status: "Processing",
+      total: totalAmount,
+      items: items,
+      customer: customer, 
     };
-
-    ordersData.push(newOrder);
-    fs.writeFileSync(filePath, JSON.stringify(ordersData, null, 2));
+    await addOrder(newOrder);
     try {
       const emailHtml = `
           <div style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #2563eb; border-bottom: 2px solid #eee; padding-bottom: 10px;">Order #${orderId}</h2>
-            <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+            <p><strong>Date:</strong> ${newOrder.date}</p>
             <p><strong>Payment Method:</strong> ${customer.paymentMethod.toUpperCase()}</p>
 
             <h3 style="background-color: #f8f9fa; padding: 10px; border-radius: 5px;">Customer Details</h3>
@@ -80,6 +83,7 @@ export async function POST(request: Request) {
             </table>
           </div>
       `;
+
       await Promise.all([
         transporter.sendMail({
           from: `"Store Orders" ${process.env.EMAIL_USER}`,
@@ -101,9 +105,10 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { message: "Order placed successfully!" },
+      { message: "Order placed successfully!", orderId },
       { status: 200 }
     );
+
   } catch (error) {
     console.error("Error processing order:", error);
     return NextResponse.json(

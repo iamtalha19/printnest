@@ -108,7 +108,6 @@ export default function LatestNews() {
             >
               {sectionInfo.description}
             </motion.p>
-
             <motion.button
               className="relative group cursor-pointer outline-none border-none bg-transparent p-0"
               initial={{ scale: 0.8, opacity: 0 }}

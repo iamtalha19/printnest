@@ -2,12 +2,22 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, ShoppingCart, User, Heart, Trash2, X } from "lucide-react";
+import {
+  Search,
+  ShoppingCart,
+  User,
+  Heart,
+  Trash2,
+  X,
+  LogOut,
+} from "lucide-react";
 import db from "@/app/db.json";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/app/redux/Store";
 import { removeFromCart } from "@/app/redux/CartSlice";
 import { toggleWishlist } from "@/app/redux/WishListSlice";
+import { logout } from "@/app/redux/AuthSlice";
+
 export default function Navbar() {
   const navbarData = db.navbar;
   const dispatch = useDispatch();
@@ -17,8 +27,18 @@ export default function Navbar() {
   const { items: wishlistItems } = useSelector(
     (state: RootState) => state.wishlist,
   );
+  // Get Auth State
+  const { isAuthenticated, user } = useSelector(
+    (state: RootState) => state.auth,
+  );
+
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
   return (
     <header className="absolute top-0 left-0 w-full z-50 font-sans bg-transparent pl-30 pr-30">
       <div className="container mx-auto px-4 pt-6 pb-4 flex flex-col lg:flex-row items-center justify-between gap-6 relative">
@@ -45,6 +65,7 @@ export default function Navbar() {
           </div>
         </div>
         <div className="flex items-center gap-4 relative">
+          {/* Cart Icon */}
           <div
             className="relative"
             onMouseEnter={() => setIsCartOpen(true)}
@@ -122,12 +143,46 @@ export default function Navbar() {
               </div>
             )}
           </div>
-          <Link
-            href="/account"
-            className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-slate-700 hover:text-blue-600 hover:shadow-md transition-all"
-          >
-            <User className="w-5 h-5" />
-          </Link>
+
+          {/* User Icon (Consistent Design) */}
+          {isAuthenticated ? (
+            <div className="relative group">
+              <Link
+                href="/account"
+                className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-slate-700 hover:text-blue-600 hover:shadow-md transition-all"
+              >
+                <User className="w-5 h-5" />
+              </Link>
+              {/* Dropdown Menu */}
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-slate-100 p-2 z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-2 group-hover:translate-y-0">
+                <div className="px-3 py-2 text-xs text-slate-500 font-bold border-b border-slate-100 mb-1">
+                  Signed in as <br />
+                  <span className="text-slate-800 text-sm">{user?.name}</span>
+                </div>
+                <Link
+                  href="/account"
+                  className="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md transition-colors"
+                >
+                  My Account
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-md transition-colors mt-1"
+                >
+                  <LogOut size={14} /> Logout
+                </button>
+              </div>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-slate-700 hover:text-blue-600 hover:shadow-md transition-all"
+            >
+              <User className="w-5 h-5" />
+            </Link>
+          )}
+
+          {/* Wishlist Icon */}
           <div
             className="relative"
             onMouseEnter={() => setIsWishlistOpen(true)}

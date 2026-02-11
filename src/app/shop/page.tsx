@@ -7,7 +7,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/app/redux/CartSlice";
 import { toggleWishlist } from "@/app/redux/WishListSlice";
 import { RootState } from "@/app/redux/Store";
-import { ChevronRight, ChevronDown, ShoppingBag, Check } from "lucide-react";
+import {
+  ChevronRight,
+  ChevronDown,
+  ShoppingBag,
+  Check,
+  Heart,
+} from "lucide-react";
 import db from "@/app/db.json";
 import Toast from "@/app/components/products/Toast";
 
@@ -31,6 +37,7 @@ export default function ShopPage() {
     message: string;
     type: "add" | "remove";
   }>({ show: false, message: "", type: "add" });
+
   const sortedProducts = useMemo(() => {
     let products = [...allProducts];
 
@@ -53,15 +60,18 @@ export default function ShopPage() {
         return products;
     }
   }, [allProducts, sortBy]);
+
   const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentProducts = sortedProducts.slice(
     startIndex,
     startIndex + ITEMS_PER_PAGE,
   );
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
+
   const showToast = (message: string, type: "add" | "remove") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
@@ -265,9 +275,27 @@ function ShopHeader({ currentPage }: { currentPage: number }) {
   );
 }
 
-function SimpleProductCard({ product, onAddToCart, isInCart }: any) {
+function SimpleProductCard({
+  product,
+  onAddToCart,
+  isInCart,
+  isWishlisted,
+  onToggleWishlist,
+}: any) {
   return (
-    <div className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300">
+    <div className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative">
+      <button
+        onClick={onToggleWishlist}
+        className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full shadow-md transition-all duration-300 ${
+          isWishlisted
+            ? "bg-red-50 text-red-500"
+            : "bg-white text-slate-400 hover:bg-red-50 hover:text-red-500"
+        }`}
+        title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+      >
+        <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} />
+      </button>
+
       <div className="relative h-72 bg-[#F6F7FB] flex items-center justify-center p-6 group-hover:bg-[#ebf0f7] transition-colors">
         <div className="relative w-full h-full">
           <Image

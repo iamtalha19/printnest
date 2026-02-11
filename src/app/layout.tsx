@@ -4,11 +4,15 @@ import "./globals.css";
 import { Providers as ReduxProvider } from "@/app/redux/Provider";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import AuthInitializer from "./components/AuthInitializer";
+
 const inter = Inter({ subsets: ["latin"] });
+
 export const metadata: Metadata = {
   title: "PrintNest",
   description: "Custom Printing Services",
 };
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -18,6 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ReduxProvider>
+          <AuthInitializer />
           <Navbar />
           {children}
           <Footer />

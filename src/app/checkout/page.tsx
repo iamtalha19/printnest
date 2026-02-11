@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
+import AuthPromptModal from "@/app/components/AuthPromptModal";
 
 import {
   ChevronRight,
@@ -33,12 +34,13 @@ export default function CheckoutPage() {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const { cartItems } = useSelector((state: any) => state.cart);
-
+  const { isAuthenticated, user } = useSelector((state: any) => state.auth);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const subtotal = cartItems.reduce(
     (acc: number, item: any) => acc + item.price * (item.quantity || 1),
     0,
   );
-
   const [formData, setFormData] = useState<CheckoutData>({
     email: "",
     firstName: "",
@@ -51,6 +53,22 @@ export default function CheckoutPage() {
     phone: "",
     paymentMethod: "cod",
   });
+
+  useEffect(() => {
+    if (user?.email) {
+      setFormData((prev) => ({ ...prev, email: user.email }));
+    }
+  }, [user]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsCheckingAuth(false);
+      if (!isAuthenticated) {
+        setShowAuthModal(true);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [isAuthenticated]);
 
   const updateData = (newData: Partial<CheckoutData>) =>
     setFormData((prev) => ({ ...prev, ...newData }));
@@ -97,6 +115,14 @@ export default function CheckoutPage() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-800">
+      {showAuthModal && (
+        <AuthPromptModal
+          onClose={() => {
+            router.push("/cart");
+          }}
+        />
+      )}
+
       <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
         <Image
           src={checkoutConfig.backgroundImage}
@@ -112,46 +138,53 @@ export default function CheckoutPage() {
         <CheckoutHeader />
 
         <div className="max-w-7xl mx-auto mt-30 px-4 lg:px-8 pb-32">
-          <form
-            ref={formRef}
-            onSubmit={handleSubmit}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start"
+          <div
+            className={`transition-all duration-300 ${showAuthModal || isCheckingAuth ? "opacity-50 blur-sm pointer-events-none" : "opacity-100"}`}
           >
-            <div className="lg:col-span-7 space-y-10">
-              <ContactSection email={formData.email} update={updateData} />
+            <form
+              ref={formRef}
+              onSubmit={handleSubmit}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start"
+            >
+              <div className="lg:col-span-7 space-y-10">
+                <ContactSection
+                  email={formData.email}
+                  update={updateData}
+                  isReadOnly={!!user?.email}
+                />
 
-              <BillingSection data={formData} update={updateData} />
+                <BillingSection data={formData} update={updateData} />
 
-              <PaymentSection
-                selectedMethod={formData.paymentMethod}
-                update={updateData}
-              />
+                <PaymentSection
+                  selectedMethod={formData.paymentMethod}
+                  update={updateData}
+                />
 
-              <div className="pt-6 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
-                <Link
-                  href="/cart"
-                  className="flex items-center gap-2 text-slate-600 font-bold hover:text-slate-900 transition-colors"
-                >
-                  <ChevronLeft size={16} /> Return to Cart
-                </Link>
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto px-10 py-4 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white font-bold text-lg shadow-lg shadow-purple-200 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer"
-                >
-                  Place Order
-                </button>
+                <div className="pt-6 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
+                  <Link
+                    href="/cart"
+                    className="flex items-center gap-2 text-slate-600 font-bold hover:text-slate-900 transition-colors"
+                  >
+                    <ChevronLeft size={16} /> Return to Cart
+                  </Link>
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto px-10 py-4 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white font-bold text-lg shadow-lg shadow-purple-200 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                  >
+                    Place Order
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="lg:col-span-5">
-              <OrderSummary cartItems={cartItems} subtotal={subtotal} />
-            </div>
-          </form>
+              <div className="lg:col-span-5">
+                <OrderSummary cartItems={cartItems} subtotal={subtotal} />
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-
 function CheckoutHeader() {
   return (
     <div className="w-full pb-20 mt-50 flex flex-col items-center justify-center">
@@ -179,9 +212,11 @@ function CheckoutHeader() {
 function ContactSection({
   email,
   update,
+  isReadOnly,
 }: {
   email: string;
   update: (d: Partial<CheckoutData>) => void;
+  isReadOnly?: boolean;
 }) {
   return (
     <section>
@@ -191,14 +226,17 @@ function ContactSection({
       <input
         type="email"
         required
+        readOnly={isReadOnly}
         placeholder="Email address"
-        className="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-500 placeholder:text-slate-400"
+        className={`w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-500 placeholder:text-slate-400 ${isReadOnly ? "bg-slate-50 text-slate-500 cursor-not-allowed" : ""}`}
         value={email}
         onChange={(e) => update({ email: e.target.value })}
       />
-      <p className="text-xs text-slate-500 mt-2">
-        You are currently checking out as a guest
-      </p>
+      {!isReadOnly && (
+        <p className="text-xs text-slate-500 mt-2">
+          You are currently checking out as a guest
+        </p>
+      )}
     </section>
   );
 }

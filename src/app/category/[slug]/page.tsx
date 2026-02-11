@@ -4,9 +4,10 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, ChevronDown, ShoppingBag, Check } from "lucide-react";
+import { ChevronRight, ChevronDown, ShoppingBag, Heart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/app/redux/CartSlice";
+import { toggleWishlist } from "@/app/redux/WishListSlice";
 import { RootState } from "@/app/redux/Store";
 import Toast from "@/app/components/products/Toast";
 import db from "@/app/db.json";
@@ -34,7 +35,7 @@ export default function CategoryPage() {
   const slug = params.slug as string;
   const dispatch = useDispatch();
   const { cartItems } = useSelector((state: RootState) => state.cart);
-
+  const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
   const [category, setCategory] = useState<Category | null>(null);
   const [categoryProducts, setCategoryProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,6 +100,26 @@ export default function CategoryPage() {
       }),
     );
     showToast(`Added "${product.title}" to cart!`, "add");
+  };
+
+  const handleToggleWishlist = (product: Product) => {
+    const isWishlisted = wishlistItems.some((item) => item.id === product.id);
+    const priceVal = parseFloat(product.price.replace(/[^0-9.]/g, ""));
+
+    dispatch(
+      toggleWishlist({
+        id: product.id,
+        title: product.title,
+        price: priceVal,
+        image: product.image,
+      }),
+    );
+    showToast(
+      isWishlisted
+        ? `Removed "${product.title}" from wishlist`
+        : `Added "${product.title}" to wishlist`,
+      isWishlisted ? "remove" : "add",
+    );
   };
 
   if (loading) {
@@ -189,6 +210,10 @@ export default function CategoryPage() {
               product={product}
               isInCart={cartItems.some((item: any) => item.id === product.id)}
               onAddToCart={() => handleAddToCart(product)}
+              isWishlisted={wishlistItems.some(
+                (item) => item.id === product.id,
+              )}
+              onToggleWishlist={() => handleToggleWishlist(product)}
             />
           ))}
 
@@ -213,10 +238,14 @@ function SimpleProductCard({
   product,
   onAddToCart,
   isInCart,
+  isWishlisted,
+  onToggleWishlist,
 }: {
   product: Product;
   onAddToCart: () => void;
   isInCart: boolean;
+  isWishlisted: boolean;
+  onToggleWishlist: () => void;
 }) {
   return (
     <div className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative">
@@ -229,6 +258,18 @@ function SimpleProductCard({
           {product.badge}
         </span>
       )}
+
+      <button
+        onClick={onToggleWishlist}
+        className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full shadow-md transition-all duration-300 ${
+          isWishlisted
+            ? "bg-red-50 text-red-500"
+            : "bg-white text-slate-400 hover:bg-red-50 hover:text-red-500"
+        }`}
+        title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+      >
+        <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} />
+      </button>
 
       <div className="relative h-72 bg-[#F6F7FB] flex items-center justify-center p-6 group-hover:bg-[#ebf0f7] transition-colors">
         <div className="relative w-full h-full">
