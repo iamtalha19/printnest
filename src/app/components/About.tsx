@@ -93,7 +93,7 @@ export default function About() {
                   src={aboutData.secondaryImages[0]}
                   alt="Detail 1"
                   className="w-full h-80 object-cover rounded-t-full rounded-br-full shadow-lg"
-                  delay={0.3}
+                  delay={0}
                 />
               </div>
               <div className="w-full aspect-square">
@@ -101,7 +101,7 @@ export default function About() {
                   src={aboutData.secondaryImages[1]}
                   alt="Detail 2"
                   className="w-full h-80 object-cover rounded-t-full rounded-bl-full shadow-lg"
-                  delay={0.5}
+                  delay={0}
                 />
               </div>
             </div>
