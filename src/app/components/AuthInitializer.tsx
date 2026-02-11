@@ -15,9 +15,7 @@ export default function AuthInitializer() {
           const data = await res.json();
           dispatch(loginSuccess({ user: data.user, token: "active" }));
         }
-      } catch (err) {
-        console.log("Session check failed", err);
-      }
+      } catch (err) {}
     };
 
     checkSession();

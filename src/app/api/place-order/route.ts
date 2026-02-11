@@ -5,8 +5,6 @@ import { cookies } from "next/headers";
 import { addOrder } from "@/app/lib/db";
 
 const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key-change-this";
-
-// Configure Nodemailer
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -27,7 +25,6 @@ export async function POST(req: Request) {
         const decoded = jwt.verify(token, SECRET_KEY) as { id: string };
         userId = decoded.id;
       } catch (error) {
-        console.log("Token invalid, processing as guest");
       }
     }
     const orderId = Date.now().toString();
@@ -101,7 +98,6 @@ export async function POST(req: Request) {
       ]);
 
     } catch (emailError) {
-      console.error("Nodemailer failed to send:", emailError);
     }
 
     return NextResponse.json(
@@ -110,7 +106,6 @@ export async function POST(req: Request) {
     );
 
   } catch (error) {
-    console.error("Error processing order:", error);
     return NextResponse.json(
       { error: "Failed to place order." },
       { status: 500 }
