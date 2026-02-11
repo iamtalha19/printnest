@@ -20,7 +20,9 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/app/redux/Store";
 import { loginSuccess, logout } from "@/app/redux/AuthSlice";
+import { addToCart } from "@/app/redux/CartSlice";
 import db from "@/app/db.json";
+import QuickViewModal from "@/app/components/products/QuickViewModal";
 
 interface Order {
   id: string;
@@ -46,6 +48,7 @@ export default function MyAccountPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -96,6 +99,23 @@ export default function MyAccountPage() {
     dispatch(logout());
     setActiveTab("dashboard");
     setOrders([]);
+  };
+  const handleAddToCart = (product: any, quantity = 1) => {
+    const priceVal =
+      typeof product.price === "string"
+        ? parseFloat(product.price.replace(/[^0-9.]/g, ""))
+        : product.price;
+
+    dispatch(
+      addToCart({
+        id: product.id,
+        name: product.title || product.name,
+        price: priceVal,
+        image: product.image,
+        quantity: quantity,
+      }),
+    );
+    alert(`Added ${quantity} x "${product.title || product.name}" to cart!`);
   };
 
   if (!isAuthenticated) {
@@ -272,6 +292,12 @@ export default function MyAccountPage() {
   }
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
+      <QuickViewModal
+        product={quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+        onAddToCart={handleAddToCart}
+      />
+
       <PageHeader
         title={`Welcome, ${user?.name || "User"}`}
         breadcrumb="Dashboard"
@@ -279,6 +305,7 @@ export default function MyAccountPage() {
 
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
         <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar Navigation */}
           <div className="lg:w-1/4 shrink-0">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden sticky top-24">
               <div className="p-6 border-b border-slate-100 flex items-center gap-4 bg-slate-50/50">
@@ -482,12 +509,12 @@ export default function MyAccountPage() {
                             ${item.price}
                           </p>
                         </div>
-                        <Link
-                          href={`/product/${item.id}`}
+                        <button
+                          onClick={() => setQuickViewProduct(item)}
                           className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg hover:bg-purple-600 transition-colors"
                         >
                           View
-                        </Link>
+                        </button>
                       </div>
                     ))}
                   </div>
