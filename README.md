@@ -84,7 +84,123 @@ A modern, fully-featured Next.js e-commerce platform for custom print-on-demand 
 
 ---
 
-## 📁 Project Structure
+## � Package Installation Commands
+
+### Install All Packages
+
+```bash
+npm install
+```
+
+### Production Dependencies
+
+Install all production dependencies at once:
+
+```bash
+npm install @reduxjs/toolkit bcryptjs clsx cookie framer-motion jsonwebtoken lucide-react next nodemailer react react-dom react-redux tailwind-merge
+```
+
+Or install individually:
+
+#### State Management
+
+```bash
+npm install @reduxjs/toolkit@^2.11.2      # Redux Toolkit for state management
+npm install react-redux@^9.2.0            # React bindings for Redux
+```
+
+#### Authentication & Security
+
+```bash
+npm install bcryptjs@^3.0.3               # Password hashing
+npm install jsonwebtoken@^9.0.3           # JWT token generation/validation
+npm install cookie@^1.1.1                 # Cookie parsing utilities
+```
+
+#### UI & Styling
+
+```bash
+npm install framer-motion@^12.30.0        # Animation library
+npm install lucide-react@^0.563.0         # Icon library
+npm install clsx@^2.1.1                   # Conditional className utility
+npm install tailwind-merge@^3.4.0         # Tailwind class merging utility
+```
+
+#### Framework & Core
+
+```bash
+npm install next@16.1.6                   # Next.js framework
+npm install react@19.2.3                  # React library
+npm install react-dom@19.2.3              # React DOM renderer
+```
+
+#### Email
+
+```bash
+npm install nodemailer@^7.0.13            # Email sending (SMTP)
+```
+
+### Development Dependencies
+
+Install all dev dependencies at once:
+
+```bash
+npm install -D @tailwindcss/postcss @types/bcryptjs @types/cookie @types/jsonwebtoken @types/node @types/nodemailer @types/react @types/react-dom babel-plugin-react-compiler eslint eslint-config-next tailwindcss typescript
+```
+
+Or install individually:
+
+#### CSS & Styling
+
+```bash
+npm install -D @tailwindcss/postcss@^4   # Tailwind PostCSS integration
+npm install -D tailwindcss@^4             # Tailwind CSS framework
+```
+
+#### TypeScript Types
+
+```bash
+npm install -D @types/bcryptjs@^2.4.6     # Type definitions for bcryptjs
+npm install -D @types/cookie@^0.6.0       # Type definitions for cookie
+npm install -D @types/jsonwebtoken@^9.0.10 # Type definitions for JWT
+npm install -D @types/node@^20            # Type definitions for Node.js
+npm install -D @types/nodemailer@^7.0.9   # Type definitions for nodemailer
+npm install -D @types/react@^19           # Type definitions for React
+npm install -D @types/react-dom@^19       # Type definitions for React DOM
+npm install -D typescript@^5              # TypeScript compiler
+```
+
+#### Linting & Build Tools
+
+```bash
+npm install -D eslint@^9                  # JavaScript/TypeScript linter
+npm install -D eslint-config-next@16.1.6  # Next.js ESLint configuration
+npm install -D babel-plugin-react-compiler@1.0.0  # React compiler plugin
+```
+
+### Package Purposes
+
+| Package              | Purpose                                                 |
+| -------------------- | ------------------------------------------------------- |
+| **@reduxjs/toolkit** | Simplified Redux setup with createSlice, configureStore |
+| **bcryptjs**         | Hash passwords securely before storing                  |
+| **clsx**             | Conditionally join classNames together                  |
+| **cookie**           | Parse and serialize HTTP cookies                        |
+| **framer-motion**    | Production-ready motion library for React               |
+| **jsonwebtoken**     | Create and verify JWT tokens for auth                   |
+| **lucide-react**     | Beautiful & consistent icon set                         |
+| **next**             | React framework with SSR, routing, API routes           |
+| **nodemailer**       | Send emails from Node.js (order confirmations)          |
+| **react**            | JavaScript library for building UIs                     |
+| **react-dom**        | React package for working with the DOM                  |
+| **react-redux**      | Official React bindings for Redux                       |
+| **tailwind-merge**   | Merge Tailwind CSS classes without conflicts            |
+| **tailwindcss**      | Utility-first CSS framework                             |
+| **typescript**       | Typed superset of JavaScript                            |
+
+---
+
+## �📁 Project Structure
 
 ```
 printnest/
