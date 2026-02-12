@@ -13,9 +13,11 @@ import {
   ShoppingBag,
   Check,
   Heart,
+  Eye,
 } from "lucide-react";
 import db from "@/app/db.json";
 import Toast from "@/app/components/products/Toast";
+import QuickViewModal from "@/app/components/products/QuickViewModal";
 
 const pageConfig = {
   title: "Shop",
@@ -32,6 +34,7 @@ export default function ShopPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("Default Sorting");
   const [isSortOpen, setIsSortOpen] = useState(false);
+  const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -77,7 +80,7 @@ export default function ShopPage() {
     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
   };
 
-  const handleAddToCart = (product: any) => {
+  const handleAddToCart = (product: any, quantity = 1) => {
     const priceVal =
       typeof product.price === "string"
         ? parseFloat(product.price.replace(/[^0-9.]/g, ""))
@@ -89,10 +92,10 @@ export default function ShopPage() {
         name: product.title,
         price: priceVal,
         image: product.image,
-        quantity: 1,
+        quantity: quantity,
       }),
     );
-    showToast(`Added "${product.title}" to cart!`, "add");
+    showToast(`Added ${quantity} x "${product.title}" to cart!`, "add");
   };
 
   const handleToggleWishlist = (product: any) => {
@@ -121,6 +124,12 @@ export default function ShopPage() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-800">
+      <QuickViewModal
+        product={quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+        onAddToCart={handleAddToCart}
+      />
+
       <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-linear-to-b from-amber-50/50 via-teal-50/30 to-white z-10 mix-blend-multiply" />
         <Image
@@ -192,6 +201,7 @@ export default function ShopPage() {
                 isInCart={cartItems.some((item: any) => item.id === product.id)}
                 onAddToCart={() => handleAddToCart(product)}
                 onToggleWishlist={() => handleToggleWishlist(product)}
+                onQuickView={() => setQuickViewProduct(product)}
               />
             ))}
           </div>
@@ -281,19 +291,34 @@ function SimpleProductCard({
   isInCart,
   isWishlisted,
   onToggleWishlist,
+  onQuickView,
 }: any) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const showFilled = mounted && isWishlisted;
+
   return (
     <div className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative">
       <button
         onClick={onToggleWishlist}
         className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full shadow-md transition-all duration-300 ${
-          isWishlisted
+          showFilled
             ? "bg-red-50 text-red-500"
             : "bg-white text-slate-400 hover:bg-red-50 hover:text-red-500"
         }`}
-        title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+        title={showFilled ? "Remove from wishlist" : "Add to wishlist"}
       >
-        <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} />
+        <Heart size={18} fill={showFilled ? "currentColor" : "none"} />
+      </button>
+      <button
+        onClick={onQuickView}
+        className="absolute top-16 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full shadow-md bg-white text-slate-400 hover:bg-blue-500 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0"
+        title="Quick View"
+      >
+        <Eye size={18} />
       </button>
 
       <div className="relative h-72 bg-[#F6F7FB] flex items-center justify-center p-6 group-hover:bg-[#ebf0f7] transition-colors">
@@ -309,12 +334,11 @@ function SimpleProductCard({
           {isInCart ? (
             <>
               <button
-                onClick={onAddToCart}
+                onClick={() => onAddToCart(product)}
                 className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-xs font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
               >
                 <ShoppingBag size={14} fill="currentColor" />
-                Add to cart
-                <Check size={14} className="ml-1" />
+                Add Again
               </button>
               <Link
                 href="/cart"
@@ -325,7 +349,7 @@ function SimpleProductCard({
             </>
           ) : (
             <button
-              onClick={onAddToCart}
+              onClick={() => onAddToCart(product)}
               className="flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-sm font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
             >
               <ShoppingBag size={16} fill="currentColor" />

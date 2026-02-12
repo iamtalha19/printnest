@@ -13,8 +13,7 @@ export async function GET(req: Request) {
     if (!token) {
       return NextResponse.json({ message: "No token" }, { status: 401 });
     }
-
-    const decoded = jwt.verify(token, SECRET_KEY!) as { id: string };
+    const decoded = jwt.verify(token, SECRET_KEY!) as { id: string }; 
     const users = await getUsers();
     const user = users.find((u) => u.id === decoded.id);
 

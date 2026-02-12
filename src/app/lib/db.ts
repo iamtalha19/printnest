@@ -8,6 +8,8 @@ export interface User {
   name: string;
   email: string;
   password?: string;
+  cart?: any[];
+  wishlist?: any[];
 }
 
 export interface Order {
@@ -17,24 +19,13 @@ export interface Order {
   status: string;
   total: number;
   items: any[];
-  customer?: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    province: string;
-    postcode: string;
-    paymentMethod: string;
-  };
+  customer?: any;
 }
 
 interface Database {
   users: User[];
   orders: Order[];
 }
-
 
 async function getDb(): Promise<Database> {
   try {
@@ -56,8 +47,21 @@ export async function getUsers() {
 
 export async function addUser(user: User) {
   const db = await getDb();
+  user.cart = [];
+  user.wishlist = [];
   db.users.push(user);
   await saveDb(db);
+}
+export async function updateUser(userId: string, data: Partial<User>) {
+  const db = await getDb();
+  const userIndex = db.users.findIndex(u => u.id === userId);
+  
+  if (userIndex !== -1) {
+    db.users[userIndex] = { ...db.users[userIndex], ...data };
+    await saveDb(db);
+    return true;
+  }
+  return false;
 }
 
 export async function getOrders(userId: string) {

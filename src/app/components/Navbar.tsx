@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -14,8 +14,8 @@ import {
 import db from "@/app/db.json";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/app/redux/Store";
-import { removeFromCart } from "@/app/redux/CartSlice";
-import { toggleWishlist } from "@/app/redux/WishListSlice";
+import { removeFromCart, clearCart } from "@/app/redux/CartSlice";
+import { toggleWishlist, clearWishlist } from "@/app/redux/WishListSlice";
 import { logout } from "@/app/redux/AuthSlice";
 
 export default function Navbar() {
@@ -30,12 +30,22 @@ export default function Navbar() {
   const { isAuthenticated, user } = useSelector(
     (state: RootState) => state.auth,
   );
-
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(clearCart());
+    dispatch(clearWishlist());
+
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("cartState");
+      localStorage.removeItem("wishlistItems");
+    }
   };
 
   return (
@@ -74,7 +84,7 @@ export default function Navbar() {
               className="relative w-11 h-11 rounded-full bg-white flex items-center justify-center text-slate-700 hover:text-blue-600 hover:shadow-md transition-all"
             >
               <ShoppingCart className="w-5 h-5" />
-              {totalQuantity > 0 && (
+              {mounted && totalQuantity > 0 && (
                 <span className="absolute -top-1 -right-1 bg-[#3B82F6] text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-[#EBF5FF]">
                   {totalQuantity}
                 </span>
@@ -84,7 +94,7 @@ export default function Navbar() {
               <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50 animate-in fade-in slide-in-from-top-2">
                 <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                   <span className="font-bold text-slate-800">
-                    My Cart ({totalQuantity})
+                    My Cart ({mounted ? totalQuantity : 0})
                   </span>
                 </div>
                 {cartItems.length === 0 ? (
@@ -141,8 +151,7 @@ export default function Navbar() {
               </div>
             )}
           </div>
-
-          {isAuthenticated ? (
+          {mounted && isAuthenticated ? (
             <div className="relative group">
               <Link
                 href="/account"
@@ -177,7 +186,6 @@ export default function Navbar() {
               <User className="w-5 h-5" />
             </Link>
           )}
-
           <div
             className="relative"
             onMouseEnter={() => setIsWishlistOpen(true)}
@@ -188,7 +196,7 @@ export default function Navbar() {
               className="relative w-11 h-11 rounded-full bg-white flex items-center justify-center text-slate-700 hover:text-blue-600 hover:shadow-md transition-all"
             >
               <Heart className="w-5 h-5" />
-              {wishlistItems.length > 0 && (
+              {mounted && wishlistItems.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-[#FF6B6B] text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-[#EBF5FF]">
                   {wishlistItems.length}
                 </span>
@@ -198,7 +206,7 @@ export default function Navbar() {
               <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50 animate-in fade-in slide-in-from-top-2">
                 <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                   <span className="font-bold text-slate-800">
-                    Wishlist ({wishlistItems.length})
+                    Wishlist ({mounted ? wishlistItems.length : 0})
                   </span>
                 </div>
                 {wishlistItems.length === 0 ? (

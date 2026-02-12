@@ -11,8 +11,16 @@ interface WishlistState {
   items: WishlistItem[];
 }
 
+const loadWishlist = (): WishlistItem[] => {
+  if (typeof window !== "undefined") {
+    const saved = localStorage.getItem("wishlistItems");
+    return saved ? JSON.parse(saved) : [];
+  }
+  return [];
+};
+
 const initialState: WishlistState = {
-  items: [],
+  items: loadWishlist(),
 };
 
 export const wishlistSlice = createSlice({
@@ -29,9 +37,15 @@ export const wishlistSlice = createSlice({
       } else {
         state.items.push(action.payload);
       }
+      if (typeof window !== "undefined") {
+        localStorage.setItem("wishlistItems", JSON.stringify(state.items));
+      }
     },
     clearWishlist: (state) => {
       state.items = [];
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("wishlistItems");
+      }
     },
   },
 });
