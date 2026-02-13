@@ -2,7 +2,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { X, Minus, Plus } from "lucide-react";
-export default function QuickViewModal({ product, onClose, onAddToCart }: any) {
+
+function QuickViewModal({ product, onClose, onAddToCart }: any) {
   const [quantity, setQuantity] = useState(1);
   if (!product) return null;
   return (
@@ -68,3 +69,5 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: any) {
     </div>
   );
 }
+
+export default QuickViewModal;

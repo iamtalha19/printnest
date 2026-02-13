@@ -8,9 +8,9 @@ import {
   Phone,
 } from "lucide-react";
 import db from "@/app/db.json";
-const footerData = db.footer;
 
-export default function Footer() {
+function Footer() {
+  const footerData = db.footer;
   const { newsletter, brand, columns, contact, bottom } = footerData;
 
   const socialIcons = {
@@ -156,13 +156,13 @@ export default function Footer() {
   );
 }
 
-function FooterLinkColumn({
+const FooterLinkColumn = ({
   title,
   links,
 }: {
   title: string;
   links: { label: string; url: string }[];
-}) {
+}) => {
   return (
     <div>
       <h4 className="text-white font-bold mb-6">
@@ -183,4 +183,6 @@ function FooterLinkColumn({
       </ul>
     </div>
   );
-}
+};
+
+export default Footer;

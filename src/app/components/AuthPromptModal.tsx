@@ -7,7 +7,7 @@ interface AuthPromptModalProps {
   onClose: () => void;
 }
 
-export default function AuthPromptModal({ onClose }: AuthPromptModalProps) {
+const AuthPromptModal = ({ onClose }: AuthPromptModalProps) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200">
@@ -61,4 +61,6 @@ export default function AuthPromptModal({ onClose }: AuthPromptModalProps) {
       </div>
     </div>
   );
-}
+};
+
+export default AuthPromptModal;

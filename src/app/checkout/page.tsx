@@ -4,7 +4,8 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { clearCart } from "@/app/redux/CartSlice";
 import AuthPromptModal from "@/app/components/AuthPromptModal";
 
 import {
@@ -13,6 +14,7 @@ import {
   CreditCard,
   Banknote,
   ChevronLeft,
+  X,
 } from "lucide-react";
 import db from "@/app/db.json";
 const checkoutConfig = db.checkout;
@@ -31,10 +33,12 @@ interface CheckoutData {
 }
 
 export default function CheckoutPage() {
+  const dispatch = useDispatch();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const { cartItems } = useSelector((state: any) => state.cart);
   const { isAuthenticated, user } = useSelector((state: any) => state.auth);
+  const [hasMounted, setHasMounted] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const subtotal = cartItems.reduce(
@@ -53,12 +57,24 @@ export default function CheckoutPage() {
     phone: "",
     paymentMethod: "cod",
   });
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
-    if (user?.email) {
-      setFormData((prev) => ({ ...prev, email: user.email }));
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        email: user.email || "",
+        firstName: user.name?.split(" ")[0] || "",
+        lastName: user.name?.split(" ")[1] || "",
+        phone: user.phone || "",
+        address: user.address || "",
+        city: user.city || "",
+      }));
     }
   }, [user]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsCheckingAuth(false);
@@ -66,7 +82,6 @@ export default function CheckoutPage() {
         setShowAuthModal(true);
       }
     }, 1000);
-
     return () => clearTimeout(timer);
   }, [isAuthenticated]);
 
@@ -75,14 +90,11 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!formRef.current?.checkValidity()) {
       const firstInvalid = formRef.current?.querySelector(
         ":invalid",
       ) as HTMLElement;
-      if (firstInvalid) {
-        firstInvalid.focus();
-      }
+      if (firstInvalid) firstInvalid.focus();
       return;
     }
 
@@ -92,24 +104,20 @@ export default function CheckoutPage() {
         items: cartItems,
         totalAmount: subtotal,
       };
-
       const response = await fetch("/api/place-order", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        alert("Order placed successfully!");
+        dispatch(clearCart());
         router.push("/thank-you");
       } else {
         throw new Error("API request failed");
       }
     } catch (error) {
-      console.error("Submission error:", error);
-      alert("Error: Could not place order. Please try again.");
+      alert("Error: Could not place order.");
     }
   };
 
@@ -122,7 +130,6 @@ export default function CheckoutPage() {
           }}
         />
       )}
-
       <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
         <Image
           src={checkoutConfig.backgroundImage}
@@ -136,7 +143,6 @@ export default function CheckoutPage() {
 
       <div className="relative z-10 pt-40">
         <CheckoutHeader />
-
         <div className="max-w-7xl mx-auto mt-30 px-4 lg:px-8 pb-32">
           <div
             className={`transition-all duration-300 ${showAuthModal || isCheckingAuth ? "opacity-50 blur-sm pointer-events-none" : "opacity-100"}`}
@@ -150,16 +156,10 @@ export default function CheckoutPage() {
                 <ContactSection
                   email={formData.email}
                   update={updateData}
-                  isReadOnly={!!user?.email}
+                  isReadOnly={hasMounted && !!user?.email}
                 />
-
                 <BillingSection data={formData} update={updateData} />
-
-                <PaymentSection
-                  selectedMethod={formData.paymentMethod}
-                  update={updateData}
-                />
-
+                <PaymentSection data={formData} update={updateData} />
                 <div className="pt-6 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
                   <Link
                     href="/cart"
@@ -185,6 +185,7 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
 function CheckoutHeader() {
   return (
     <div className="w-full pb-20 mt-50 flex flex-col items-center justify-center">
@@ -192,7 +193,6 @@ function CheckoutHeader() {
         Checkout
       </h1>
       <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10"></div>
-
       <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
         <Link href="/" className="hover:text-blue-600 transition-colors">
           {checkoutConfig.breadcrumbs.home}
@@ -209,15 +209,7 @@ function CheckoutHeader() {
   );
 }
 
-function ContactSection({
-  email,
-  update,
-  isReadOnly,
-}: {
-  email: string;
-  update: (d: Partial<CheckoutData>) => void;
-  isReadOnly?: boolean;
-}) {
+function ContactSection({ email, update, isReadOnly }: any) {
   return (
     <section>
       <h2 className="text-lg font-bold text-slate-700 mb-4">
@@ -241,18 +233,11 @@ function ContactSection({
   );
 }
 
-function BillingSection({
-  data,
-  update,
-}: {
-  data: CheckoutData;
-  update: (d: Partial<CheckoutData>) => void;
-}) {
+function BillingSection({ data, update }: any) {
   const InputClass =
     "w-full border border-slate-300 rounded-md px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-700 placeholder:text-slate-400";
   const LabelClass =
     "text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block";
-
   return (
     <section>
       <h2 className="text-lg font-bold text-slate-700 mb-4">Billing address</h2>
@@ -382,89 +367,12 @@ function BillingSection({
   );
 }
 
-function PaymentSection({
-  selectedMethod,
-  update,
-}: {
-  selectedMethod: "cod" | "bank";
-  update: (d: Partial<CheckoutData>) => void;
-}) {
-  return (
-    <section>
-      <h2 className="text-lg font-bold text-slate-700 mb-4">Payment options</h2>
-      <div className="space-y-3">
-        <PaymentOption
-          id="cod"
-          label="Cash on Delivery"
-          icon={<Banknote className="text-slate-600" size={20} />}
-          description="Pay with cash upon delivery."
-          isSelected={selectedMethod === "cod"}
-          onSelect={() => update({ paymentMethod: "cod" })}
-        />
-        <PaymentOption
-          id="bank"
-          label="Direct Bank Transfer"
-          icon={<CreditCard className="text-slate-600" size={20} />}
-          description="Make your payment directly into our bank account. Please use your Order ID as the payment reference."
-          isSelected={selectedMethod === "bank"}
-          onSelect={() => update({ paymentMethod: "bank" })}
-        />
-      </div>
-    </section>
-  );
-}
-
-function PaymentOption({
-  id,
-  label,
-  icon,
-  description,
-  isSelected,
-  onSelect,
-}: any) {
-  return (
-    <div
-      onClick={onSelect}
-      className={`border rounded-xl p-4 cursor-pointer transition-all ${
-        isSelected
-          ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
-          : "border-slate-200 hover:border-slate-300"
-      }`}
-    >
-      <div className="flex items-center gap-3">
-        <div
-          className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-            isSelected ? "border-blue-600" : "border-slate-400"
-          }`}
-        >
-          {isSelected && (
-            <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />
-          )}
-        </div>
-        {icon}
-        <span className="font-bold text-slate-800">{label}</span>
-      </div>
-      {isSelected && (
-        <div className="mt-3 ml-8 text-sm text-slate-500 animate-in fade-in slide-in-from-top-1">
-          {description}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function OrderSummary({
-  cartItems,
-  subtotal,
-}: {
-  cartItems: any[];
-  subtotal: number;
-}) {
+function OrderSummary({ cartItems, subtotal }: any) {
   return (
     <div className="bg-white border border-slate-200 rounded-lg p-6 lg:p-8 shadow-sm sticky top-40">
       <h3 className="text-lg font-bold text-slate-700 mb-6">Order summary</h3>
       <div className="space-y-6 mb-6">
-        {cartItems.map((item) => (
+        {cartItems.map((item: any) => (
           <div key={item.id} className="flex gap-4 items-start">
             <div className="relative w-16 h-16 border border-slate-200 rounded bg-slate-50 shrink-0">
               {item.image ? (
@@ -520,6 +428,71 @@ function OrderSummary({
           <span className="text-slate-900">${subtotal.toFixed(2)}</span>
         </div>
       </div>
+    </div>
+  );
+}
+
+function PaymentSection({
+  data,
+  update,
+}: {
+  data: CheckoutData;
+  update: (d: Partial<CheckoutData>) => void;
+}) {
+  return (
+    <section>
+      <h2 className="text-lg font-bold text-slate-700 mb-4">Payment options</h2>
+      <div className="space-y-3">
+        <PaymentOption
+          id="cod"
+          label="Cash on Delivery"
+          icon={<Banknote className="text-slate-600" size={20} />}
+          description="Pay with cash upon delivery."
+          isSelected={data.paymentMethod === "cod"}
+          onSelect={() => update({ paymentMethod: "cod" })}
+        />
+        <PaymentOption
+          id="bank"
+          label="Direct Bank Transfer"
+          icon={<CreditCard className="text-slate-600" size={20} />}
+          description="Make your payment directly into our bank account."
+          isSelected={data.paymentMethod === "bank"}
+          onSelect={() => update({ paymentMethod: "bank" })}
+        />
+      </div>
+    </section>
+  );
+}
+
+function PaymentOption({
+  id,
+  label,
+  icon,
+  description,
+  isSelected,
+  onSelect,
+}: any) {
+  return (
+    <div
+      onClick={onSelect}
+      className={`border rounded-xl p-4 cursor-pointer transition-all ${isSelected ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500" : "border-slate-200 hover:border-slate-300"}`}
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className={`w-5 h-5 rounded-full border flex items-center justify-center ${isSelected ? "border-blue-600" : "border-slate-400"}`}
+        >
+          {isSelected && (
+            <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />
+          )}
+        </div>
+        {icon}
+        <span className="font-bold text-slate-800">{label}</span>
+      </div>
+      {isSelected && (
+        <div className="mt-3 ml-8 text-sm text-slate-500 animate-in fade-in slide-in-from-top-1">
+          {description}
+        </div>
+      )}
     </div>
   );
 }

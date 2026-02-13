@@ -1,12 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "@/app/redux/AuthSlice";
 import { initializeCart } from "@/app/redux/CartSlice";
+import { initializeWishlist } from "@/app/redux/WishListSlice";
+import { RootState } from "@/app/redux/Store";
 
-export default function AuthInitializer() {
+function AuthInitializer() {
   const dispatch = useDispatch();
+
+  const cart = useSelector((state: RootState) => state.cart);
+  const wishlist = useSelector((state: RootState) => state.wishlist);
+  const auth = useSelector((state: RootState) => state.auth);
+
+  const [isLoaded, setIsLoaded] = useState(false);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -15,6 +24,7 @@ export default function AuthInitializer() {
         if (res.ok) {
           const data = await res.json();
           dispatch(loginSuccess({ user: data.user, token: "active" }));
+
           if (data.user.cart && Array.isArray(data.user.cart)) {
             const totalQty = data.user.cart.reduce(
               (acc: number, item: any) => acc + (item.quantity || 1),
@@ -34,12 +44,49 @@ export default function AuthInitializer() {
               }),
             );
           }
+
+          if (data.user.wishlist && Array.isArray(data.user.wishlist)) {
+            dispatch(initializeWishlist(data.user.wishlist));
+          }
         }
-      } catch (err) {}
+      } catch (err) {
+        console.error("Session check failed", err);
+      } finally {
+        setIsLoaded(true);
+      }
     };
 
     checkSession();
   }, [dispatch]);
 
+  useEffect(() => {
+    if (!isLoaded || !auth.isAuthenticated) return;
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    const syncData = async () => {
+      try {
+        await fetch("/api/auth/me", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cart: cart.cartItems,
+            wishlist: wishlist.items,
+          }),
+        });
+      } catch (error) {
+        console.error("Failed to sync data", error);
+      }
+    };
+
+    const timeoutId = setTimeout(syncData, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [cart.cartItems, wishlist.items, auth.isAuthenticated, isLoaded]);
+
   return null;
 }
+
+export default AuthInitializer;

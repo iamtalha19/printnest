@@ -18,7 +18,7 @@ import { removeFromCart, clearCart } from "@/app/redux/CartSlice";
 import { toggleWishlist, clearWishlist } from "@/app/redux/WishListSlice";
 import { logout } from "@/app/redux/AuthSlice";
 
-export default function Navbar() {
+function Navbar() {
   const navbarData = db.navbar;
   const dispatch = useDispatch();
   const { cartItems, totalQuantity } = useSelector(
@@ -270,3 +270,5 @@ export default function Navbar() {
     </header>
   );
 }
+
+export default Navbar;

@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/app/redux/AuthSlice";
+import { initializeCart } from "@/app/redux/CartSlice";
+import { initializeWishlist } from "@/app/redux/WishListSlice";
 import { Loader2, ChevronRight, Eye, EyeOff } from "lucide-react";
 import db from "@/app/db.json";
 
@@ -31,7 +33,39 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Login failed");
 
+      if (data.user.wishlist && Array.isArray(data.user.wishlist)) {
+        dispatch(initializeWishlist(data.user.wishlist));
+      } else {
+        dispatch(initializeWishlist([]));
+      }
+
+      if (data.user.cart && Array.isArray(data.user.cart)) {
+        const totalQty = data.user.cart.reduce(
+          (acc: number, item: any) => acc + (item.quantity || 1),
+          0,
+        );
+        const totalAmt = data.user.cart.reduce(
+          (acc: number, item: any) => acc + item.price * (item.quantity || 1),
+          0,
+        );
+
+        dispatch(
+          initializeCart({
+            cartItems: data.user.cart,
+            totalQuantity: totalQty,
+            totalAmount: totalAmt,
+          }),
+        );
+      } else {
+        dispatch(
+          initializeCart({ cartItems: [], totalQuantity: 0, totalAmount: 0 }),
+        );
+      }
+
+      // ✅ STEP 3: Dispatch Login Success LAST
+      // This triggers AuthInitializer, but since data is already in Redux, it won't overwrite with empty arrays.
       dispatch(loginSuccess({ user: data.user, token: data.token }));
+
       router.push("/");
     } catch (err: any) {
       setError(err.message);

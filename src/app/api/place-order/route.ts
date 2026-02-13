@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { addOrder } from "@/app/lib/db";
+import { addOrder, updateUser } from "@/app/lib/db";
 
 const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key-change-this";
 const transporter = nodemailer.createTransport({
@@ -38,13 +38,15 @@ export async function POST(req: Request) {
       customer: customer, 
     };
     await addOrder(newOrder);
+    if (userId !== "guest") {
+      await updateUser(userId, { cart: [] });
+    }
     try {
       const emailHtml = `
           <div style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #2563eb; border-bottom: 2px solid #eee; padding-bottom: 10px;">Order #${orderId}</h2>
             <p><strong>Date:</strong> ${newOrder.date}</p>
             <p><strong>Payment Method:</strong> ${customer.paymentMethod.toUpperCase()}</p>
-
             <h3 style="background-color: #f8f9fa; padding: 10px; border-radius: 5px;">Customer Details</h3>
             <p><strong>Name:</strong> ${customer.firstName} ${customer.lastName}</p>
             <p><strong>Email:</strong> ${customer.email}</p>
@@ -53,7 +55,6 @@ export async function POST(req: Request) {
               ${customer.address} ${customer.apartment ? `, ${customer.apartment}` : ""}<br>
               ${customer.city}, ${customer.province} ${customer.postcode}
             </p>
-
             <h3 style="margin-top: 20px;">Order Summary</h3>
             <table border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">
               <thead>
@@ -98,6 +99,7 @@ export async function POST(req: Request) {
       ]);
 
     } catch (emailError) {
+       console.error("Email failed", emailError);
     }
 
     return NextResponse.json(

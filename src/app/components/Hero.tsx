@@ -5,7 +5,7 @@ import db from "@/app/db.json";
 import { ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function Hero() {
+function Hero() {
   const heroData = db.hero;
   const { assets, content } = heroData;
 
@@ -305,3 +305,5 @@ export default function Hero() {
     </section>
   );
 }
+
+export default Hero;

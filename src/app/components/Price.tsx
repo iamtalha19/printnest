@@ -4,9 +4,8 @@ import { Check } from "lucide-react";
 import db from "@/app/db.json";
 import { motion } from "framer-motion";
 
-const pricingData = db.price;
-
-export default function PricingSection() {
+function PricingSection() {
+  const pricingData = db.price;
   const [isAnnual, setIsAnnual] = useState(false);
   const { header, toggles, plans } = pricingData;
   const containerVariants = {
@@ -162,3 +161,5 @@ const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
     </div>
   );
 };
+
+export default PricingSection;

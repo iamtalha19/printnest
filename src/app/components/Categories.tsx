@@ -66,7 +66,7 @@ interface CategoriesData {
   categories: Category[];
 }
 
-export default function Categories() {
+function Categories() {
   const [categoriesData, setCategoriesData] = useState<CategoriesData | null>(
     null,
   );
@@ -202,3 +202,5 @@ export default function Categories() {
     </section>
   );
 }
+
+export default Categories;

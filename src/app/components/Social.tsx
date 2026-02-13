@@ -5,7 +5,7 @@ import db from "@/app/db.json";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 
-export default function Social() {
+function Social() {
   const socialData = db.social;
   const { title, logos } = socialData;
 
@@ -56,3 +56,5 @@ export default function Social() {
     </section>
   );
 }
+
+export default Social;

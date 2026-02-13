@@ -6,7 +6,7 @@ interface ToastProps {
   type: "add" | "remove";
   onClose: () => void;
 }
-export default function Toast({ show, message, type, onClose }: ToastProps) {
+function Toast({ show, message, type, onClose }: ToastProps) {
   return (
     <div
       className={`fixed bottom-5 right-5 z-100 transform transition-all duration-500 ease-in-out ${show ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"}`}
@@ -35,3 +35,5 @@ export default function Toast({ show, message, type, onClose }: ToastProps) {
     </div>
   );
 }
+
+export default Toast;

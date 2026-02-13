@@ -1,9 +1,15 @@
+"use client";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface User {
+export interface User {
   id: string;
   email: string;
   name: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  cart?: any[];
+  wishlist?: any[];
 }
 
 interface AuthState {
@@ -35,8 +41,13 @@ const authSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
     },
+    updateUser: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
+    },
   },
 });
 
-export const { loginSuccess, logout } = authSlice.actions;
+export const { loginSuccess, logout, updateUser } = authSlice.actions;
 export default authSlice.reducer;

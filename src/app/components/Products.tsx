@@ -2,7 +2,6 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import db from "@/app/db.json";
-const productsData = db.products;
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/app/redux/CartSlice";
@@ -59,7 +58,8 @@ const BlindsImage = ({
   );
 };
 
-export default function FeaturedProducts() {
+function FeaturedProducts() {
+  const productsData = db.products;
   const dispatch = useDispatch();
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -328,3 +328,5 @@ export default function FeaturedProducts() {
     </section>
   );
 }
+
+export default FeaturedProducts;

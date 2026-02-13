@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import { addToCart, removeFromCart, deleteItem } from "@/app/redux/CartSlice";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import db from "@/app/db.json";
+import Loading from "@/app/components/Loading";
 
 const cartData = db.cart;
 
@@ -25,6 +26,19 @@ export default function CartPage() {
       acc + item.price * (item.quantity || 1),
     0,
   );
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <div className="min-h-screen pt-32 pb-20 px-4 flex items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-800">

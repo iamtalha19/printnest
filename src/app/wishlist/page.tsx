@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
@@ -9,6 +9,7 @@ import { toggleWishlist, WishlistItem } from "@/app/redux/WishListSlice";
 import { ChevronRight, ShoppingCart, Trash2 } from "lucide-react";
 import db from "@/app/db.json";
 import Toast from "@/app/components/products/Toast";
+import Loading from "@/app/components/Loading";
 const pageConfig = {
   backgroundImage: db.cart.backgroundImage,
   breadcrumbs: {
@@ -46,6 +47,20 @@ export default function WishlistPage() {
       setToast((prev) => ({ ...prev, show: false }));
     }, 3000);
   };
+
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <div className="min-h-screen pt-32 pb-20 px-4 flex items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-800">

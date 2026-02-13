@@ -11,7 +11,6 @@ import {
   ChevronRight,
   ChevronDown,
   ShoppingBag,
-  Check,
   Heart,
   Eye,
 } from "lucide-react";
@@ -294,11 +293,13 @@ function SimpleProductCard({
   onQuickView,
 }: any) {
   const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const showFilled = mounted && isWishlisted;
+  const showInCart = mounted && isInCart;
 
   return (
     <div className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative">
@@ -331,7 +332,7 @@ function SimpleProductCard({
           />
         </div>
         <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/5">
-          {isInCart ? (
+          {showInCart ? (
             <>
               <button
                 onClick={() => onAddToCart(product)}

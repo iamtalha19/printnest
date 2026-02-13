@@ -16,6 +16,7 @@ import {
   Calendar,
   CheckCircle,
   Clock,
+  User as UserIcon,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/app/redux/Store";
@@ -53,12 +54,31 @@ export default function MyAccountPage() {
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    name: "",
+    phone: "",
+    address: "",
+    city: "",
+    country: "Pakistan",
+  });
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchOrders();
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (user) {
+      setProfileForm({
+        name: user.name || "",
+        phone: user.phone || "",
+        address: user.address || "",
+        city: user.city || "",
+        country: user.country || "Pakistan",
+      });
+    }
+  }, [user]);
 
   const fetchOrders = async () => {
     try {
@@ -76,17 +96,14 @@ export default function MyAccountPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
-
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginForm),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Login failed");
-
       dispatch(loginSuccess({ user: data.user, token: data.token }));
     } catch (err: any) {
       setError(err.message);
@@ -105,7 +122,6 @@ export default function MyAccountPage() {
       typeof product.price === "string"
         ? parseFloat(product.price.replace(/[^0-9.]/g, ""))
         : product.price;
-
     dispatch(
       addToCart({
         id: product.id,
@@ -118,6 +134,27 @@ export default function MyAccountPage() {
     alert(`Added ${quantity} x "${product.title || product.name}" to cart!`);
   };
 
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    try {
+      const res = await fetch("/api/auth/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profileForm),
+      });
+      if (res.ok) {
+        alert("Profile updated successfully!");
+        dispatch(
+          loginSuccess({ user: { ...user, ...profileForm }, token: "active" }),
+        );
+      }
+    } catch (error) {
+      alert("Failed to update profile");
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="relative min-h-screen bg-white font-sans text-slate-800">
@@ -127,7 +164,6 @@ export default function MyAccountPage() {
             <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">
               Login to your account
             </h2>
-
             <form
               onSubmit={handleLogin}
               className="border border-slate-200 rounded-xl p-8 bg-white shadow-xl shadow-slate-200/50"
@@ -137,7 +173,6 @@ export default function MyAccountPage() {
                   {error}
                 </div>
               )}
-
               <div className="space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">
@@ -153,7 +188,6 @@ export default function MyAccountPage() {
                     }
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">
                     Password
@@ -177,7 +211,6 @@ export default function MyAccountPage() {
                     </button>
                   </div>
                 </div>
-
                 <button
                   type="submit"
                   disabled={loading}
@@ -185,7 +218,6 @@ export default function MyAccountPage() {
                 >
                   {loading ? "Signing in..." : "Log in"}
                 </button>
-
                 <div className="text-center text-sm text-slate-500 mt-4">
                   Don't have an account?{" "}
                   <Link
@@ -216,7 +248,6 @@ export default function MyAccountPage() {
           >
             <ArrowLeft size={18} /> Back to Dashboard
           </button>
-
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/50">
               <div>
@@ -244,7 +275,6 @@ export default function MyAccountPage() {
                 </p>
               </div>
             </div>
-
             <div className="p-8">
               <h3 className="font-bold text-slate-900 mb-4">Items Ordered</h3>
               <div className="space-y-4">
@@ -297,7 +327,6 @@ export default function MyAccountPage() {
         onClose={() => setQuickViewProduct(null)}
         onAddToCart={handleAddToCart}
       />
-
       <PageHeader
         title={`Welcome, ${user?.name || "User"}`}
         breadcrumb="Dashboard"
@@ -305,7 +334,6 @@ export default function MyAccountPage() {
 
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Navigation */}
           <div className="lg:w-1/4 shrink-0">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden sticky top-24">
               <div className="p-6 border-b border-slate-100 flex items-center gap-4 bg-slate-50/50">
@@ -329,6 +357,12 @@ export default function MyAccountPage() {
                   label="Dashboard"
                 />
                 <NavButton
+                  active={activeTab === "profile"}
+                  onClick={() => setActiveTab("profile")}
+                  icon={<UserIcon size={18} />}
+                  label="Edit Profile"
+                />
+                <NavButton
                   active={activeTab === "orders"}
                   onClick={() => setActiveTab("orders")}
                   icon={<Package size={18} />}
@@ -350,8 +384,7 @@ export default function MyAccountPage() {
                   onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl transition-colors mt-2"
                 >
-                  <LogOut size={18} />
-                  Logout
+                  <LogOut size={18} /> Logout
                 </button>
               </nav>
             </div>
@@ -391,12 +424,129 @@ export default function MyAccountPage() {
                     >
                       recent orders
                     </button>
-                    , see your wishlist, and manage your account details.
+                    ,{" "}
+                    <button
+                      onClick={() => setActiveTab("cart")}
+                      className="text-purple-600 hover:underline"
+                    >
+                      items in cart
+                    </button>
+                    ,{" "}
+                    <button
+                      onClick={() => setActiveTab("wishlist")}
+                      className="text-purple-600 hover:underline"
+                    >
+                      items in wishlist
+                    </button>
+                    {" and "}edit your{" "}
+                    <button
+                      onClick={() => setActiveTab("profile")}
+                      className="text-purple-600 hover:underline"
+                    >
+                      account details
+                    </button>
+                    .
                   </p>
                 </div>
               </div>
             )}
-
+            {activeTab === "profile" && (
+              <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                <h3 className="text-xl font-bold text-slate-900 mb-6">
+                  Edit Profile
+                </h3>
+                <form
+                  onSubmit={handleUpdateProfile}
+                  className="space-y-6 max-w-2xl"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Full Name
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all"
+                        value={profileForm.name}
+                        onChange={(e) =>
+                          setProfileForm({
+                            ...profileForm,
+                            name: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all"
+                        value={profileForm.phone}
+                        onChange={(e) =>
+                          setProfileForm({
+                            ...profileForm,
+                            phone: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all"
+                      value={profileForm.address}
+                      onChange={(e) =>
+                        setProfileForm({
+                          ...profileForm,
+                          address: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all"
+                        value={profileForm.city}
+                        onChange={(e) =>
+                          setProfileForm({
+                            ...profileForm,
+                            city: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Country
+                      </label>
+                      <input
+                        type="text"
+                        disabled
+                        className="w-full border border-slate-200 bg-slate-50 rounded-lg px-4 py-2.5 text-slate-500"
+                        value={profileForm.country}
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className="px-8 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors shadow-lg shadow-purple-200"
+                  >
+                    Save Changes
+                  </button>
+                </form>
+              </div>
+            )}
             {activeTab === "orders" && (
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <div className="p-6 border-b border-slate-100">
@@ -439,11 +589,7 @@ export default function MyAccountPage() {
                             <td className="px-6 py-4">{order.date}</td>
                             <td className="px-6 py-4">
                               <span
-                                className={`px-2 py-1 rounded text-xs font-bold ${
-                                  order.status === "Completed"
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-yellow-100 text-yellow-700"
-                                }`}
+                                className={`px-2 py-1 rounded text-xs font-bold ${order.status === "Completed" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}
                               >
                                 {order.status}
                               </span>
@@ -521,7 +667,6 @@ export default function MyAccountPage() {
                 )}
               </div>
             )}
-
             {activeTab === "cart" && (
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                 <h3 className="text-xl font-bold text-slate-900 mb-6">
@@ -591,25 +736,12 @@ export default function MyAccountPage() {
     </div>
   );
 }
-function NavButton({
-  active,
-  onClick,
-  icon,
-  label,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  label: string;
-}) {
+
+const NavButton = ({ active, onClick, icon, label }: any) => {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all mb-1 ${
-        active
-          ? "bg-purple-600 text-white shadow-lg shadow-purple-200"
-          : "text-slate-600 hover:bg-slate-50"
-      }`}
+      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all mb-1 ${active ? "bg-purple-600 text-white shadow-lg shadow-purple-200" : "text-slate-600 hover:bg-slate-50"}`}
     >
       <span
         className={
@@ -621,9 +753,8 @@ function NavButton({
       {label}
     </button>
   );
-}
-
-function StatCard({
+};
+const StatCard = ({
   label,
   value,
   icon,
@@ -633,7 +764,7 @@ function StatCard({
   value: string;
   icon: React.ReactNode;
   bg: string;
-}) {
+}) => {
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
       <div
@@ -647,15 +778,15 @@ function StatCard({
       </div>
     </div>
   );
-}
+};
 
-function PageHeader({
+const PageHeader = ({
   title,
   breadcrumb,
 }: {
   title: string;
   breadcrumb: string;
-}) {
+}) => {
   return (
     <div className="relative w-full h-175 z-0">
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
@@ -685,4 +816,4 @@ function PageHeader({
       </div>
     </div>
   );
-}
+};

@@ -68,7 +68,7 @@ const RevealText = ({
   );
 };
 
-export default function About() {
+function About() {
   const aboutData = db.about;
 
   return (
@@ -179,3 +179,5 @@ export default function About() {
     </section>
   );
 }
+
+export default About;

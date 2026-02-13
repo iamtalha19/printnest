@@ -50,7 +50,7 @@ const BlindsImage = ({
   );
 };
 
-export default function LatestNews() {
+const LatestNews = () => {
   const latestNewsData = db.blog;
   const { sectionInfo, posts } = latestNewsData;
   const headerVariants: any = {
@@ -141,9 +141,9 @@ export default function LatestNews() {
       </div>
     </section>
   );
-}
+};
 
-function BlogCard({ post, index }: { post: any; index: number }) {
+const BlogCard = ({ post, index }: { post: any; index: number }) => {
   const slug = post.title.toLowerCase().replace(/\s+/g, "-");
 
   return (
@@ -186,4 +186,6 @@ function BlogCard({ post, index }: { post: any; index: number }) {
       </article>
     </Link>
   );
-}
+};
+
+export default LatestNews;

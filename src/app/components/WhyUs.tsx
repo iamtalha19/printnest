@@ -5,7 +5,7 @@ import db from "@/app/db.json";
 import { Printer, Settings2, Headset, PenTool, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function WhyChooseUs() {
+function WhyChooseUs() {
   const whyChooseUsData = db.whyus;
   const { header, features } = whyChooseUsData;
 
@@ -123,3 +123,5 @@ const FeatureCard = ({ item }: { item: any }) => {
     </motion.div>
   );
 };
+
+export default WhyChooseUs;

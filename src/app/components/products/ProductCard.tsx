@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, Eye, Heart, Maximize2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
-export default function ProductCard({
+function ProductCard({
   product,
   isWishlisted,
   onToggleWishlist,
@@ -11,6 +12,11 @@ export default function ProductCard({
   onAddToCart,
 }: any) {
   const slug = product.title.toLowerCase().replace(/\s+/g, "-");
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  const activeWishlist = isMounted && isWishlisted;
 
   return (
     <Link href={`/product/${slug}`}>
@@ -39,9 +45,13 @@ export default function ProductCard({
               e.preventDefault();
               onToggleWishlist(product.id, product.title);
             }}
-            className={`w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-all ${isWishlisted ? "bg-red-500 text-white" : "bg-white text-slate-400 hover:bg-blue-500 hover:text-white"}`}
+            className={`w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-all ${
+              activeWishlist
+                ? "bg-red-500 text-white"
+                : "bg-white text-slate-400 hover:bg-blue-500 hover:text-white"
+            }`}
           >
-            <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} />
+            <Heart size={18} fill={activeWishlist ? "currentColor" : "none"} />
           </button>
         </div>
         <div className="mb-4">
@@ -86,3 +96,5 @@ export default function ProductCard({
     </Link>
   );
 }
+
+export default ProductCard;

@@ -2,14 +2,26 @@ import fs from 'fs/promises';
 import path from 'path';
 
 const DB_PATH = path.join(process.cwd(), 'src/app/logindb.json');
+export interface SavedCard {
+  id: string;
+  number: string;
+  expiry: string;
+  cvc: string;
+  name: string;
+}
 
 export interface User {
   id: string;
   name: string;
   email: string;
   password?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
   cart?: any[];
   wishlist?: any[];
+  savedCards?: SavedCard[];
 }
 
 export interface Order {
@@ -49,6 +61,7 @@ export async function addUser(user: User) {
   const db = await getDb();
   user.cart = [];
   user.wishlist = [];
+  user.savedCards = []; 
   db.users.push(user);
   await saveDb(db);
 }

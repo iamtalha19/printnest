@@ -5,7 +5,7 @@ import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import db from "@/app/db.json";
 import { motion } from "framer-motion";
 
-export default function Testimonials() {
+function Testimonials() {
   const testimonialsData = db.testimonials;
   const { header, testimonials } = testimonialsData;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -100,7 +100,7 @@ export default function Testimonials() {
   );
 }
 
-function TestimonialCard({ item }: { item: any }) {
+const TestimonialCard = ({ item }: { item: any }) => {
   return (
     <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-xl transition-all duration-300 group">
       <div className="flex items-center gap-4 mb-8">
@@ -133,15 +133,15 @@ function TestimonialCard({ item }: { item: any }) {
       </div>
     </div>
   );
-}
+};
 
-function NavButton({
+const NavButton = ({
   onClick,
   icon,
 }: {
   onClick: () => void;
   icon: React.ReactNode;
-}) {
+}) => {
   return (
     <button
       onClick={onClick}
@@ -150,4 +150,6 @@ function NavButton({
       {icon}
     </button>
   );
-}
+};
+
+export default Testimonials;

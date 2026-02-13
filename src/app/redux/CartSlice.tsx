@@ -42,10 +42,6 @@ export const cartSlice = createSlice({
         (item) => item.id === newItem.id,
       );
       const quantityToAdd = newItem.quantity || 1;
-
-      state.totalQuantity += quantityToAdd;
-      state.totalAmount += newItem.price * quantityToAdd;
-
       if (!existingItem) {
         state.cartItems.push({
           id: newItem.id,
@@ -59,6 +55,14 @@ export const cartSlice = createSlice({
         existingItem.quantity += quantityToAdd;
         existingItem.totalPrice += newItem.price * quantityToAdd;
       }
+      state.totalQuantity = state.cartItems.reduce(
+        (acc, item) => acc + item.quantity,
+        0,
+      );
+      state.totalAmount = state.cartItems.reduce(
+        (acc, item) => acc + item.totalPrice,
+        0,
+      );
 
       if (typeof window !== "undefined") {
         localStorage.setItem("cartState", JSON.stringify(state));
@@ -70,15 +74,20 @@ export const cartSlice = createSlice({
       const existingItem = state.cartItems.find((item) => item.id === id);
 
       if (existingItem) {
-        state.totalQuantity--;
-        state.totalAmount -= existingItem.price;
-
         if (existingItem.quantity === 1) {
           state.cartItems = state.cartItems.filter((item) => item.id !== id);
         } else {
           existingItem.quantity--;
           existingItem.totalPrice -= existingItem.price;
         }
+        state.totalQuantity = state.cartItems.reduce(
+          (acc, item) => acc + item.quantity,
+          0,
+        );
+        state.totalAmount = state.cartItems.reduce(
+          (acc, item) => acc + item.totalPrice,
+          0,
+        );
       }
 
       if (typeof window !== "undefined") {
@@ -88,12 +97,15 @@ export const cartSlice = createSlice({
 
     deleteItem: (state, action: PayloadAction<number | string>) => {
       const id = action.payload;
-      const existingItem = state.cartItems.find((item) => item.id === id);
-      if (existingItem) {
-        state.totalQuantity -= existingItem.quantity;
-        state.totalAmount -= existingItem.totalPrice;
-        state.cartItems = state.cartItems.filter((item) => item.id !== id);
-      }
+      state.cartItems = state.cartItems.filter((item) => item.id !== id);
+      state.totalQuantity = state.cartItems.reduce(
+        (acc, item) => acc + item.quantity,
+        0,
+      );
+      state.totalAmount = state.cartItems.reduce(
+        (acc, item) => acc + item.totalPrice,
+        0,
+      );
 
       if (typeof window !== "undefined") {
         localStorage.setItem("cartState", JSON.stringify(state));

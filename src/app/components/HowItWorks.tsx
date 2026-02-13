@@ -1,7 +1,6 @@
 "use client";
 
 import db from "@/app/db.json";
-const howItWorksData = db.howitworks;
 import {
   Play,
   MousePointer2,
@@ -11,7 +10,8 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function HowItWorks() {
+function HowItWorks() {
+  const howItWorksData = db.howitworks;
   const {
     sectionLabel,
     headingMain,
@@ -158,15 +158,15 @@ const iconMap: Record<string, any> = {
   Printer,
 };
 
-function resolveIcon(icon: any) {
+const resolveIcon = (icon: any) => {
   if (!icon) return HelpCircle;
   if (typeof icon === "string") {
     return (iconMap as any)[icon] ?? HelpCircle;
   }
   return icon;
-}
+};
 
-function StepCard({ data }: { data: any }) {
+const StepCard = ({ data }: { data: any }) => {
   const Icon = resolveIcon(data.icon);
   const { bg, hoverBorder, hoverShadow, iconBg, iconShadow } = data.theme;
   const iconBounceVariant: any = {
@@ -211,4 +211,6 @@ function StepCard({ data }: { data: any }) {
       </p>
     </motion.div>
   );
-}
+};
+
+export default HowItWorks;

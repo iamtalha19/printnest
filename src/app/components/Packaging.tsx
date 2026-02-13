@@ -4,9 +4,8 @@ import React from "react";
 import db from "@/app/db.json";
 import { motion } from "framer-motion";
 
-const packagingHeroData = db.packaging;
-
-export default function PackagingHero() {
+function PackagingHero() {
+  const packagingHeroData = db.packaging;
   const { header, video } = packagingHeroData;
   const fadeUpVariant: any = {
     hidden: { opacity: 0, y: 30 },
@@ -122,3 +121,5 @@ export default function PackagingHero() {
     </section>
   );
 }
+
+export default PackagingHero;

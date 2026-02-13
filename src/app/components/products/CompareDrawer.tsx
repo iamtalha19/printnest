@@ -9,7 +9,8 @@ import {
   Share2,
   Plus as PlusIcon,
 } from "lucide-react";
-export default function CompareDrawer({
+
+function CompareDrawer({
   isOpen,
   compareItems,
   allProducts,
@@ -229,3 +230,5 @@ export default function CompareDrawer({
     </div>
   );
 }
+
+export default CompareDrawer;
