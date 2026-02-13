@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginSuccess } from "@/app/redux/AuthSlice";
+import { loginSuccess, setAuthLoaded } from "@/app/redux/AuthSlice";
 import { initializeCart } from "@/app/redux/CartSlice";
 import { initializeWishlist } from "@/app/redux/WishListSlice";
 import { RootState } from "@/app/redux/Store";
@@ -53,6 +53,7 @@ function AuthInitializer() {
         console.error("Session check failed", err);
       } finally {
         setIsLoaded(true);
+        dispatch(setAuthLoaded());
       }
     };
 

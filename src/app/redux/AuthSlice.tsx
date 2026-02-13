@@ -17,12 +17,14 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
   token: null,
   isAuthenticated: false,
+  isLoading: true,
 };
 
 const authSlice = createSlice({
@@ -36,11 +38,16 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.isAuthenticated = true;
+      state.isLoading = false;
     },
     logout: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+      state.isLoading = false;
+    },
+    setAuthLoaded: (state) => {
+      state.isLoading = false;
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
@@ -50,5 +57,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { loginSuccess, logout, updateUser } = authSlice.actions;
+export const { loginSuccess, logout, updateUser, setAuthLoaded } =
+  authSlice.actions;
 export default authSlice.reducer;

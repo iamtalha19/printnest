@@ -30,7 +30,23 @@ export async function GET() {
 
     const recentOrders = [...orders]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 10);
+      .slice(0, 10)
+      .map((order) => {
+        // Find the user who placed this order
+        const customer = users.find((user) => user.id === order.userId);
+        
+        // Add customer information to the order
+        return {
+          ...order,
+          customer: customer ? {
+            name: customer.name,
+            email: customer.email,
+            address: customer.address,
+            city: customer.city,
+            country: customer.country,
+          } : null,
+        };
+      });
       
     const usersWithDetails = users.map((user) => {
       const { password, ...userWithoutPassword } = user;
