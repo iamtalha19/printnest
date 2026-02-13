@@ -62,11 +62,13 @@ export default function LoginPage() {
         );
       }
 
-      // ✅ STEP 3: Dispatch Login Success LAST
-      // This triggers AuthInitializer, but since data is already in Redux, it won't overwrite with empty arrays.
       dispatch(loginSuccess({ user: data.user, token: data.token }));
 
-      router.push("/");
+      if (data.user.isAdmin) {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/");
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -82,7 +84,7 @@ export default function LoginPage() {
           src={db.shop.backgroundImage}
           alt="Background"
           fill
-          className="object-fill opacity-80"
+          className="object-cover opacity-80"
           priority
         />
         <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
@@ -125,6 +127,7 @@ export default function LoginPage() {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   required
                   className="w-full border border-slate-300 rounded-lg px-4 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all"
                   placeholder="name@example.com"
@@ -141,6 +144,7 @@ export default function LoginPage() {
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
+                    name="password"
                     required
                     className="w-full border border-slate-300 rounded-lg px-4 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all pr-12"
                     placeholder="Enter your password"

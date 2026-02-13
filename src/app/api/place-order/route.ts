@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { addOrder, updateUser } from "@/app/lib/db";
 
-const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key-change-this";
+const SECRET_KEY = process.env.JWT_SECRET;
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
     if (token) {
       try {
-        const decoded = jwt.verify(token, SECRET_KEY) as { id: string };
+        const decoded = jwt.verify(token, SECRET_KEY!) as { id: string };
         userId = decoded.id;
       } catch (error) {
       }

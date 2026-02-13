@@ -17,10 +17,12 @@ import { RootState } from "@/app/redux/Store";
 import { removeFromCart, clearCart } from "@/app/redux/CartSlice";
 import { toggleWishlist, clearWishlist } from "@/app/redux/WishListSlice";
 import { logout } from "@/app/redux/AuthSlice";
+import { useRouter } from "next/navigation";
 
 function Navbar() {
   const navbarData = db.navbar;
   const dispatch = useDispatch();
+  const router = useRouter();
   const { cartItems, totalQuantity } = useSelector(
     (state: RootState) => state.cart,
   );
@@ -37,14 +39,20 @@ function Navbar() {
     setMounted(true);
   }, []);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    dispatch(clearCart());
-    dispatch(clearWishlist());
-
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("cartState");
-      localStorage.removeItem("wishlistItems");
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      dispatch(logout());
+      dispatch(clearCart());
+      dispatch(clearWishlist());
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("cartState");
+        localStorage.removeItem("wishlistItems");
+      }
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed:", error);
     }
   };
 
@@ -91,7 +99,7 @@ function Navbar() {
               )}
             </Link>
             {isCartOpen && (
-              <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50">
                 <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                   <span className="font-bold text-slate-800">
                     My Cart ({mounted ? totalQuantity : 0})
@@ -143,7 +151,7 @@ function Navbar() {
                 <div className="mt-4 pt-3 border-t border-slate-100">
                   <Link
                     href="/cart"
-                    className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 rounded-lg transition-colors shadow-lg shadow-blue-200"
+                    className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 rounded-lg transition-colors shadow-lg"
                   >
                     View Cart & Checkout
                   </Link>
@@ -154,7 +162,7 @@ function Navbar() {
           {mounted && isAuthenticated ? (
             <div className="relative group">
               <Link
-                href="/account"
+                href={user?.isAdmin ? "/admin/dashboard" : "/account"}
                 className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-slate-700 hover:text-blue-600 hover:shadow-md transition-all"
               >
                 <User className="w-5 h-5" />
@@ -165,10 +173,10 @@ function Navbar() {
                   <span className="text-slate-800 text-sm">{user?.name}</span>
                 </div>
                 <Link
-                  href="/account"
+                  href={user?.isAdmin ? "/admin/dashboard" : "/account"}
                   className="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md transition-colors"
                 >
-                  My Account
+                  {user?.isAdmin ? "Admin Dashboard" : "My Account"}
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -203,7 +211,7 @@ function Navbar() {
               )}
             </Link>
             {isWishlistOpen && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50">
                 <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                   <span className="font-bold text-slate-800">
                     Wishlist ({mounted ? wishlistItems.length : 0})

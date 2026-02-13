@@ -88,3 +88,32 @@ export async function addOrder(order: Order) {
   db.orders.push(order);
   await saveDb(db);
 }
+
+export async function getAllOrders() {
+  const db = await getDb();
+  return db.orders || [];
+}
+
+export async function deleteUser(userId: string) {
+  const db = await getDb();
+  const userIndex = db.users.findIndex((u) => u.id === userId);
+
+  if (userIndex !== -1) {
+    db.users.splice(userIndex, 1);
+    await saveDb(db);
+    return true;
+  }
+  return false;
+}
+
+export async function updateOrderStatus(orderId: string, status: string) {
+  const db = await getDb();
+  const orderIndex = db.orders?.findIndex((o) => o.id === orderId);
+
+  if (orderIndex !== undefined && orderIndex !== -1) {
+    db.orders[orderIndex].status = status;
+    await saveDb(db);
+    return db.orders[orderIndex];
+  }
+  return null;
+}

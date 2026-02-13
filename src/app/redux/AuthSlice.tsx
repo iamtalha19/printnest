@@ -10,6 +10,7 @@ export interface User {
   country?: string;
   cart?: any[];
   wishlist?: any[];
+  isAdmin?: boolean;
 }
 
 interface AuthState {

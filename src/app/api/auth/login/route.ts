@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { getUsers } from "@/app/lib/db";
 
 const SECRET_KEY = process.env.JWT_SECRET;
+const ADMIN_EMAIL = process.env.EMAIL_USER;
 
 export async function POST(req: Request) {
   try {
@@ -33,9 +34,10 @@ export async function POST(req: Request) {
       maxAge: 3600 
     });
     const { password: _, ...userWithoutPassword } = user;
+    const isAdmin = user.email === ADMIN_EMAIL;
     return NextResponse.json({ 
       token, 
-      user: userWithoutPassword 
+      user: { ...userWithoutPassword, isAdmin }
     });
   } catch (error) {
     console.error("Login error:", error);

@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 import { getUsers, updateUser } from "@/app/lib/db";
 
 const SECRET_KEY = process.env.JWT_SECRET;
+const ADMIN_EMAIL = process.env.EMAIL_USER; 
+
 async function getCurrentUserId() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
@@ -30,16 +32,16 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "User not found" }, { status: 401 });
     }
     const { password, ...userWithoutPassword } = user;
+    const isAdmin = user.email === ADMIN_EMAIL;
 
     return NextResponse.json({ 
-      user: userWithoutPassword 
+      user: { ...userWithoutPassword, isAdmin } 
     });
 
   } catch (error) {
     return NextResponse.json({ message: "Invalid token" }, { status: 401 });
   }
 }
-
 export async function PUT(req: Request) {
   try {
     const userId = await getCurrentUserId();
