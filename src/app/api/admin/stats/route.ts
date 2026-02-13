@@ -31,8 +31,7 @@ export async function GET() {
     const recentOrders = [...orders]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 10);
-
-    // Enhanced user data with cart and wishlist info
+      
     const usersWithDetails = users.map((user) => {
       const { password, ...userWithoutPassword } = user;
       return {

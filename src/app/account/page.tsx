@@ -23,8 +23,8 @@ import { RootState } from "@/app/redux/Store";
 import { loginSuccess, logout } from "@/app/redux/AuthSlice";
 import { addToCart } from "@/app/redux/CartSlice";
 import { useRouter } from "next/navigation";
-import QuickViewModal from "@/app/components/products/QuickViewModal";
 import db from "@/app/db.json";
+import QuickViewModal from "@/app/components/products/QuickViewModal";
 
 interface Order {
   id: string;
@@ -64,6 +64,7 @@ export default function MyAccountPage() {
     country: "Pakistan",
   });
 
+  // ✅ Admin Redirection
   useEffect(() => {
     if (isAuthenticated && user?.isAdmin) {
       router.push("/admin/dashboard");
@@ -112,7 +113,9 @@ export default function MyAccountPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Login failed");
+
       dispatch(loginSuccess({ user: data.user, token: data.token }));
+
       if (data.user.isAdmin) {
         router.push("/admin/dashboard");
       }
@@ -179,7 +182,7 @@ export default function MyAccountPage() {
             </h2>
             <form
               onSubmit={handleLogin}
-              className="border border-slate-200 rounded-xl p-8 bg-white shadow-xl"
+              className="border border-slate-200 rounded-xl p-8 bg-white shadow-xl shadow-slate-200/50"
             >
               {error && (
                 <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
@@ -194,7 +197,7 @@ export default function MyAccountPage() {
                   <input
                     type="email"
                     required
-                    className="w-full border border-slate-300 rounded-lg px-4 py-3 outline-none focus:border-purple-500"
+                    className="w-full border border-slate-300 rounded-lg px-4 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all"
                     value={loginForm.email}
                     onChange={(e) =>
                       setLoginForm({ ...loginForm, email: e.target.value })
@@ -209,7 +212,7 @@ export default function MyAccountPage() {
                     <input
                       type={showPassword ? "text" : "password"}
                       required
-                      className="w-full border border-slate-300 rounded-lg px-4 py-3 outline-none focus:border-purple-500"
+                      className="w-full border border-slate-300 rounded-lg px-4 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all pr-12"
                       value={loginForm.password}
                       onChange={(e) =>
                         setLoginForm({ ...loginForm, password: e.target.value })
@@ -218,7 +221,7 @@ export default function MyAccountPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -227,10 +230,19 @@ export default function MyAccountPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 rounded-lg bg-linear-to-r from-purple-600 to-blue-500 text-white font-bold shadow-lg"
+                  className="w-full py-3.5 rounded-lg bg-linear-to-r from-purple-600 to-blue-500 text-white font-bold shadow-lg shadow-purple-200 hover:shadow-xl hover:scale-[1.01] transition-all disabled:opacity-70 disabled:scale-100"
                 >
                   {loading ? "Signing in..." : "Log in"}
                 </button>
+                <div className="text-center text-sm text-slate-500 mt-4">
+                  Don't have an account?{" "}
+                  <Link
+                    href="/signup"
+                    className="text-purple-600 font-bold hover:underline"
+                  >
+                    Sign up
+                  </Link>
+                </div>
               </div>
             </form>
           </div>
@@ -254,7 +266,7 @@ export default function MyAccountPage() {
             <ArrowLeft size={18} /> Back to Dashboard
           </button>
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start gap-4">
+            <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/50">
               <div>
                 <h2 className="text-2xl font-bold text-slate-900">
                   Order Details
@@ -268,7 +280,7 @@ export default function MyAccountPage() {
                       <CheckCircle size={14} className="text-green-500" />
                     ) : (
                       <Clock size={14} className="text-orange-500" />
-                    )}{" "}
+                    )}
                     {selectedOrder.status}
                   </span>
                 </div>
@@ -286,9 +298,9 @@ export default function MyAccountPage() {
                 {selectedOrder.items.map((item, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-4 py-4 border-b last:border-0"
+                    className="flex items-center gap-4 py-4 border-b border-slate-50 last:border-0"
                   >
-                    <div className="h-20 w-20 bg-slate-50 rounded-lg relative overflow-hidden border">
+                    <div className="h-20 w-20 bg-slate-50 rounded-lg relative overflow-hidden shrink-0 border border-slate-100">
                       {item.image ? (
                         <Image
                           src={item.image}
@@ -342,7 +354,7 @@ export default function MyAccountPage() {
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:w-1/4 shrink-0">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden sticky top-24">
-              <div className="p-6 border-b border-slate-100 flex items-center gap-4">
+              <div className="p-6 border-b border-slate-100 flex items-center gap-4 bg-slate-50/50">
                 <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-xl">
                   {user?.name?.[0]?.toUpperCase() || "U"}
                 </div>
@@ -388,7 +400,7 @@ export default function MyAccountPage() {
                 />
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl mt-2 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl transition-colors mt-2"
                 >
                   <LogOut size={18} /> Logout
                 </button>
@@ -418,236 +430,61 @@ export default function MyAccountPage() {
                     bg="bg-orange-50"
                   />
                 </div>
-                <div className="bg-white p-8 rounded-2xl shadow-sm border">
-                  <h3 className="text-xl font-bold mb-4">
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">
                     Hello, {user?.name}!
                   </h3>
                   <p className="text-slate-500">
                     From your account dashboard you can view your{" "}
                     <button
                       onClick={() => setActiveTab("orders")}
-                      className="text-purple-600 underline"
+                      className="text-purple-600 hover:underline"
                     >
                       recent orders
                     </button>
                     ,{" "}
                     <button
                       onClick={() => setActiveTab("cart")}
-                      className="text-purple-600 underline"
+                      className="text-purple-600 hover:underline"
                     >
-                      cart items
+                      items in cart
                     </button>
-                    , and edit your profile.
+                    ,{" "}
+                    <button
+                      onClick={() => setActiveTab("wishlist")}
+                      className="text-purple-600 hover:underline"
+                    >
+                      items in wishlist
+                    </button>
+                    {" and "}edit your{" "}
+                    <button
+                      onClick={() => setActiveTab("profile")}
+                      className="text-purple-600 hover:underline"
+                    >
+                      account details
+                    </button>
+                    .
                   </p>
                 </div>
               </div>
             )}
-            {activeTab === "orders" && (
-              <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div className="p-8 border-b border-slate-100">
-                  <h3 className="text-xl font-bold">Order History</h3>
-                </div>
-                {orders.length === 0 ? (
-                  <div className="p-16 text-center">
-                    <Package size={64} className="mx-auto text-slate-300 mb-4" />
-                    <p className="text-slate-500 text-lg">No orders yet</p>
-                    <Link
-                      href="/shop"
-                      className="inline-block mt-4 px-6 py-3 bg-purple-600 text-white font-bold rounded-lg"
-                    >
-                      Start Shopping
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-slate-50 text-slate-500 text-xs uppercase">
-                        <tr>
-                          <th className="px-8 py-4 text-left">Order ID</th>
-                          <th className="px-8 py-4 text-left">Date</th>
-                          <th className="px-8 py-4 text-left">Status</th>
-                          <th className="px-8 py-4 text-left">Total</th>
-                          <th className="px-8 py-4 text-left">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        {orders.map((order) => (
-                          <tr key={order.id} className="hover:bg-slate-50">
-                            <td className="px-8 py-5 text-sm font-mono text-purple-600">
-                              #{order.id.slice(-8).toUpperCase()}
-                            </td>
-                            <td className="px-8 py-5 text-sm text-slate-600">
-                              {new Date(order.date).toLocaleDateString()}
-                            </td>
-                            <td className="px-8 py-5">
-                              <OrderStatusBadge status={order.status} />
-                            </td>
-                            <td className="px-8 py-5 text-sm font-bold">
-                              
-                            </td>
-                            <td className="px-8 py-5">
-                              <button
-                                onClick={() => setSelectedOrder(order)}
-                                className="text-purple-600 hover:underline text-sm font-medium"
-                              >
-                                View Details
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === "wishlist" && (
-              <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div className="p-8 border-b border-slate-100">
-                  <h3 className="text-xl font-bold">My Wishlist</h3>
-                </div>
-                {wishlistItems.length === 0 ? (
-                  <div className="p-16 text-center">
-                    <Heart size={64} className="mx-auto text-slate-300 mb-4" />
-                    <p className="text-slate-500 text-lg">
-                      Your wishlist is empty
-                    </p>
-                    <Link
-                      href="/shop"
-                      className="inline-block mt-4 px-6 py-3 bg-purple-600 text-white font-bold rounded-lg"
-                    >
-                      Browse Products
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {wishlistItems.map((item: any) => (
-                      <div
-                        key={item.id}
-                        className="border rounded-xl p-4 hover:shadow-lg transition-shadow"
-                      >
-                        <div className="relative h-48 bg-slate-50 rounded-lg mb-4 overflow-hidden">
-                          {item.image && (
-                            <Image
-                              src={item.image}
-                              alt={item.title}
-                              fill
-                              className="object-contain p-2"
-                            />
-                          )}
-                        </div>
-                        <h4 className="font-bold text-slate-900 mb-2 line-clamp-2">
-                          {item.title}
-                        </h4>
-                        <p className="text-purple-600 font-bold text-lg mb-4">
-                          
-                        </p>
-                        <button
-                          onClick={() => setQuickViewProduct(item)}
-                          className="w-full py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
-                        >
-                          Quick View
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === "cart" && (
-              <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div className="p-8 border-b border-slate-100">
-                  <h3 className="text-xl font-bold">Shopping Cart</h3>
-                </div>
-                {cartItems.length === 0 ? (
-                  <div className="p-16 text-center">
-                    <ShoppingCart
-                      size={64}
-                      className="mx-auto text-slate-300 mb-4"
-                    />
-                    <p className="text-slate-500 text-lg">Your cart is empty</p>
-                    <Link
-                      href="/shop"
-                      className="inline-block mt-4 px-6 py-3 bg-purple-600 text-white font-bold rounded-lg"
-                    >
-                      Start Shopping
-                    </Link>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="p-8 space-y-4">
-                      {cartItems.map((item: any) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-4 py-4 border-b last:border-0"
-                        >
-                          <div className="h-20 w-20 bg-slate-50 rounded-lg relative overflow-hidden border">
-                            {item.image && (
-                              <Image
-                                src={item.image}
-                                alt={item.name}
-                                fill
-                                className="object-contain p-2"
-                              />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-bold text-slate-900">
-                              {item.name}
-                            </h4>
-                            <p className="text-sm text-slate-500">
-                              Qty: {item.quantity} × 
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-purple-600 text-lg">
-                              
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="p-8 bg-slate-50 border-t">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-lg font-bold">Total:</span>
-                        <span className="text-2xl font-bold text-purple-600">
-                          $
-                          {cartItems
-                            .reduce(
-                              (sum: number, item: any) => sum + item.totalPrice,
-                              0,
-                            )
-                            .toFixed(2)}
-                        </span>
-                      </div>
-                      <Link
-                        href="/checkout"
-                        className="block w-full py-3 bg-purple-600 text-white font-bold rounded-lg text-center hover:bg-purple-700 transition-colors"
-                      >
-                        Proceed to Checkout
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
             {activeTab === "profile" && (
-              <div className="bg-white p-8 rounded-2xl shadow-sm border">
-                <h3 className="text-xl font-bold mb-6">Edit Profile</h3>
+              <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                <h3 className="text-xl font-bold text-slate-900 mb-6">
+                  Edit Profile
+                </h3>
                 <form
                   onSubmit={handleUpdateProfile}
                   className="space-y-6 max-w-2xl"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium mb-2">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
                         Full Name
                       </label>
                       <input
                         type="text"
-                        className="w-full border rounded-lg px-4 py-2.5 outline-none focus:border-purple-500"
+                        className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all"
                         value={profileForm.name}
                         onChange={(e) =>
                           setProfileForm({
@@ -658,12 +495,12 @@ export default function MyAccountPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
                         Phone Number
                       </label>
                       <input
                         type="tel"
-                        className="w-full border rounded-lg px-4 py-2.5 outline-none focus:border-purple-500"
+                        className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all"
                         value={profileForm.phone}
                         onChange={(e) =>
                           setProfileForm({
@@ -674,30 +511,30 @@ export default function MyAccountPage() {
                       />
                     </div>
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all"
+                      value={profileForm.address}
+                      onChange={(e) =>
+                        setProfileForm({
+                          ...profileForm,
+                          address: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium mb-2">
-                        Address
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full border rounded-lg px-4 py-2.5 outline-none focus:border-purple-500"
-                        value={profileForm.address}
-                        onChange={(e) =>
-                          setProfileForm({
-                            ...profileForm,
-                            address: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
                         City
                       </label>
                       <input
                         type="text"
-                        className="w-full border rounded-lg px-4 py-2.5 outline-none focus:border-purple-500"
+                        className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all"
                         value={profileForm.city}
                         onChange={(e) =>
                           setProfileForm({
@@ -707,10 +544,21 @@ export default function MyAccountPage() {
                         }
                       />
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Country
+                      </label>
+                      <input
+                        type="text"
+                        disabled
+                        className="w-full border border-slate-200 bg-slate-50 rounded-lg px-4 py-2.5 text-slate-500"
+                        value={profileForm.country}
+                      />
+                    </div>
                   </div>
                   <button
                     type="submit"
-                    className="px-8 py-3 bg-purple-600 text-white font-bold rounded-lg shadow-lg"
+                    className="px-8 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors shadow-lg shadow-purple-200"
                   >
                     Save Changes
                   </button>
@@ -718,52 +566,58 @@ export default function MyAccountPage() {
               </div>
             )}
             {activeTab === "orders" && (
-              <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div className="p-8 border-b border-slate-100">
-                  <h3 className="text-xl font-bold">Order History</h3>
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="p-6 border-b border-slate-100">
+                  <h3 className="text-xl font-bold text-slate-900">
+                    Order History
+                  </h3>
                 </div>
-                {orders.length === 0 ? (
-                  <div className="p-16 text-center">
-                    <Package size={64} className="mx-auto text-slate-300 mb-4" />
-                    <p className="text-slate-500 text-lg">No orders yet</p>
-                    <Link
-                      href="/shop"
-                      className="inline-block mt-4 px-6 py-3 bg-purple-600 text-white font-bold rounded-lg"
-                    >
-                      Start Shopping
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-slate-50 text-slate-500 text-xs uppercase">
+                <div className="overflow-x-auto">
+                  {orders.length === 0 ? (
+                    <div className="text-center py-12 text-slate-400">
+                      <Package size={48} className="mx-auto mb-3 opacity-20" />
+                      <p>You haven't placed any orders yet.</p>
+                      <Link
+                        href="/shop"
+                        className="text-purple-600 font-bold hover:underline mt-2 inline-block"
+                      >
+                        Start Shopping
+                      </Link>
+                    </div>
+                  ) : (
+                    <table className="w-full text-left text-sm text-slate-600">
+                      <thead className="bg-slate-50 text-slate-900 font-bold uppercase text-xs">
                         <tr>
-                          <th className="px-8 py-4 text-left">Order ID</th>
-                          <th className="px-8 py-4 text-left">Date</th>
-                          <th className="px-8 py-4 text-left">Status</th>
-                          <th className="px-8 py-4 text-left">Total</th>
-                          <th className="px-8 py-4 text-left">Actions</th>
+                          <th className="px-6 py-4">Order ID</th>
+                          <th className="px-6 py-4">Date</th>
+                          <th className="px-6 py-4">Status</th>
+                          <th className="px-6 py-4">Total</th>
+                          <th className="px-6 py-4">Action</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y">
+                      <tbody className="divide-y divide-slate-100">
                         {orders.map((order) => (
-                          <tr key={order.id} className="hover:bg-slate-50">
-                            <td className="px-8 py-5 text-sm font-mono text-purple-600">
-                              #{order.id.slice(-8).toUpperCase()}
+                          <tr
+                            key={order.id}
+                            className="hover:bg-slate-50/50 transition-colors"
+                          >
+                            <td className="px-6 py-4 font-medium text-purple-600">
+                              {order.id}
                             </td>
-                            <td className="px-8 py-5 text-sm text-slate-600">
-                              {new Date(order.date).toLocaleDateString()}
-                            </td>
-                            <td className="px-8 py-5">
+                            <td className="px-6 py-4">{order.date}</td>
+                            <td className="px-6 py-4">
                               <OrderStatusBadge status={order.status} />
                             </td>
-                            <td className="px-8 py-5 text-sm font-bold">
-                              
+                            <td className="px-6 py-4 font-bold text-slate-800">
+                              ${order.total.toFixed(2)}
+                              <span className="text-xs font-normal text-slate-400 block">
+                                {order.items.length} items
+                              </span>
                             </td>
-                            <td className="px-8 py-5">
+                            <td className="px-6 py-4">
                               <button
                                 onClick={() => setSelectedOrder(order)}
-                                className="text-purple-600 hover:underline text-sm font-medium"
+                                className="text-blue-600 hover:text-purple-600 font-bold text-xs uppercase tracking-wide border border-blue-200 hover:border-purple-200 px-3 py-1.5 rounded-full transition-all"
                               >
                                 View Details
                               </button>
@@ -772,57 +626,54 @@ export default function MyAccountPage() {
                         ))}
                       </tbody>
                     </table>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             )}
-
             {activeTab === "wishlist" && (
-              <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div className="p-8 border-b border-slate-100">
-                  <h3 className="text-xl font-bold">My Wishlist</h3>
-                </div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h3 className="text-xl font-bold text-slate-900 mb-6">
+                  My Wishlist
+                </h3>
                 {wishlistItems.length === 0 ? (
-                  <div className="p-16 text-center">
-                    <Heart size={64} className="mx-auto text-slate-300 mb-4" />
-                    <p className="text-slate-500 text-lg">
-                      Your wishlist is empty
-                    </p>
+                  <div className="text-center py-12 text-slate-400">
+                    <Heart size={48} className="mx-auto mb-3 opacity-20" />
+                    <p>No items in wishlist yet.</p>
                     <Link
                       href="/shop"
-                      className="inline-block mt-4 px-6 py-3 bg-purple-600 text-white font-bold rounded-lg"
+                      className="text-purple-600 font-bold hover:underline mt-2 inline-block"
                     >
-                      Browse Products
+                      Go Shopping
                     </Link>
                   </div>
                 ) : (
-                  <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {wishlistItems.map((item: any) => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {wishlistItems.map((item) => (
                       <div
                         key={item.id}
-                        className="border rounded-xl p-4 hover:shadow-lg transition-shadow"
+                        className="flex items-center gap-4 p-4 border border-slate-100 rounded-xl hover:shadow-md transition-all"
                       >
-                        <div className="relative h-48 bg-slate-50 rounded-lg mb-4 overflow-hidden">
-                          {item.image && (
-                            <Image
-                              src={item.image}
-                              alt={item.title}
-                              fill
-                              className="object-contain p-2"
-                            />
-                          )}
+                        <div className="h-16 w-16 bg-slate-50 rounded-lg relative overflow-hidden shrink-0">
+                          <Image
+                            src={item.image}
+                            alt={item.title}
+                            fill
+                            className="object-contain p-2"
+                          />
                         </div>
-                        <h4 className="font-bold text-slate-900 mb-2 line-clamp-2">
-                          {item.title}
-                        </h4>
-                        <p className="text-purple-600 font-bold text-lg mb-4">
-                          
-                        </p>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-slate-800 line-clamp-1">
+                            {item.title}
+                          </h4>
+                          <p className="text-purple-600 font-medium text-sm">
+                            ${item.price}
+                          </p>
+                        </div>
                         <button
                           onClick={() => setQuickViewProduct(item)}
-                          className="w-full py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                          className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg hover:bg-purple-600 transition-colors"
                         >
-                          Quick View
+                          View
                         </button>
                       </div>
                     ))}
@@ -830,78 +681,63 @@ export default function MyAccountPage() {
                 )}
               </div>
             )}
-
             {activeTab === "cart" && (
-              <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div className="p-8 border-b border-slate-100">
-                  <h3 className="text-xl font-bold">Shopping Cart</h3>
-                </div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h3 className="text-xl font-bold text-slate-900 mb-6">
+                  Items in Cart
+                </h3>
                 {cartItems.length === 0 ? (
-                  <div className="p-16 text-center">
+                  <div className="text-center py-12 text-slate-400">
                     <ShoppingCart
-                      size={64}
-                      className="mx-auto text-slate-300 mb-4"
+                      size={48}
+                      className="mx-auto mb-3 opacity-20"
                     />
-                    <p className="text-slate-500 text-lg">Your cart is empty</p>
+                    <p>Your cart is empty.</p>
                     <Link
                       href="/shop"
-                      className="inline-block mt-4 px-6 py-3 bg-purple-600 text-white font-bold rounded-lg"
+                      className="text-purple-600 font-bold hover:underline mt-2 inline-block"
                     >
-                      Start Shopping
+                      Go Shopping
                     </Link>
                   </div>
                 ) : (
-                  <div>
-                    <div className="p-8 space-y-4">
-                      {cartItems.map((item: any) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-4 py-4 border-b last:border-0"
-                        >
-                          <div className="h-20 w-20 bg-slate-50 rounded-lg relative overflow-hidden border">
+                  <div className="space-y-4">
+                    {cartItems.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between p-4 border-b border-slate-50 last:border-0"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="h-14 w-14 bg-slate-50 rounded-md relative overflow-hidden border border-slate-100">
                             {item.image && (
                               <Image
                                 src={item.image}
                                 alt={item.name}
                                 fill
-                                className="object-contain p-2"
+                                className="object-contain p-1"
                               />
                             )}
                           </div>
-                          <div className="flex-1">
-                            <h4 className="font-bold text-slate-900">
+                          <div>
+                            <h4 className="font-bold text-slate-700">
                               {item.name}
                             </h4>
                             <p className="text-sm text-slate-500">
-                              Qty: {item.quantity} × 
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-purple-600 text-lg">
-                              
+                              {item.quantity} x ${item.price}
                             </p>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                    <div className="p-8 bg-slate-50 border-t">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-lg font-bold">Total:</span>
-                        <span className="text-2xl font-bold text-purple-600">
-                          $
-                          {cartItems
-                            .reduce(
-                              (sum: number, item: any) => sum + item.totalPrice,
-                              0,
-                            )
-                            .toFixed(2)}
+                        <span className="font-bold text-purple-600">
+                          ${item.totalPrice}
                         </span>
                       </div>
+                    ))}
+                    <div className="pt-4 mt-4 border-t border-slate-100 text-right">
                       <Link
-                        href="/checkout"
-                        className="block w-full py-3 bg-purple-600 text-white font-bold rounded-lg text-center hover:bg-purple-700 transition-colors"
+                        href="/cart"
+                        className="inline-block px-6 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors"
                       >
-                        Proceed to Checkout
+                        Go to Cart Page
                       </Link>
                     </div>
                   </div>
@@ -915,44 +751,91 @@ export default function MyAccountPage() {
   );
 }
 
-const NavButton = ({ active, onClick, icon, label }: any) => (
-  <button
-    onClick={onClick}
-    className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all mb-1 ${active ? "bg-purple-600 text-white shadow-lg" : "text-slate-600 hover:bg-slate-50"}`}
-  >
-    {icon} {label}
-  </button>
-);
-
-const StatCard = ({ label, value, icon, bg }: any) => (
-  <div className="bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-4">
-    <div
-      className={`h-12 w-12 rounded-xl flex items-center justify-center ${bg}`}
+// Utility Components
+const NavButton = ({ active, onClick, icon, label }: any) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all mb-1 ${active ? "bg-purple-600 text-white shadow-lg shadow-purple-200" : "text-slate-600 hover:bg-slate-50"}`}
     >
-      {icon}
-    </div>
-    <div>
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="text-2xl font-bold">{value}</p>
-    </div>
-  </div>
-);
+      <span
+        className={
+          active ? "text-white" : "text-slate-400 group-hover:text-purple-500"
+        }
+      >
+        {icon}
+      </span>
+      {label}
+    </button>
+  );
+};
 
-const PageHeader = ({ title, breadcrumb }: any) => (
-  <div className="relative w-full h-175">
-    <div className="absolute inset-0 bg-linear-to-b from-amber-50/50 to-white z-10" />
-    <div className="relative z-10 pt-80 flex flex-col items-center justify-center">
-      <h1 className="text-6xl font-bold mb-4 capitalize">{title}</h1>
-      <div className="inline-flex items-center gap-2 bg-white px-6 py-2.5 rounded-full shadow-sm border">
-        <Link href="/">Home</Link> <ChevronRight size={14} />{" "}
-        <span className="text-slate-900">{breadcrumb}</span>
+const StatCard = ({
+  label,
+  value,
+  icon,
+  bg,
+}: {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+  bg: string;
+}) => {
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+      <div
+        className={`h-12 w-12 rounded-xl flex items-center justify-center ${bg}`}
+      >
+        {icon}
+      </div>
+      <div>
+        <p className="text-sm text-slate-500 font-medium">{label}</p>
+        <p className="text-2xl font-bold text-slate-900">{value}</p>
       </div>
     </div>
-  </div>
-);
+  );
+};
+
+const PageHeader = ({
+  title,
+  breadcrumb,
+}: {
+  title: string;
+  breadcrumb: string;
+}) => {
+  return (
+    <div className="relative w-full h-175 z-0">
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute inset-0 bg-linear-to-b from-amber-50/50 via-teal-50/30 to-white z-10 mix-blend-multiply" />
+        <Image
+          src={db.shop.backgroundImage}
+          alt="Background"
+          fill
+          className="object-fill opacity-80"
+          priority
+        />
+        <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
+      </div>
+
+      <div className="relative z-10 pt-80 flex flex-col items-center justify-center pb-10">
+        <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4 capitalize">
+          {title}
+        </h1>
+        <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10"></div>
+        <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
+          <Link href="/" className="hover:text-purple-600 transition-colors">
+            Home
+          </Link>
+          <ChevronRight size={14} />
+          <span className="text-slate-900">{breadcrumb}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const OrderStatusBadge = ({ status }: { status: string }) => {
-  const colors: any = {
+  const colors: { [key: string]: string } = {
     Pending: "bg-yellow-100 text-yellow-700",
     Accepted: "bg-green-100 text-green-700",
     Completed: "bg-blue-100 text-blue-700",
