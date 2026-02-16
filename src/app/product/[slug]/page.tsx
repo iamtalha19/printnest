@@ -153,7 +153,6 @@ export default function ProductPage() {
         <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
       </div>
 
-      {/* Header Section */}
       <div className="relative z-10 pt-80">
         <div className="w-full pb-10 flex flex-col items-center justify-center">
           <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4 text-center px-4">
@@ -184,7 +183,6 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Product Content Section */}
         <section className="max-w-6xl mx-auto px-4 pb-32 mt-12">
           <div className="grid md:grid-cols-2 gap-12 mb-12">
             <div className="relative w-full h-96 rounded-lg overflow-hidden">
@@ -203,9 +201,21 @@ export default function ProductPage() {
               </h1>
 
               <div className="flex items-center gap-4 mb-6">
-                <span className="text-3xl font-bold text-blue-600">
-                  {product.price}
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-3xl font-bold text-blue-600">
+                    {product.price}
+                  </span>
+                  {quantity > 1 && (
+                    <span className="text-lg font-semibold text-purple-600 mt-1">
+                      Total: $
+                      {(
+                        parseFloat(
+                          product.price.toString().replace(/[^0-9.]/g, ""),
+                        ) * quantity
+                      ).toFixed(2)}
+                    </span>
+                  )}
+                </div>
                 <span className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded">
                   In Stock
                 </span>

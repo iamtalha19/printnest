@@ -324,14 +324,17 @@ function SimpleProductCard({
       </button>
 
       <div className="relative h-72 bg-[#F6F7FB] flex items-center justify-center p-6 group-hover:bg-[#ebf0f7] transition-colors">
-        <div className="relative w-full h-full">
+        <Link
+          href={`/product/${product.title.toLowerCase().replace(/\s+/g, "-")}`}
+          className="relative w-full h-full block"
+        >
           <Image
             src={product.image}
             alt={product.title}
             fill
             className="object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
           />
-        </div>
+        </Link>
         <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/5">
           {showInCart ? (
             <>
@@ -361,21 +364,25 @@ function SimpleProductCard({
         </div>
       </div>
 
-      <div className="p-4 text-center bg-white">
-        <h3 className="font-bold text-slate-800 text-lg mb-2 truncate group-hover:text-purple-600 transition-colors">
-          {product.title}
-        </h3>
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-sm font-bold text-blue-900">
-            ${product.price}
-          </span>
-          {product.oldPrice && (
-            <span className="text-xs text-red-400 line-through">
-              ${product.oldPrice}
+      <Link
+        href={`/product/${product.title.toLowerCase().replace(/\s+/g, "-")}`}
+      >
+        <div className="p-4 text-center bg-white cursor-pointer">
+          <h3 className="font-bold text-slate-800 text-lg mb-2 truncate group-hover:text-purple-600 transition-colors">
+            {product.title}
+          </h3>
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-sm font-bold text-blue-900">
+              ${product.price}
             </span>
-          )}
+            {product.oldPrice && (
+              <span className="text-xs text-red-400 line-through">
+                ${product.oldPrice}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
+      </Link>
     </div>
   );
 }

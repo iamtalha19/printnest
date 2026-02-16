@@ -64,7 +64,6 @@ export default function MyAccountPage() {
     country: "Pakistan",
   });
 
-  // ✅ Admin Redirection
   useEffect(() => {
     if (isAuthenticated && user?.isAdmin) {
       router.push("/admin/dashboard");
@@ -751,7 +750,6 @@ export default function MyAccountPage() {
   );
 }
 
-// Utility Components
 const NavButton = ({ active, onClick, icon, label }: any) => {
   return (
     <button

@@ -1,9 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import db from "@/app/data/db.json";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import db from "@/app/data/db.json";
+import blogPosts from "@/app/data/blog.json";
+
+interface BlogPost {
+  id: number;
+  title: string;
+  image: string;
+  author: {
+    name: string;
+    avatar: string;
+  };
+  date: string;
+  readTime: string;
+}
 
 const BlindsImage = ({
   src,
@@ -51,8 +64,8 @@ const BlindsImage = ({
 };
 
 const LatestNews = () => {
-  const latestNewsData = db.blog;
-  const { sectionInfo, posts } = latestNewsData;
+  const sectionInfo = db.blog.sectionInfo;
+  const posts: BlogPost[] = blogPosts;
   const headerVariants: any = {
     hidden: { opacity: 0, y: 20 },
     visible: (custom: number) => ({
