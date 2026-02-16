@@ -223,14 +223,10 @@ export default function AdminDashboard() {
   const [viewType, setViewType] = useState<"cart" | "wishlist" | "both">(
     "both",
   );
-
-  // Pagination states
   const [userPage, setUserPage] = useState(1);
   const [orderPage, setOrderPage] = useState(1);
   const [productPage, setProductPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
-
-  // Product Management States
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [productForm, setProductForm] = useState({
@@ -303,7 +299,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // --- Product Management Handlers (Optimistic Updates) ---
   const openAddProduct = () => {
     setEditingProduct(null);
     setProductForm({
@@ -328,7 +323,7 @@ export default function AdminDashboard() {
     setIsProductModalOpen(true);
   };
 
-  const handleSaveProduct = (e: React.FormEvent) => {
+  const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -343,40 +338,50 @@ export default function AdminDashboard() {
       printText: "We print with",
     };
 
-    // Simulate API request delay then update local state
-    setTimeout(() => {
-      setStats((prev: any) => {
-        if (!prev) return prev;
-        let updatedProducts = [...prev.products];
-        if (editingProduct) {
-          updatedProducts = updatedProducts.map((p: any) =>
-            p.id === editingProduct.id ? { ...p, ...newProductData } : p,
-          );
-        } else {
-          updatedProducts = [
-            { id: Date.now(), ...newProductData },
-            ...updatedProducts,
-          ];
-        }
-        return { ...prev, products: updatedProducts };
+    try {
+      const url = editingProduct
+        ? `/api/admin/products/${editingProduct.id}`
+        : `/api/admin/products`;
+
+      const method = editingProduct ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newProductData),
       });
-      setIsProductModalOpen(false);
+
+      if (res.ok) {
+        await fetchStats();
+        setIsProductModalOpen(false);
+      } else {
+        const errorData = await res.json();
+        alert(`Failed to save product: ${errorData.message}`);
+      }
+    } catch (error) {
+      alert("Error saving product");
+    } finally {
       setIsSubmitting(false);
-    }, 400);
+    }
   };
 
-  const handleDeleteProduct = (id: number) => {
-    setStats((prev: any) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        products: prev.products.filter((p: any) => p.id !== id),
-      };
-    });
-    setProductDeleteConfirm(null);
+  const handleDeleteProduct = async (id: number) => {
+    try {
+      const res = await fetch(`/api/admin/products/${id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        await fetchStats();
+        setProductDeleteConfirm(null);
+      } else {
+        alert("Failed to delete product");
+      }
+    } catch (error) {
+      alert("Error deleting product");
+    }
   };
 
-  // --- Filtering & Pagination Logic ---
   const filteredUsers = stats?.users.filter(
     (u) =>
       u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

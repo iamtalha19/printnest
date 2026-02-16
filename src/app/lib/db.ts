@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 const DB_PATH = path.join(process.cwd(), 'src/app/logindb.json');
+const SHOP_DB_PATH = path.join(process.cwd(), 'src/app/shop.json');
 export interface SavedCard {
   id: string;
   number: string;
@@ -116,4 +117,50 @@ export async function updateOrderStatus(orderId: string, status: string) {
     return db.orders[orderIndex];
   }
   return null;
+}
+
+export async function getProducts() {
+  try {
+    const data = await fs.readFile(SHOP_DB_PATH, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    return [];
+  }
+}
+
+async function saveProducts(products: any[]) {
+  await fs.writeFile(SHOP_DB_PATH, JSON.stringify(products, null, 2), 'utf-8');
+}
+
+export async function addProduct(product: any) {
+  const products = await getProducts();
+  const newId = products.length > 0 ? Math.max(...products.map((p: any) => p.id)) + 1 : 1;
+  const newProduct = { id: newId, ...product };
+  products.unshift(newProduct);
+  await saveProducts(products);
+  return newProduct;
+}
+
+export async function updateProduct(productId: number, data: any) {
+  const products = await getProducts();
+  const index = products.findIndex((p: any) => p.id === productId);
+  
+  if (index !== -1) {
+    products[index] = { ...products[index], ...data };
+    await saveProducts(products);
+    return products[index];
+  }
+  return null;
+}
+
+export async function deleteProductRecord(productId: number) {
+  const products = await getProducts();
+  const index = products.findIndex((p: any) => p.id === productId);
+  
+  if (index !== -1) {
+    products.splice(index, 1);
+    await saveProducts(products);
+    return true;
+  }
+  return false;
 }

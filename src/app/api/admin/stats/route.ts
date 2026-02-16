@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { getUsers, getAllOrders } from "@/app/lib/db";
-import db from "@/app/db.json";
-import shopProducts from "@/app/shop.json";
+import { getUsers, getAllOrders, getProducts } from "@/app/lib/db";
 
 const SECRET_KEY = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.EMAIL_USER;
@@ -22,6 +20,7 @@ export async function GET() {
 
     const users = await getUsers();
     const orders = await getAllOrders();
+    const products = await getProducts(); 
 
     const totalUsers = users.length;
     const totalOrders = orders.length;
@@ -93,7 +92,7 @@ export async function GET() {
       users: usersWithDetails,
       revenueData,
       topProducts,
-      products: shopProducts
+      products 
     });
   } catch (error) {
     console.error("Admin stats error:", error);

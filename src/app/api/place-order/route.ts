@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       id: orderId,
       userId: userId,
       date: new Date().toLocaleString(),
-      status: "Processing",
+      status: "Pending",
       total: totalAmount,
       items: items,
       customer: customer, 
