@@ -41,7 +41,6 @@ export async function PATCH(
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
     }
 
-    // Send email notification
     try {
       const statusColor =
         status === "Accepted"
@@ -60,6 +59,7 @@ export async function PATCH(
             <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <p style="margin: 5px 0;"><strong>Order ID:</strong> #${order.id.slice(-8).toUpperCase()}</p>
               <p style="margin: 5px 0;"><strong>New Status:</strong> <span style="color: ${statusColor}; font-weight: bold;">${status}</span></p>
+              <p style="margin: 5px 0;"><strong>Order:</strong> <span style="color: #6b7280;">${order.items.map((item: any) => `${item.name} ($${item.price})`).join(", ")}</span></p>
               <p style="margin: 5px 0;"><strong>Order Total:</strong> $${order.total}</p>
             </div>
             ${
@@ -82,7 +82,6 @@ export async function PATCH(
       });
     } catch (emailError) {
       console.error("Email notification failed:", emailError);
-      // Continue even if email fails
     }
 
     return NextResponse.json({
