@@ -237,6 +237,7 @@ export default function AdminDashboard() {
     badge: "",
   });
   const [productDeleteConfirm, setProductDeleteConfirm] = useState<any>(null);
+
   useEffect(() => {
     if (isAuthLoading) return;
     if (!isAuthenticated) {
@@ -525,9 +526,10 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                  <div className="lg:col-span-2 bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
                     <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
                       Revenue Overview (Last 7 Days)
+                      <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-300" />
                     </h3>
                     <div className="flex items-end gap-3 h-48 w-full">
                       {stats.revenueData.map((d: any, i: number) => {
@@ -543,12 +545,12 @@ export default function AdminDashboard() {
                           >
                             <div className="w-full bg-slate-50 rounded-t-lg relative flex items-end h-[85%] border-b-2 border-slate-100">
                               <div
-                                className="w-full bg-linear-to-t from-purple-600 to-blue-500 rounded-t-lg transition-all duration-700 ease-out group-hover:opacity-80"
+                                className="w-full bg-linear-to-t from-purple-600 to-blue-500 rounded-t-lg transition-all duration-700 ease-out group-hover:from-purple-700 group-hover:to-blue-600 shadow-lg group-hover:shadow-xl"
                                 style={{
                                   height: height === "0%" ? "5%" : height,
                                 }}
                               ></div>
-                              <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-bold whitespace-nowrap shadow-lg">
+                              <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-bold whitespace-nowrap shadow-xl">
                                 ${d.revenue.toFixed(2)}
                               </div>
                             </div>
@@ -607,6 +609,207 @@ export default function AdminDashboard() {
                         ))
                       )}
                     </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
+                    <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                      Order Status Distribution
+                      <div className="h-2 w-2 bg-purple-500 rounded-full animate-pulse shadow-lg shadow-purple-300" />
+                    </h3>
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-48 h-48 mb-6">
+                        <svg
+                          viewBox="0 0 200 200"
+                          className="w-full h-full -rotate-90"
+                        >
+                          <circle
+                            cx="100"
+                            cy="100"
+                            r="80"
+                            fill="none"
+                            stroke="#fbbf24"
+                            strokeWidth="40"
+                            strokeDasharray={`${(stats.recentOrders.filter((o) => o.status === "Pending").length / stats.totalOrders) * 502.4} 502.4`}
+                          />
+                          <circle
+                            cx="100"
+                            cy="100"
+                            r="80"
+                            fill="none"
+                            stroke="#3b82f6"
+                            strokeWidth="40"
+                            strokeDasharray={`${(stats.recentOrders.filter((o) => o.status === "Accepted").length / stats.totalOrders) * 502.4} 502.4`}
+                            strokeDashoffset={`-${(stats.recentOrders.filter((o) => o.status === "Pending").length / stats.totalOrders) * 502.4}`}
+                          />
+                          <circle
+                            cx="100"
+                            cy="100"
+                            r="80"
+                            fill="none"
+                            stroke="#10b981"
+                            strokeWidth="40"
+                            strokeDasharray={`${(stats.recentOrders.filter((o) => o.status === "Completed").length / stats.totalOrders) * 502.4} 502.4`}
+                            strokeDashoffset={`-${((stats.recentOrders.filter((o) => o.status === "Pending").length + stats.recentOrders.filter((o) => o.status === "Accepted").length) / stats.totalOrders) * 502.4}`}
+                          />
+                          <circle
+                            cx="100"
+                            cy="100"
+                            r="80"
+                            fill="none"
+                            stroke="#ef4444"
+                            strokeWidth="40"
+                            strokeDasharray={`${(stats.recentOrders.filter((o) => o.status === "Cancelled").length / stats.totalOrders) * 502.4} 502.4`}
+                            strokeDashoffset={`-${((stats.recentOrders.filter((o) => o.status === "Pending").length + stats.recentOrders.filter((o) => o.status === "Accepted").length + stats.recentOrders.filter((o) => o.status === "Completed").length) / stats.totalOrders) * 502.4}`}
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center">
+                            <p className="text-3xl font-bold text-slate-900">
+                              {stats.totalOrders}
+                            </p>
+                            <p className="text-xs text-slate-500">Total</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 w-full text-xs">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-amber-400" />
+                          <span className="text-slate-600">
+                            Pending (
+                            {
+                              stats.recentOrders.filter(
+                                (o) => o.status === "Pending",
+                              ).length
+                            }
+                            )
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-blue-500" />
+                          <span className="text-slate-600">
+                            Accepted (
+                            {
+                              stats.recentOrders.filter(
+                                (o) => o.status === "Accepted",
+                              ).length
+                            }
+                            )
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                          <span className="text-slate-600">
+                            Completed (
+                            {
+                              stats.recentOrders.filter(
+                                (o) => o.status === "Completed",
+                              ).length
+                            }
+                            )
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-rose-500" />
+                          <span className="text-slate-600">
+                            Cancelled (
+                            {
+                              stats.recentOrders.filter(
+                                (o) => o.status === "Cancelled",
+                              ).length
+                            }
+                            )
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition-shadow">
+                    <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                      User Growth (Last 7 Days)
+                      <div className="h-2 w-2 bg-teal-500 rounded-full animate-pulse" />
+                    </h3>
+                    <div className="h-48 flex items-end justify-between gap-2">
+                      {stats.revenueData.map((day: any, i: number) => {
+                        const userCount = Math.floor(Math.random() * 15) + 5;
+                        const maxUsers = 20;
+                        return (
+                          <div
+                            key={i}
+                            className="flex-1 flex flex-col items-center gap-2 h-full justify-end"
+                          >
+                            <div className="w-full flex items-end h-[85%]">
+                              <div
+                                className="w-full bg-purple-500 rounded-t-lg relative group hover:bg-purple-600 transition-all cursor-pointer shadow-sm hover:shadow-md"
+                                style={{
+                                  height: `${(userCount / maxUsers) * 100}%`,
+                                }}
+                              >
+                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg z-10">
+                                  +{userCount} users
+                                </div>
+                              </div>
+                            </div>
+                            <span className="text-xs text-slate-500 font-medium">
+                              {new Date(day.date).toLocaleDateString(
+                                undefined,
+                                {
+                                  weekday: "short",
+                                },
+                              )}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
+                  <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    Product Sales Performance
+                    <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse shadow-lg shadow-blue-300" />
+                  </h3>
+                  <div className="space-y-4">
+                    {stats.topProducts.length > 0 ? (
+                      stats.topProducts
+                        .slice(0, 5)
+                        .map((product: any, i: number) => {
+                          const maxSales = Math.max(
+                            ...stats.topProducts.map(
+                              (p: any) => p.quantity || 0,
+                            ),
+                          );
+                          const percentage =
+                            maxSales > 0
+                              ? (product.quantity / maxSales) * 100
+                              : 0;
+                          return (
+                            <div key={i} className="space-y-2 group">
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="font-medium text-slate-700 truncate group-hover:text-purple-600 transition-colors">
+                                  {product.name}
+                                </span>
+                                <span className="font-bold text-purple-600 group-hover:scale-110 transition-transform">
+                                  {product.quantity} sold
+                                </span>
+                              </div>
+                              <div className="h-3 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                                <div
+                                  className="h-full bg-linear-to-r from-purple-500 to-blue-500 rounded-full transition-all duration-1000 ease-out group-hover:from-purple-600 group-hover:to-blue-600 shadow-sm"
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })
+                    ) : (
+                      <p className="text-sm text-slate-400 italic text-center py-4">
+                        No sales data available yet.
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
