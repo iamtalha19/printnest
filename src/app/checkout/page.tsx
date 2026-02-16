@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "@/app/redux/CartSlice";
-import AuthPromptModal from "@/app/components/AuthPromptModal";
+import AuthPromptModal from "@/app/components/auth/AuthPromptModal";
 
 import {
   ChevronRight,

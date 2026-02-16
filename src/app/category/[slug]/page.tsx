@@ -10,8 +10,8 @@ import { addToCart } from "@/app/redux/CartSlice";
 import { toggleWishlist } from "@/app/redux/WishListSlice";
 import { RootState } from "@/app/redux/Store";
 import Toast from "@/app/components/products/Toast";
-import db from "@/app/db.json";
-import shopProducts from "@/app/shop.json";
+import db from "@/app/data/db.json";
+import shopProducts from "@/app/data/shop.json";
 
 interface Category {
   id: number;
@@ -27,7 +27,7 @@ interface Product {
   image: string;
   badge?: string | null;
   printText?: string;
-  oldPrice?: string;
+  oldPrice?: string | null;
   category?: string;
 }
 
