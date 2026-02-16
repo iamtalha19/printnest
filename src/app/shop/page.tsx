@@ -14,8 +14,8 @@ import {
   Heart,
   Eye,
 } from "lucide-react";
-import db from "@/app/db.json";
-import shopProducts from "@/app/shop.json";
+import db from "@/app/data/db.json";
+import shopProducts from "@/app/data/shop.json";
 import Toast from "@/app/components/products/Toast";
 import QuickViewModal from "@/app/components/products/QuickViewModal";
 

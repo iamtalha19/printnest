@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/app/redux/CartSlice";

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 import { Printer, Settings2, Headset, PenTool, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
 

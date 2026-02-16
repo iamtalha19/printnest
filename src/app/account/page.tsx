@@ -23,7 +23,7 @@ import { RootState } from "@/app/redux/Store";
 import { loginSuccess, logout } from "@/app/redux/AuthSlice";
 import { addToCart } from "@/app/redux/CartSlice";
 import { useRouter } from "next/navigation";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 import QuickViewModal from "@/app/components/products/QuickViewModal";
 
 interface Order {

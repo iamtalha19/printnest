@@ -1,8 +1,8 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-const DB_PATH = path.join(process.cwd(), 'src/app/logindb.json');
-const SHOP_DB_PATH = path.join(process.cwd(), 'src/app/shop.json');
+const DB_PATH = path.join(process.cwd(), 'src/app/data/logindb.json');
+const SHOP_DB_PATH = path.join(process.cwd(), 'src/app/data/shop.json');
 export interface SavedCard {
   id: string;
   number: string;

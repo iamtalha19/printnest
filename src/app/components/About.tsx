@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 

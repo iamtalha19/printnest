@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { addToCart } from "@/app/redux/CartSlice";
 import { toggleWishlist, WishlistItem } from "@/app/redux/WishListSlice";
 import { ChevronRight, ShoppingCart, Trash2 } from "lucide-react";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 import Toast from "@/app/components/products/Toast";
 import Loading from "@/app/components/Loading";
 const pageConfig = {

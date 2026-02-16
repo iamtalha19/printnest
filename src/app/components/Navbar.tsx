@@ -13,7 +13,7 @@ import {
   LogOut,
   LayoutDashboard,
 } from "lucide-react";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/app/redux/Store";
 import { removeFromCart, clearCart } from "@/app/redux/CartSlice";

@@ -1,6 +1,6 @@
 "use client";
 
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 import {
   Play,
   MousePointer2,

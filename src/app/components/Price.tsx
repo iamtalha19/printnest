@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Check } from "lucide-react";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 import { motion } from "framer-motion";
 
 function PricingSection() {

@@ -7,7 +7,7 @@ import {
   Mail,
   Phone,
 } from "lucide-react";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 
 function Footer() {
   const footerData = db.footer;

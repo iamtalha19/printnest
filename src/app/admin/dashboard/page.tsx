@@ -26,7 +26,7 @@ import {
   Plus,
   Edit,
 } from "lucide-react";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 
 interface UserData {
   id: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 import Link from "next/link";
 import { motion } from "framer-motion";
 

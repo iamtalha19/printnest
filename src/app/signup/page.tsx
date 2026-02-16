@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Loader2, ChevronRight, Eye, EyeOff } from "lucide-react";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({

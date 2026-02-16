@@ -16,7 +16,7 @@ import {
   ChevronLeft,
   X,
 } from "lucide-react";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 const checkoutConfig = db.checkout;
 
 interface CheckoutData {

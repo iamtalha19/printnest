@@ -8,7 +8,7 @@ import { loginSuccess } from "@/app/redux/AuthSlice";
 import { initializeCart } from "@/app/redux/CartSlice";
 import { initializeWishlist } from "@/app/redux/WishListSlice";
 import { Loader2, ChevronRight, Eye, EyeOff } from "lucide-react";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
