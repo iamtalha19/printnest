@@ -145,7 +145,6 @@ const StatCard = ({ title, value, icon: Icon, color }: any) => (
           />
         </div>
       </div>
-
       <div className="space-y-2">
         <p className="text-slate-500 text-sm font-semibold uppercase tracking-wider">
           {title}
@@ -217,16 +216,17 @@ export default function AdminDashboard() {
     "overview" | "users" | "orders" | "products"
   >("overview");
   const [searchTerm, setSearchTerm] = useState("");
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [viewType, setViewType] = useState<"cart" | "wishlist" | "both">(
     "both",
   );
+  const ITEMS_PER_PAGE = 5;
   const [userPage, setUserPage] = useState(1);
   const [orderPage, setOrderPage] = useState(1);
   const [productPage, setProductPage] = useState(1);
-  const ITEMS_PER_PAGE = 5;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [productForm, setProductForm] = useState({
@@ -237,8 +237,6 @@ export default function AdminDashboard() {
     badge: "",
   });
   const [productDeleteConfirm, setProductDeleteConfirm] = useState<any>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   useEffect(() => {
     if (isAuthLoading) return;
     if (!isAuthenticated) {
@@ -310,7 +308,6 @@ export default function AdminDashboard() {
     });
     setIsProductModalOpen(true);
   };
-
   const openEditProduct = (product: any) => {
     setEditingProduct(product);
     setProductForm({
@@ -322,11 +319,9 @@ export default function AdminDashboard() {
     });
     setIsProductModalOpen(true);
   };
-
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
     const newProductData = {
       title: productForm.title,
       price: `$${parseFloat(productForm.price).toFixed(2)}`,
@@ -337,26 +332,20 @@ export default function AdminDashboard() {
       badge: productForm.badge || null,
       printText: "We print with",
     };
-
     try {
       const url = editingProduct
         ? `/api/admin/products/${editingProduct.id}`
         : `/api/admin/products`;
-
-      const method = editingProduct ? "PATCH" : "POST";
-
       const res = await fetch(url, {
-        method,
+        method: editingProduct ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newProductData),
       });
-
       if (res.ok) {
         await fetchStats();
         setIsProductModalOpen(false);
       } else {
-        const errorData = await res.json();
-        alert(`Failed to save product: ${errorData.message}`);
+        alert("Failed to save product");
       }
     } catch (error) {
       alert("Error saving product");
@@ -364,13 +353,11 @@ export default function AdminDashboard() {
       setIsSubmitting(false);
     }
   };
-
   const handleDeleteProduct = async (id: number) => {
     try {
       const res = await fetch(`/api/admin/products/${id}`, {
         method: "DELETE",
       });
-
       if (res.ok) {
         await fetchStats();
         setProductDeleteConfirm(null);
@@ -420,64 +407,8 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 font-sans">
         <PageHeader title="Admin Panel" breadcrumb="Dashboard" />
-
-        <div className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="lg:w-1/4 shrink-0">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-100 overflow-hidden sticky top-24 p-6">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="h-12 w-12 rounded-full bg-linear-to-br from-slate-200 to-slate-300 animate-pulse" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-linear-to-r from-slate-200 to-slate-300 rounded animate-pulse" />
-                    <div className="h-3 bg-linear-to-r from-slate-200 to-slate-300 rounded w-2/3 animate-pulse" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className="h-12 bg-linear-to-r from-slate-100 to-slate-200 rounded-xl animate-pulse"
-                      style={{ animationDelay: `${i * 100}ms` }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:flex-1 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="bg-white/80 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-white relative overflow-hidden"
-                  >
-                    <div className="absolute inset-0 -translate-x-full animate-shimmer bg-linear-to-r from-transparent via-white/60 to-transparent" />
-                    <div className="flex justify-between items-start mb-6">
-                      <div className="h-14 w-14 bg-linear-to-br from-slate-200 to-slate-300 rounded-2xl animate-pulse" />
-                      <div className="h-6 w-16 bg-linear-to-r from-slate-200 to-slate-300 rounded-full animate-pulse" />
-                    </div>
-                    <div className="space-y-3">
-                      <div className="h-3 bg-linear-to-r from-slate-200 to-slate-300 rounded w-1/2 animate-pulse" />
-                      <div className="h-8 bg-linear-to-r from-slate-200 to-slate-300 rounded w-3/4 animate-pulse" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-100 overflow-hidden p-8">
-                <div className="h-6 bg-linear-to-r from-slate-200 to-slate-300 rounded w-1/4 mb-6 animate-pulse" />
-                <div className="space-y-4">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div
-                      key={i}
-                      className="h-16 bg-linear-to-r from-slate-100 to-slate-200 rounded-xl animate-pulse"
-                      style={{ animationDelay: `${i * 80}ms` }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 lg:px-8 py-32 flex justify-center items-center">
+          <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin shadow-lg"></div>
         </div>
       </div>
     );
@@ -486,7 +417,6 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 font-sans text-slate-800">
       <PageHeader title="Admin Panel" breadcrumb="Dashboard" />
-
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:w-1/4 shrink-0">
@@ -540,9 +470,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="lg:flex-1">
-            {(activeTab === "users" ||
-              activeTab === "orders" ||
-              activeTab === "products") && (
+            {["users", "orders", "products"].includes(activeTab) && (
               <div className="mb-6">
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-linear-to-r from-purple-600 to-blue-600 rounded-xl opacity-0 group-focus-within:opacity-20 blur transition duration-300" />
@@ -570,10 +498,11 @@ export default function AdminDashboard() {
                 </div>
               </div>
             )}
-
             {activeTab === "overview" && (
-              <div key="overview" className="space-y-6">
-                {/* Stat Cards */}
+              <div
+                key="overview"
+                className="space-y-6 animate-in fade-in duration-300"
+              >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <StatCard
                     title="Total Revenue"
@@ -596,7 +525,6 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Revenue Chart Widget */}
                   <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
                       Revenue Overview (Last 7 Days)
@@ -635,7 +563,6 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  {/* Top Selling Products Widget */}
                   <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <h3 className="font-bold text-slate-800 mb-6">
                       Top Selling Products
@@ -682,113 +609,12 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 </div>
-
-                {/* Order Status Distribution */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                  <h3 className="font-bold text-slate-800 mb-4">
-                    Order Status Distribution
-                  </h3>
-                  <div className="flex h-4 rounded-full overflow-hidden">
-                    <div
-                      className="bg-amber-400 h-full"
-                      style={{
-                        width: `${(stats.recentOrders.filter((o) => o.status === "Pending").length / stats.totalOrders) * 100}%`,
-                      }}
-                    />
-                    <div
-                      className="bg-blue-500 h-full"
-                      style={{
-                        width: `${(stats.recentOrders.filter((o) => o.status === "Accepted").length / stats.totalOrders) * 100}%`,
-                      }}
-                    />
-                    <div
-                      className="bg-emerald-500 h-full"
-                      style={{
-                        width: `${(stats.recentOrders.filter((o) => o.status === "Completed").length / stats.totalOrders) * 100}%`,
-                      }}
-                    />
-                    <div
-                      className="bg-rose-500 h-full"
-                      style={{
-                        width: `${(stats.recentOrders.filter((o) => o.status === "Cancelled").length / stats.totalOrders) * 100}%`,
-                      }}
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-4 mt-4 text-xs text-slate-500 font-medium">
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-amber-400" />{" "}
-                      Pending
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-blue-500" />{" "}
-                      Accepted
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500" />{" "}
-                      Completed
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-rose-500" />{" "}
-                      Cancelled
-                    </div>
-                  </div>
-                </div>
-
-                {/* Recent Transactions */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                  <div className="p-8 border-b border-slate-100 flex justify-between items-center">
-                    <h3 className="font-bold text-slate-800 text-xl">
-                      Recent Transactions
-                    </h3>
-                    <button
-                      onClick={() => setActiveTab("orders")}
-                      className="text-sm text-purple-600 font-medium hover:underline"
-                    >
-                      View All
-                    </button>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                      <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-bold tracking-wider">
-                        <tr>
-                          <th className="px-8 py-4">Order ID</th>
-                          <th className="px-8 py-4">Date</th>
-                          <th className="px-8 py-4">Amount</th>
-                          <th className="px-8 py-4">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {stats.recentOrders.slice(0, 5).map((order) => (
-                          <tr
-                            key={order.id}
-                            className="group cursor-pointer transition-all duration-200 border-b border-slate-100 last:border-0 hover:bg-slate-50/80"
-                          >
-                            <td className="px-8 py-5 font-mono text-sm font-bold text-purple-600 group-hover:text-purple-700">
-                              #{order.id.slice(-8).toUpperCase()}
-                            </td>
-                            <td className="px-8 py-5 text-sm text-slate-500 group-hover:text-slate-700">
-                              {new Date(order.date).toLocaleDateString()}
-                            </td>
-                            <td className="px-8 py-5 text-sm font-bold text-slate-800 group-hover:text-purple-600">
-                              ${order.total}
-                            </td>
-                            <td className="px-8 py-5">
-                              <StatusBadge status={order.status} />
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
               </div>
             )}
-
-            {/* Products Tab */}
             {activeTab === "products" && (
               <div
                 key="products"
-                className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
+                className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-in fade-in duration-300"
               >
                 <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                   <h3 className="text-xl font-bold">Product Management</h3>
@@ -805,7 +631,6 @@ export default function AdminDashboard() {
                       <tr>
                         <th className="px-8 py-4">Product Info</th>
                         <th className="px-8 py-4">Price</th>
-                        <th className="px-8 py-4">Status</th>
                         <th className="px-8 py-4 text-right">Actions</th>
                       </tr>
                     </thead>
@@ -813,7 +638,7 @@ export default function AdminDashboard() {
                       {paginatedProducts?.length === 0 ? (
                         <tr>
                           <td
-                            colSpan={4}
+                            colSpan={3}
                             className="px-8 py-10 text-center text-slate-500 italic"
                           >
                             No products found.
@@ -827,7 +652,7 @@ export default function AdminDashboard() {
                           >
                             <td className="px-8 py-4">
                               <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-lg bg-white border border-slate-100 overflow-hidden relative shrink-0">
+                                <div className="w-12 h-12 rounded-lg border overflow-hidden relative bg-white">
                                   {p.image ? (
                                     <Image
                                       src={p.image}
@@ -840,7 +665,7 @@ export default function AdminDashboard() {
                                   )}
                                 </div>
                                 <div>
-                                  <p className="font-bold text-slate-800 text-sm">
+                                  <p className="font-bold text-sm text-slate-800">
                                     {p.title}
                                   </p>
                                   <p className="text-xs text-slate-500">
@@ -851,7 +676,7 @@ export default function AdminDashboard() {
                             </td>
                             <td className="px-8 py-4">
                               <div className="flex flex-col">
-                                <span className="font-bold text-slate-800 text-sm">
+                                <span className="font-bold text-sm text-slate-800">
                                   {p.price}
                                 </span>
                                 {p.oldPrice && (
@@ -861,24 +686,17 @@ export default function AdminDashboard() {
                                 )}
                               </div>
                             </td>
-                            <td className="px-8 py-4">
-                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
-                                In Stock
-                              </span>
-                            </td>
                             <td className="px-8 py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
                                 <button
                                   onClick={() => openEditProduct(p)}
-                                  className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                  title="Edit"
+                                  className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
                                 >
                                   <Edit size={16} />
                                 </button>
                                 <button
                                   onClick={() => setProductDeleteConfirm(p)}
-                                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                  title="Delete"
+                                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
                                 >
                                   <Trash2 size={16} />
                                 </button>
@@ -889,12 +707,11 @@ export default function AdminDashboard() {
                       )}
                     </tbody>
                   </table>
-                  {/* Pagination Control for Products */}
-                  <div className="flex items-center justify-between px-8 py-4 border-t border-slate-100 bg-slate-50">
+                  <div className="flex items-center justify-between px-8 py-4 border-t bg-slate-50">
                     <button
                       disabled={productPage === 1}
-                      onClick={() => setProductPage((prev) => prev - 1)}
-                      className="px-4 py-2 text-sm font-bold bg-white border border-slate-200 text-slate-600 rounded-lg disabled:opacity-50 hover:bg-slate-100 transition-colors shadow-sm"
+                      onClick={() => setProductPage((p) => p - 1)}
+                      className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
                     >
                       Previous
                     </button>
@@ -906,8 +723,8 @@ export default function AdminDashboard() {
                         productPage === totalProductPages ||
                         totalProductPages === 0
                       }
-                      onClick={() => setProductPage((prev) => prev + 1)}
-                      className="px-4 py-2 text-sm font-bold bg-white border border-slate-200 text-slate-600 rounded-lg disabled:opacity-50 hover:bg-slate-100 transition-colors shadow-sm"
+                      onClick={() => setProductPage((p) => p + 1)}
+                      className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
                     >
                       Next
                     </button>
@@ -915,12 +732,10 @@ export default function AdminDashboard() {
                 </div>
               </div>
             )}
-
-            {/* Users Tab */}
             {activeTab === "users" && (
               <div
                 key="users"
-                className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
+                className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-in fade-in duration-300"
               >
                 <div className="p-8 border-b border-slate-100 bg-slate-50/50">
                   <h3 className="text-xl font-bold">User Management</h3>
@@ -938,7 +753,7 @@ export default function AdminDashboard() {
                       {paginatedUsers?.map((u) => (
                         <tr
                           key={u.id}
-                          className="group hover:bg-slate-50/80 backdrop-blur-sm transition-all duration-200"
+                          className="group hover:bg-slate-50/80 transition-all duration-200"
                         >
                           <td className="px-8 py-5">
                             <div className="flex items-center gap-3">
@@ -946,9 +761,7 @@ export default function AdminDashboard() {
                                 {u.name[0]}
                               </div>
                               <div>
-                                <p className="font-bold text-slate-800 text-sm">
-                                  {u.name}
-                                </p>
+                                <p className="font-bold text-sm">{u.name}</p>
                                 <p className="text-xs text-slate-500">
                                   {u.email}
                                 </p>
@@ -962,7 +775,7 @@ export default function AdminDashboard() {
                                   setSelectedUser(u);
                                   setViewType("cart");
                                 }}
-                                className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200 transition-colors"
+                                className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200"
                               >
                                 <ShoppingCart
                                   size={14}
@@ -975,7 +788,7 @@ export default function AdminDashboard() {
                                   setSelectedUser(u);
                                   setViewType("wishlist");
                                 }}
-                                className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200 transition-colors"
+                                className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200"
                               >
                                 <Heart size={14} className="text-red-500" />{" "}
                                 Wishlist ({u.wishlistCount})
@@ -985,7 +798,7 @@ export default function AdminDashboard() {
                           <td className="px-8 py-5 text-right">
                             <button
                               onClick={() => setDeleteConfirm(u.id)}
-                              className="text-slate-400 hover:text-red-600 transition-colors p-2.5 hover:bg-red-50 rounded-xl group-hover:bg-white shadow-sm"
+                              className="text-slate-400 hover:text-red-600 p-2.5 rounded-xl hover:bg-red-50"
                             >
                               <Trash2 size={18} />
                             </button>
@@ -994,12 +807,11 @@ export default function AdminDashboard() {
                       ))}
                     </tbody>
                   </table>
-                  {/* Pagination Control for Users */}
-                  <div className="flex items-center justify-between px-8 py-4 border-t border-slate-100 bg-slate-50">
+                  <div className="flex items-center justify-between px-8 py-4 border-t bg-slate-50">
                     <button
                       disabled={userPage === 1}
-                      onClick={() => setUserPage((prev) => prev - 1)}
-                      className="px-4 py-2 text-sm font-bold bg-white border border-slate-200 text-slate-600 rounded-lg disabled:opacity-50 hover:bg-slate-100 transition-colors shadow-sm"
+                      onClick={() => setUserPage((p) => p - 1)}
+                      className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
                     >
                       Previous
                     </button>
@@ -1007,9 +819,11 @@ export default function AdminDashboard() {
                       Page {userPage} of {totalUserPages}
                     </span>
                     <button
-                      disabled={userPage === totalUserPages}
-                      onClick={() => setUserPage((prev) => prev + 1)}
-                      className="px-4 py-2 text-sm font-bold bg-white border border-slate-200 text-slate-600 rounded-lg disabled:opacity-50 hover:bg-slate-100 transition-colors shadow-sm"
+                      disabled={
+                        userPage === totalUserPages || totalUserPages === 0
+                      }
+                      onClick={() => setUserPage((p) => p + 1)}
+                      className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
                     >
                       Next
                     </button>
@@ -1017,12 +831,10 @@ export default function AdminDashboard() {
                 </div>
               </div>
             )}
-
-            {/* Orders Tab */}
             {activeTab === "orders" && (
               <div
                 key="orders"
-                className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
+                className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-in fade-in duration-300"
               >
                 <div className="p-8 border-b border-slate-100 bg-slate-50/50">
                   <h3 className="text-xl font-bold">Order Management</h3>
@@ -1062,14 +874,12 @@ export default function AdminDashboard() {
                                 </div>
                               </>
                             ) : (
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-sm text-red-600 font-medium italic">
-                                  Deleted Account
-                                </span>
-                              </div>
+                              <span className="text-sm text-red-600 font-medium italic">
+                                Deleted Account
+                              </span>
                             )}
                           </td>
-                          <td className="px-8 py-5 font-bold text-slate-800 text-sm">
+                          <td className="px-8 py-5 font-bold text-sm">
                             ${o.total}
                           </td>
                           <td className="px-8 py-5">
@@ -1078,7 +888,7 @@ export default function AdminDashboard() {
                               onChange={(e) =>
                                 handleStatusChange(o.id, e.target.value)
                               }
-                              className="bg-transparent text-sm font-bold py-1 pr-2 cursor-pointer focus:outline-none focus:text-purple-600 border border-slate-200 rounded px-2 hover:bg-white"
+                              className="bg-transparent text-sm font-bold py-1 border rounded px-2 focus:outline-none"
                             >
                               <option value="Pending">Pending</option>
                               <option value="Accepted">Accepted</option>
@@ -1089,7 +899,7 @@ export default function AdminDashboard() {
                           <td className="px-8 py-5 text-right">
                             <button
                               onClick={() => setSelectedOrder(o)}
-                              className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-slate-900 px-3 py-1.5 rounded-lg hover:bg-purple-600 transition-colors shadow-sm"
+                              className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-slate-900 px-3 py-1.5 rounded-lg hover:bg-purple-600"
                             >
                               <Eye size={14} /> View
                             </button>
@@ -1098,12 +908,11 @@ export default function AdminDashboard() {
                       ))}
                     </tbody>
                   </table>
-                  {/* Pagination Control for Orders */}
-                  <div className="flex items-center justify-between px-8 py-4 border-t border-slate-100 bg-slate-50">
+                  <div className="flex items-center justify-between px-8 py-4 border-t bg-slate-50">
                     <button
                       disabled={orderPage === 1}
-                      onClick={() => setOrderPage((prev) => prev - 1)}
-                      className="px-4 py-2 text-sm font-bold bg-white border border-slate-200 text-slate-600 rounded-lg disabled:opacity-50 hover:bg-slate-100 transition-colors shadow-sm"
+                      onClick={() => setOrderPage((p) => p - 1)}
+                      className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
                     >
                       Previous
                     </button>
@@ -1111,9 +920,11 @@ export default function AdminDashboard() {
                       Page {orderPage} of {totalOrderPages}
                     </span>
                     <button
-                      disabled={orderPage === totalOrderPages}
-                      onClick={() => setOrderPage((prev) => prev + 1)}
-                      className="px-4 py-2 text-sm font-bold bg-white border border-slate-200 text-slate-600 rounded-lg disabled:opacity-50 hover:bg-slate-100 transition-colors shadow-sm"
+                      disabled={
+                        orderPage === totalOrderPages || totalOrderPages === 0
+                      }
+                      onClick={() => setOrderPage((p) => p + 1)}
+                      className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
                     >
                       Next
                     </button>
@@ -1124,27 +935,23 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-
-      {/* --- MODALS SECTION --- */}
-
-      {/* Add/Edit Product Modal */}
       {isProductModalOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-              <h3 className="text-xl font-black text-slate-800">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b flex justify-between items-center bg-slate-50">
+              <h3 className="text-xl font-black">
                 {editingProduct ? "Edit Product" : "Add New Product"}
               </h3>
               <button
                 onClick={() => setIsProductModalOpen(false)}
-                className="p-2 hover:bg-slate-200 text-slate-500 rounded-xl transition-colors"
+                className="p-2 hover:bg-slate-200 rounded-lg"
               >
                 <X size={20} />
               </button>
             </div>
             <form onSubmit={handleSaveProduct} className="p-6 space-y-5">
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                <label className="block text-sm font-bold mb-1.5 text-slate-700">
                   Product Title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -1155,13 +962,12 @@ export default function AdminDashboard() {
                     setProductForm({ ...productForm, title: e.target.value })
                   }
                   placeholder="e.g., Premium Cotton T-Shirt"
-                  className="w-full px-4 py-3 border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none rounded-xl transition-all placeholder:text-slate-400"
+                  className="w-full px-4 py-3 border rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                 />
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                  <label className="block text-sm font-bold mb-1.5 text-slate-700">
                     Price ($) <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -1173,15 +979,12 @@ export default function AdminDashboard() {
                       setProductForm({ ...productForm, price: e.target.value })
                     }
                     placeholder="0.00"
-                    className="w-full px-4 py-3 border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none rounded-xl transition-all"
+                    className="w-full px-4 py-3 border rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1.5">
-                    Old Price ($){" "}
-                    <span className="text-slate-400 font-normal">
-                      (Optional)
-                    </span>
+                  <label className="block text-sm font-bold mb-1.5 text-slate-700">
+                    Old Price ($)
                   </label>
                   <input
                     type="number"
@@ -1194,13 +997,12 @@ export default function AdminDashboard() {
                       })
                     }
                     placeholder="0.00"
-                    className="w-full px-4 py-3 border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none rounded-xl transition-all"
+                    className="w-full px-4 py-3 border rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                   />
                 </div>
               </div>
-
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                <label className="block text-sm font-bold mb-1.5 text-slate-700">
                   Image URL <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -1211,14 +1013,12 @@ export default function AdminDashboard() {
                     setProductForm({ ...productForm, image: e.target.value })
                   }
                   placeholder="https://example.com/image.png"
-                  className="w-full px-4 py-3 border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none rounded-xl transition-all placeholder:text-slate-400"
+                  className="w-full px-4 py-3 border rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                 />
               </div>
-
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">
-                  Badge{" "}
-                  <span className="text-slate-400 font-normal">(Optional)</span>
+                <label className="block text-sm font-bold mb-1.5 text-slate-700">
+                  Badge
                 </label>
                 <input
                   type="text"
@@ -1227,85 +1027,41 @@ export default function AdminDashboard() {
                     setProductForm({ ...productForm, badge: e.target.value })
                   }
                   placeholder="e.g., Sale, New, Hot"
-                  className="w-full px-4 py-3 border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none rounded-xl transition-all placeholder:text-slate-400"
+                  className="w-full px-4 py-3 border rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                 />
               </div>
-
               <div className="pt-4 flex gap-3">
                 <button
                   type="button"
                   onClick={() => setIsProductModalOpen(false)}
-                  className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+                  className="flex-1 px-4 py-3 bg-slate-100 font-bold rounded-xl hover:bg-slate-200"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 px-4 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 disabled:opacity-50 transition-colors shadow-md shadow-purple-200 flex justify-center items-center gap-2"
+                  className="flex-1 px-4 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 disabled:opacity-50"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>{" "}
-                      Saving...
-                    </>
-                  ) : (
-                    "Save Product"
-                  )}
+                  {isSubmitting ? "Saving..." : "Save Product"}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-
-      {/* Product Delete Confirmation Modal */}
-      {productDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center animate-in fade-in zoom-in duration-200">
-            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Trash2 size={32} />
-            </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">
-              Delete Product?
-            </h3>
-            <p className="text-slate-500 mb-6 text-sm">
-              Are you sure you want to delete{" "}
-              <span className="font-bold text-slate-800">
-                "{productDeleteConfirm.title}"
-              </span>
-              ? This action removes it from the store.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setProductDeleteConfirm(null)}
-                className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDeleteProduct(productDeleteConfirm.id)}
-                className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors shadow-md shadow-red-200"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {selectedUser && (
         <div
           onClick={() => setSelectedUser(null)}
-          className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white/95 backdrop-blur-xl rounded-3xl w-full max-w-lg shadow-2xl border border-white/20 overflow-hidden"
+            className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
           >
-            <div className="p-6 border-b border-slate-100/50 flex justify-between items-start bg-linear-to-br from-purple-50/50 to-transparent">
+            <div className="p-6 border-b flex justify-between items-start bg-slate-50">
               <div>
-                <h3 className="text-xl font-black bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                <h3 className="text-xl font-black">
                   {selectedUser.name}'s Storage
                 </h3>
                 <p className="text-sm text-slate-500 mt-1">
@@ -1314,78 +1070,74 @@ export default function AdminDashboard() {
               </div>
               <button
                 onClick={() => setSelectedUser(null)}
-                className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
+                className="p-2 hover:bg-slate-200 rounded-lg"
               >
-                <X size={20} className="text-slate-400" />
+                <X size={20} />
               </button>
             </div>
-            <div className="p-6 max-h-[60vh] overflow-y-auto">
-              <div className="space-y-3">
-                {(viewType === "cart"
-                  ? selectedUser.cart
-                  : selectedUser.wishlist
-                )?.map((item: any, i: number) => (
-                  <div
-                    key={i}
-                    className="flex gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100"
-                  >
-                    <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0">
-                      {item.image ? (
-                        <Image
-                          src={item.image}
-                          alt=""
-                          width={40}
-                          height={40}
-                          className="object-contain"
-                        />
-                      ) : (
-                        <Package size={20} className="text-slate-300" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-slate-800 truncate">
-                        {item.name || item.title}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        {viewType === "cart" && `Qty: ${item.quantity} × `}$
-                        {item.price}
-                      </p>
-                    </div>
-                    {viewType === "cart" && (
-                      <p className="font-bold text-sm text-purple-600">
-                        ${item.totalPrice}
-                      </p>
+            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3">
+              {(viewType === "cart"
+                ? selectedUser.cart
+                : selectedUser.wishlist
+              )?.map((item: any, i: number) => (
+                <div
+                  key={i}
+                  className="flex gap-4 p-3 bg-slate-50 rounded-xl border"
+                >
+                  <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border relative overflow-hidden">
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt=""
+                        fill
+                        className="object-contain"
+                      />
+                    ) : (
+                      <Package size={20} className="text-slate-300" />
                     )}
                   </div>
-                ))}
-                {(viewType === "cart"
-                  ? selectedUser.cart
-                  : selectedUser.wishlist
-                )?.length === 0 && (
-                  <p className="text-center text-slate-400">No items found.</p>
-                )}
-              </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold truncate">
+                      {item.name || item.title}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {viewType === "cart" && `Qty: ${item.quantity} × `}$
+                      {item.price}
+                    </p>
+                  </div>
+                  {viewType === "cart" && (
+                    <p className="font-bold text-sm text-purple-600">
+                      ${item.totalPrice}
+                    </p>
+                  )}
+                </div>
+              ))}
+              {(viewType === "cart" ? selectedUser.cart : selectedUser.wishlist)
+                ?.length === 0 && (
+                <p className="text-center text-slate-400 italic py-4">
+                  No items found.
+                </p>
+              )}
             </div>
           </div>
         </div>
       )}
-
       {selectedOrder && (
         <div
           onClick={() => setSelectedOrder(null)}
-          className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white/95 backdrop-blur-xl rounded-3xl w-full max-w-2xl shadow-2xl border border-white/20 overflow-hidden flex flex-col max-h-[90vh]"
+            className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
           >
-            <div className="p-6 border-b border-slate-100/50 flex justify-between items-center bg-linear-to-br from-slate-50/50 to-transparent">
+            <div className="p-6 border-b flex justify-between items-center bg-slate-50">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-linear-to-br from-purple-100 to-blue-100 text-purple-600 rounded-xl shadow-sm">
-                  <ClipboardList size={22} strokeWidth={2} />
+                <div className="p-2.5 bg-purple-100 text-purple-600 rounded-xl">
+                  <ClipboardList size={22} />
                 </div>
                 <div>
-                  <h3 className="font-black text-lg bg-linear-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+                  <h3 className="font-black text-lg">
                     Order #{selectedOrder.id.slice(-8).toUpperCase()}
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -1395,39 +1147,37 @@ export default function AdminDashboard() {
               </div>
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="p-2 hover:bg-slate-200 rounded-xl transition-colors"
+                className="p-2 hover:bg-slate-200 rounded-lg"
               >
-                <X size={20} className="text-slate-500" />
+                <X size={20} />
               </button>
             </div>
             <div className="p-6 overflow-y-auto space-y-8">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border">
                 <div>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">
+                  <p className="text-xs text-slate-500 font-bold uppercase mb-1">
                     Status
                   </p>
                   <StatusBadge status={selectedOrder.status} />
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">
+                  <p className="text-xs text-slate-500 font-bold uppercase mb-1">
                     Total Amount
                   </p>
-                  <p className="text-2xl font-bold text-slate-900">
-                    ${selectedOrder.total}
-                  </p>
+                  <p className="text-2xl font-bold">${selectedOrder.total}</p>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <h4 className="flex items-center gap-2 font-bold text-slate-800 mb-4 text-sm uppercase tracking-wide">
+                  <h4 className="flex items-center gap-2 font-bold mb-4 text-sm uppercase">
                     <Users size={16} className="text-purple-500" /> Customer
                     Details
                   </h4>
                   <div className="space-y-3 text-sm">
-                    <div className="flex justify-between border-b border-slate-100 pb-2">
+                    <div className="flex justify-between border-b pb-2">
                       <span className="text-slate-500">Name</span>
                       {selectedOrder.customer?.name ? (
-                        <span className="font-medium text-slate-800">
+                        <span className="font-medium">
                           {selectedOrder.customer.name}
                         </span>
                       ) : (
@@ -1436,20 +1186,20 @@ export default function AdminDashboard() {
                         </span>
                       )}
                     </div>
-                    <div className="flex justify-between border-b border-slate-100 pb-2">
+                    <div className="flex justify-between border-b pb-2">
                       <span className="text-slate-500">Email</span>
-                      <span className="font-medium text-slate-800">
+                      <span className="font-medium">
                         {selectedOrder.customer?.email || "—"}
                       </span>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <h4 className="flex items-center gap-2 font-bold text-slate-800 mb-4 text-sm uppercase tracking-wide">
+                  <h4 className="flex items-center gap-2 font-bold mb-4 text-sm uppercase">
                     <MapPin size={16} className="text-purple-500" /> Shipping
                     Info
                   </h4>
-                  <div className="p-4 bg-slate-50 rounded-xl text-sm text-slate-600 leading-relaxed border border-slate-100">
+                  <div className="p-4 bg-slate-50 rounded-xl text-sm text-slate-600 leading-relaxed border">
                     {selectedOrder.customer?.address ? (
                       <>
                         {selectedOrder.customer.address}
@@ -1466,11 +1216,11 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div>
-                <h4 className="flex items-center gap-2 font-bold text-slate-800 mb-4 text-sm uppercase tracking-wide">
+                <h4 className="flex items-center gap-2 font-bold mb-4 text-sm uppercase">
                   <Package size={16} className="text-purple-500" /> Order Items
                   ({selectedOrder.items.length})
                 </h4>
-                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                <div className="border rounded-xl overflow-hidden">
                   <table className="w-full text-left text-sm">
                     <thead className="bg-slate-50 text-slate-500 font-bold">
                       <tr>
@@ -1480,12 +1230,12 @@ export default function AdminDashboard() {
                         <th className="px-4 py-3 text-right">Total</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y">
                       {selectedOrder.items.map((item, idx) => (
                         <tr key={idx}>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-slate-100 rounded-md shrink-0 overflow-hidden relative">
+                              <div className="w-10 h-10 bg-slate-100 rounded-md relative overflow-hidden">
                                 {item.image && (
                                   <Image
                                     src={item.image}
@@ -1495,9 +1245,7 @@ export default function AdminDashboard() {
                                   />
                                 )}
                               </div>
-                              <span className="font-medium text-slate-800 line-clamp-1">
-                                {item.name}
-                              </span>
+                              <span className="font-medium">{item.name}</span>
                             </div>
                           </td>
                           <td className="px-4 py-3 text-center text-slate-600">
@@ -1506,7 +1254,7 @@ export default function AdminDashboard() {
                           <td className="px-4 py-3 text-right text-slate-600">
                             ${item.price}
                           </td>
-                          <td className="px-4 py-3 text-right font-bold text-slate-800">
+                          <td className="px-4 py-3 text-right font-bold">
                             ${item.totalPrice}
                           </td>
                         </tr>
@@ -1519,30 +1267,53 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
-
-      {/* User Delete Confirmation Modal */}
-      {deleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center animate-in fade-in zoom-in duration-200">
+      {productDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center animate-in zoom-in-95 duration-200">
             <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <Trash2 size={32} />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">
-              Delete User?
-            </h3>
+            <h3 className="text-xl font-bold mb-2">Delete Product?</h3>
+            <p className="text-slate-500 mb-6 text-sm">
+              Remove "{productDeleteConfirm.title}" from store?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setProductDeleteConfirm(null)}
+                className="flex-1 px-4 py-3 bg-slate-100 font-bold rounded-xl hover:bg-slate-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteProduct(productDeleteConfirm.id)}
+                className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={32} />
+            </div>
+            <h3 className="text-xl font-bold mb-2">Delete User?</h3>
             <p className="text-slate-500 mb-6 text-sm">
               This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+                className="flex-1 px-4 py-3 bg-slate-100 font-bold rounded-xl hover:bg-slate-200"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDeleteUser(deleteConfirm)}
-                className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors shadow-md shadow-red-200"
+                className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700"
               >
                 Delete
               </button>

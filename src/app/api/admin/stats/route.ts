@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { getUsers, getAllOrders, getProducts } from "@/app/lib/db";
+import { getUsers, getAllOrders, getProducts} from "@/app/lib/db";
 
 const SECRET_KEY = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.EMAIL_USER;
@@ -20,7 +20,7 @@ export async function GET() {
 
     const users = await getUsers();
     const orders = await getAllOrders();
-    const products = await getProducts(); 
+    const products = await getProducts();
 
     const totalUsers = users.length;
     const totalOrders = orders.length;
@@ -32,13 +32,18 @@ export async function GET() {
     const last7Days = [...Array(7)].map((_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      return d.toISOString().split('T')[0];
+      return d;
     }).reverse();
 
-    const revenueData = last7Days.map(date => {
-      const dayOrders = orders.filter(o => o.date.startsWith(date));
+    const revenueData = last7Days.map(d => {
+      const dayOrders = orders.filter(o => {
+        const orderDate = new Date(o.date);
+        return orderDate.getDate() === d.getDate() &&
+               orderDate.getMonth() === d.getMonth() &&
+               orderDate.getFullYear() === d.getFullYear();
+      });
       return {
-        date,
+        date: d.toISOString(),
         revenue: dayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
       };
     });
@@ -92,7 +97,7 @@ export async function GET() {
       users: usersWithDetails,
       revenueData,
       topProducts,
-      products 
+      products,
     });
   } catch (error) {
     console.error("Admin stats error:", error);

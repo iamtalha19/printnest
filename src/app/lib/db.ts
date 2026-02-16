@@ -3,6 +3,8 @@ import path from 'path';
 
 const DB_PATH = path.join(process.cwd(), 'src/app/data/logindb.json');
 const SHOP_DB_PATH = path.join(process.cwd(), 'src/app/data/shop.json');
+const MAIN_DB_PATH = path.join(process.cwd(), 'src/app/data/db.json');
+
 export interface SavedCard {
   id: string;
   number: string;
@@ -160,6 +162,53 @@ export async function deleteProductRecord(productId: number) {
   if (index !== -1) {
     products.splice(index, 1);
     await saveProducts(products);
+    return true;
+  }
+  return false;
+}
+
+export async function getReviews() {
+  try {
+    const data = await fs.readFile(MAIN_DB_PATH, 'utf-8');
+    return JSON.parse(data).testimonials?.testimonials || [];
+  } catch (error) {
+    return [];
+  }
+}
+
+async function saveReviews(reviews: any[]) {
+  try {
+    const data = JSON.parse(await fs.readFile(MAIN_DB_PATH, 'utf-8'));
+    if (!data.testimonials) data.testimonials = { header: {}, testimonials: [] };
+    data.testimonials.testimonials = reviews;
+    await fs.writeFile(MAIN_DB_PATH, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (error) {
+    console.error("Failed to save reviews", error);
+  }
+}
+
+export async function addReview(review: any) {
+  const reviews = await getReviews();
+  reviews.unshift(review);
+  await saveReviews(reviews);
+  return review;
+}
+
+export async function updateReview(index: number, data: any) {
+  const reviews = await getReviews();
+  if (index >= 0 && index < reviews.length) {
+    reviews[index] = { ...reviews[index], ...data };
+    await saveReviews(reviews);
+    return reviews[index];
+  }
+  return null;
+}
+
+export async function deleteReviewRecord(index: number) {
+  const reviews = await getReviews();
+  if (index >= 0 && index < reviews.length) {
+    reviews.splice(index, 1);
+    await saveReviews(reviews);
     return true;
   }
   return false;

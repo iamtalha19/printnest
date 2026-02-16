@@ -32,7 +32,42 @@
       "headingHighlight": "Print Desk",
       "description": "Stay informed with expert tips, trends, and print industry updates.",
       "buttonText": "More Blog"
-    }
+    },
+    "posts": [
+      {
+        "id": 1,
+        "title": "How to Choose the Right Material for Your Prints",
+        "image": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/b1-img-1.webp",
+        "author": {
+          "name": "Printnest",
+          "avatar": "https://secure.gravatar.com/avatar/71a77267f30008ab3eef4b020e1b29155945405731d0f1e44dbc349e0ac7723e?s=50&d=mm&r=g"
+        },
+        "date": "May 17, 2025",
+        "readTime": "2 min read"
+      },
+      {
+        "id": 2,
+        "title": "The Power of Personalization in Modern Printing",
+        "image": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/b1-img-2.webp",
+        "author": {
+          "name": "Printnest",
+          "avatar": "https://secure.gravatar.com/avatar/71a77267f30008ab3eef4b020e1b29155945405731d0f1e44dbc349e0ac7723e?s=50&d=mm&r=g"
+        },
+        "date": "May 17, 2025",
+        "readTime": "2 min read"
+      },
+      {
+        "id": 3,
+        "title": "Why Custom Merchandise Can Elevate Your Brand",
+        "image": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/b1-img-3.webp",
+        "author": {
+          "name": "Printnest",
+          "avatar": "https://secure.gravatar.com/avatar/71a77267f30008ab3eef4b020e1b29155945405731d0f1e44dbc349e0ac7723e?s=50&d=mm&r=g"
+        },
+        "date": "January 10, 2024",
+        "readTime": "2 min read"
+      }
+    ]
   },
   "cart": {
     "backgroundImage": "https://themexriver.com/wp/printnest/wp-content/uploads/2026/01/breadcrumb-bg.webp",
