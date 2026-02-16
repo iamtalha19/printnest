@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import db from "@/app/db.json";
+import db from "@/app/data/db.json";
 
 interface BlogPost {
   id: number;
@@ -98,7 +98,7 @@ export default function BlogPostPage() {
               <ChevronRight size={14} className="-ml-2" strokeWidth={2.5} />
             </div>
             <Link
-              href="/blog"
+              href="/#blog"
               className="hover:text-purple-600 transition-colors"
             >
               Blog
@@ -113,12 +113,12 @@ export default function BlogPostPage() {
           </div>
         </div>
         <div className="max-w-4xl mx-auto px-4 pb-32 mt-12">
-          <div className="relative w-full h-96 rounded-2xl overflow-hidden mb-12 shadow-lg">
+          <div className="relative w-auto h-96 rounded-2xl overflow-hidden mb-12 shadow-lg">
             <Image
               src={post.image}
               alt={post.title}
               fill
-              className="object-cover"
+              className="object-contain"
               priority
             />
           </div>
