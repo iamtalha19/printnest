@@ -11,6 +11,7 @@ import { toggleWishlist } from "@/app/redux/WishListSlice";
 import { RootState } from "@/app/redux/Store";
 import Toast from "@/app/components/products/Toast";
 import db from "@/app/db.json";
+import shopProducts from "@/app/shop.json";
 
 interface Category {
   id: number;
@@ -58,7 +59,7 @@ export default function CategoryPage() {
         setCategory(foundCategory || null);
 
         if (foundCategory) {
-          const allProducts: Product[] = db.shop.productShop;
+          const allProducts: Product[] = shopProducts;
           const keyword = foundCategory.title.toLowerCase().replace(/s$/, "");
 
           let filtered = allProducts.filter((product) =>

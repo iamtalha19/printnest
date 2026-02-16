@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { getUsers, getAllOrders } from "@/app/lib/db";
+import db from "@/app/db.json";
+import shopProducts from "@/app/shop.json";
 
 const SECRET_KEY = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.EMAIL_USER;
@@ -28,12 +30,40 @@ export async function GET() {
       0,
     );
 
+    const last7Days = [...Array(7)].map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      return d.toISOString().split('T')[0];
+    }).reverse();
+
+    const revenueData = last7Days.map(date => {
+      const dayOrders = orders.filter(o => o.date.startsWith(date));
+      return {
+        date,
+        revenue: dayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
+      };
+    });
+
+    const productSales: Record<string, any> = {};
+    orders.forEach(order => {
+      order.items?.forEach(item => {
+         if (!productSales[item.name]) {
+           productSales[item.name] = { name: item.name, quantity: 0, revenue: 0, image: item.image };
+         }
+         productSales[item.name].quantity += item.quantity;
+         productSales[item.name].revenue += item.totalPrice;
+      });
+    });
+    
+    const topProducts = Object.values(productSales)
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 5);
+
     const recentOrders = [...orders]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 10)
       .map((order) => {
         const customer = users.find((user) => user.id === order.userId);
-      
         return {
           ...order,
           customer: customer ? {
@@ -61,6 +91,9 @@ export async function GET() {
       totalRevenue,
       recentOrders,
       users: usersWithDetails,
+      revenueData,
+      topProducts,
+      products: shopProducts
     });
   } catch (error) {
     console.error("Admin stats error:", error);

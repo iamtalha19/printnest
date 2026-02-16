@@ -20,13 +20,11 @@ import {
   Search,
   Eye,
   X,
-  TrendingUp,
   MapPin,
-  Calendar,
   CheckCircle,
   Clock,
-  User as UserIcon,
-  CreditCard,
+  Plus,
+  Edit,
 } from "lucide-react";
 import db from "@/app/db.json";
 
@@ -71,6 +69,9 @@ interface DashboardStats {
   totalRevenue: number;
   recentOrders: Order[];
   users: UserData[];
+  products: any[];
+  topProducts: any[];
+  revenueData: any[];
 }
 
 const PageHeader = ({ title, breadcrumb }: any) => (
@@ -164,28 +165,24 @@ const StatusBadge = ({ status }: { status: string }) => {
       text: "text-amber-700",
       border: "border-amber-300",
       icon: Clock,
-      animate: true,
     },
     Accepted: {
       bg: "bg-linear-to-r from-blue-100 to-cyan-100",
       text: "text-blue-700",
       border: "border-blue-300",
       icon: Package,
-      animate: false,
     },
     Completed: {
       bg: "bg-linear-to-r from-emerald-100 to-green-100",
       text: "text-emerald-700",
       border: "border-emerald-300",
       icon: CheckCircle,
-      animate: false,
     },
     Cancelled: {
       bg: "bg-linear-to-r from-rose-100 to-red-100",
       text: "text-rose-700",
       border: "border-rose-300",
       icon: X,
-      animate: true,
     },
   };
 
@@ -194,7 +191,6 @@ const StatusBadge = ({ status }: { status: string }) => {
     text: "text-slate-600",
     border: "border-slate-200",
     icon: null,
-    animate: false,
   };
   const Icon = config.icon;
 
@@ -217,9 +213,9 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "users" | "orders">(
-    "overview",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "users" | "orders" | "products"
+  >("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
@@ -227,6 +223,25 @@ export default function AdminDashboard() {
   const [viewType, setViewType] = useState<"cart" | "wishlist" | "both">(
     "both",
   );
+
+  // Pagination states
+  const [userPage, setUserPage] = useState(1);
+  const [orderPage, setOrderPage] = useState(1);
+  const [productPage, setProductPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
+
+  // Product Management States
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [productForm, setProductForm] = useState({
+    title: "",
+    price: "",
+    oldPrice: "",
+    image: "",
+    badge: "",
+  });
+  const [productDeleteConfirm, setProductDeleteConfirm] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -288,17 +303,113 @@ export default function AdminDashboard() {
     }
   };
 
+  // --- Product Management Handlers (Optimistic Updates) ---
+  const openAddProduct = () => {
+    setEditingProduct(null);
+    setProductForm({
+      title: "",
+      price: "",
+      oldPrice: "",
+      image: "",
+      badge: "",
+    });
+    setIsProductModalOpen(true);
+  };
+
+  const openEditProduct = (product: any) => {
+    setEditingProduct(product);
+    setProductForm({
+      title: product.title || "",
+      price: product.price?.toString().replace("$", "") || "",
+      oldPrice: product.oldPrice?.toString().replace("$", "") || "",
+      image: product.image || "",
+      badge: product.badge || "",
+    });
+    setIsProductModalOpen(true);
+  };
+
+  const handleSaveProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const newProductData = {
+      title: productForm.title,
+      price: `$${parseFloat(productForm.price).toFixed(2)}`,
+      oldPrice: productForm.oldPrice
+        ? `$${parseFloat(productForm.oldPrice).toFixed(2)}`
+        : null,
+      image: productForm.image,
+      badge: productForm.badge || null,
+      printText: "We print with",
+    };
+
+    // Simulate API request delay then update local state
+    setTimeout(() => {
+      setStats((prev: any) => {
+        if (!prev) return prev;
+        let updatedProducts = [...prev.products];
+        if (editingProduct) {
+          updatedProducts = updatedProducts.map((p: any) =>
+            p.id === editingProduct.id ? { ...p, ...newProductData } : p,
+          );
+        } else {
+          updatedProducts = [
+            { id: Date.now(), ...newProductData },
+            ...updatedProducts,
+          ];
+        }
+        return { ...prev, products: updatedProducts };
+      });
+      setIsProductModalOpen(false);
+      setIsSubmitting(false);
+    }, 400);
+  };
+
+  const handleDeleteProduct = (id: number) => {
+    setStats((prev: any) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        products: prev.products.filter((p: any) => p.id !== id),
+      };
+    });
+    setProductDeleteConfirm(null);
+  };
+
+  // --- Filtering & Pagination Logic ---
   const filteredUsers = stats?.users.filter(
     (u) =>
       u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+  const paginatedUsers = filteredUsers?.slice(
+    (userPage - 1) * ITEMS_PER_PAGE,
+    userPage * ITEMS_PER_PAGE,
+  );
+  const totalUserPages =
+    Math.ceil((filteredUsers?.length || 0) / ITEMS_PER_PAGE) || 1;
 
   const filteredOrders = stats?.recentOrders.filter(
     (o) =>
       o.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       o.customer?.email?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+  const paginatedOrders = filteredOrders?.slice(
+    (orderPage - 1) * ITEMS_PER_PAGE,
+    orderPage * ITEMS_PER_PAGE,
+  );
+  const totalOrderPages =
+    Math.ceil((filteredOrders?.length || 0) / ITEMS_PER_PAGE) || 1;
+
+  const filteredProducts = stats?.products.filter((p) =>
+    p.title.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+  const paginatedProducts = filteredProducts?.slice(
+    (productPage - 1) * ITEMS_PER_PAGE,
+    productPage * ITEMS_PER_PAGE,
+  );
+  const totalProductPages =
+    Math.ceil((filteredProducts?.length || 0) / ITEMS_PER_PAGE) || 1;
 
   if (isAuthLoading || loading || !stats) {
     return (
@@ -396,6 +507,12 @@ export default function AdminDashboard() {
                   label="Overview"
                 />
                 <NavButton
+                  active={activeTab === "products"}
+                  onClick={() => setActiveTab("products")}
+                  icon={<Package size={18} />}
+                  label={`Products (${stats.products.length})`}
+                />
+                <NavButton
                   active={activeTab === "users"}
                   onClick={() => setActiveTab("users")}
                   icon={<Users size={18} />}
@@ -418,11 +535,12 @@ export default function AdminDashboard() {
           </div>
 
           <div className="lg:flex-1">
-            {(activeTab === "users" || activeTab === "orders") && (
+            {(activeTab === "users" ||
+              activeTab === "orders" ||
+              activeTab === "products") && (
               <div className="mb-6">
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-linear-to-r from-purple-600 to-blue-600 rounded-xl opacity-0 group-focus-within:opacity-20 blur transition duration-300" />
-
                   <div className="relative bg-white rounded-xl shadow-sm border border-slate-200 group-focus-within:border-purple-400 transition-all duration-300">
                     <Search
                       className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-purple-600 transition-colors duration-300"
@@ -435,7 +553,6 @@ export default function AdminDashboard() {
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full pl-12 pr-4 py-3.5 bg-transparent rounded-xl focus:outline-none text-slate-800 placeholder:text-slate-400"
                     />
-
                     {searchTerm && (
                       <button
                         onClick={() => setSearchTerm("")}
@@ -451,6 +568,7 @@ export default function AdminDashboard() {
 
             {activeTab === "overview" && (
               <div key="overview" className="space-y-6">
+                {/* Stat Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <StatCard
                     title="Total Revenue"
@@ -472,6 +590,95 @@ export default function AdminDashboard() {
                   />
                 </div>
 
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Revenue Chart Widget */}
+                  <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                      Revenue Overview (Last 7 Days)
+                    </h3>
+                    <div className="flex items-end gap-3 h-48 w-full">
+                      {stats.revenueData.map((d: any, i: number) => {
+                        const maxRev =
+                          Math.max(
+                            ...stats.revenueData.map((d: any) => d.revenue),
+                          ) || 1;
+                        const height = `${(d.revenue / maxRev) * 100}%`;
+                        return (
+                          <div
+                            key={i}
+                            className="flex-1 flex flex-col items-center gap-2 group h-full justify-end"
+                          >
+                            <div className="w-full bg-slate-50 rounded-t-lg relative flex items-end h-[85%] border-b-2 border-slate-100">
+                              <div
+                                className="w-full bg-linear-to-t from-purple-600 to-blue-500 rounded-t-lg transition-all duration-700 ease-out group-hover:opacity-80"
+                                style={{
+                                  height: height === "0%" ? "5%" : height,
+                                }}
+                              ></div>
+                              <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-bold whitespace-nowrap shadow-lg">
+                                ${d.revenue.toFixed(2)}
+                              </div>
+                            </div>
+                            <span className="text-xs text-slate-500 font-medium">
+                              {new Date(d.date).toLocaleDateString(undefined, {
+                                weekday: "short",
+                              })}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Top Selling Products Widget */}
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 className="font-bold text-slate-800 mb-6">
+                      Top Selling Products
+                    </h3>
+                    <div className="space-y-4">
+                      {stats.topProducts.length === 0 ? (
+                        <p className="text-sm text-slate-400 italic">
+                          No sales data yet.
+                        </p>
+                      ) : (
+                        stats.topProducts.map((p, i) => (
+                          <div
+                            key={i}
+                            className="flex items-center justify-between group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 bg-slate-50 rounded-lg border border-slate-100 overflow-hidden relative shrink-0 group-hover:border-purple-200 transition-colors">
+                                {p.image ? (
+                                  <Image
+                                    src={p.image}
+                                    alt={p.name}
+                                    fill
+                                    className="object-contain p-1"
+                                  />
+                                ) : (
+                                  <Package className="m-auto text-slate-300 w-full h-full p-3" />
+                                )}
+                              </div>
+                              <div className="overflow-hidden">
+                                <p className="text-sm font-bold text-slate-800 line-clamp-1">
+                                  {p.name}
+                                </p>
+                                <p className="text-xs text-slate-500">
+                                  {p.quantity} items sold
+                                </p>
+                              </div>
+                            </div>
+                            <p className="text-sm font-black text-purple-600 shrink-0">
+                              ${p.revenue.toFixed(2)}
+                            </p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Order Status Distribution */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                   <h3 className="font-bold text-slate-800 mb-4">
                     Order Status Distribution
@@ -522,6 +729,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
+                {/* Recent Transactions */}
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                   <div className="p-8 border-b border-slate-100 flex justify-between items-center">
                     <h3 className="font-bold text-slate-800 text-xl">
@@ -545,7 +753,7 @@ export default function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
-                        {stats.recentOrders.slice(0, 5).map((order, idx) => (
+                        {stats.recentOrders.slice(0, 5).map((order) => (
                           <tr
                             key={order.id}
                             className="group cursor-pointer transition-all duration-200 border-b border-slate-100 last:border-0 hover:bg-slate-50/80"
@@ -571,12 +779,145 @@ export default function AdminDashboard() {
               </div>
             )}
 
+            {/* Products Tab */}
+            {activeTab === "products" && (
+              <div
+                key="products"
+                className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
+              >
+                <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                  <h3 className="text-xl font-bold">Product Management</h3>
+                  <button
+                    onClick={openAddProduct}
+                    className="flex items-center gap-2 bg-slate-900 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm"
+                  >
+                    <Plus size={16} /> Add Product
+                  </button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-bold tracking-wider">
+                      <tr>
+                        <th className="px-8 py-4">Product Info</th>
+                        <th className="px-8 py-4">Price</th>
+                        <th className="px-8 py-4">Status</th>
+                        <th className="px-8 py-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {paginatedProducts?.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={4}
+                            className="px-8 py-10 text-center text-slate-500 italic"
+                          >
+                            No products found.
+                          </td>
+                        </tr>
+                      ) : (
+                        paginatedProducts?.map((p) => (
+                          <tr
+                            key={p.id}
+                            className="hover:bg-slate-50/80 transition-colors"
+                          >
+                            <td className="px-8 py-4">
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-lg bg-white border border-slate-100 overflow-hidden relative shrink-0">
+                                  {p.image ? (
+                                    <Image
+                                      src={p.image}
+                                      alt={p.title}
+                                      fill
+                                      className="object-contain p-1"
+                                    />
+                                  ) : (
+                                    <Package className="w-full h-full p-3 text-slate-300" />
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="font-bold text-slate-800 text-sm">
+                                    {p.title}
+                                  </p>
+                                  <p className="text-xs text-slate-500">
+                                    {p.badge || "Standard Item"}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-8 py-4">
+                              <div className="flex flex-col">
+                                <span className="font-bold text-slate-800 text-sm">
+                                  {p.price}
+                                </span>
+                                {p.oldPrice && (
+                                  <span className="text-xs text-slate-400 line-through">
+                                    {p.oldPrice}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-8 py-4">
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+                                In Stock
+                              </span>
+                            </td>
+                            <td className="px-8 py-4 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => openEditProduct(p)}
+                                  className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                  title="Edit"
+                                >
+                                  <Edit size={16} />
+                                </button>
+                                <button
+                                  onClick={() => setProductDeleteConfirm(p)}
+                                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                  title="Delete"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                  {/* Pagination Control for Products */}
+                  <div className="flex items-center justify-between px-8 py-4 border-t border-slate-100 bg-slate-50">
+                    <button
+                      disabled={productPage === 1}
+                      onClick={() => setProductPage((prev) => prev - 1)}
+                      className="px-4 py-2 text-sm font-bold bg-white border border-slate-200 text-slate-600 rounded-lg disabled:opacity-50 hover:bg-slate-100 transition-colors shadow-sm"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-sm text-slate-500 font-medium">
+                      Page {productPage} of {totalProductPages}
+                    </span>
+                    <button
+                      disabled={
+                        productPage === totalProductPages ||
+                        totalProductPages === 0
+                      }
+                      onClick={() => setProductPage((prev) => prev + 1)}
+                      className="px-4 py-2 text-sm font-bold bg-white border border-slate-200 text-slate-600 rounded-lg disabled:opacity-50 hover:bg-slate-100 transition-colors shadow-sm"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Users Tab */}
             {activeTab === "users" && (
               <div
                 key="users"
                 className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
               >
-                <div className="p-8 border-b border-slate-100">
+                <div className="p-8 border-b border-slate-100 bg-slate-50/50">
                   <h3 className="text-xl font-bold">User Management</h3>
                 </div>
                 <div className="overflow-x-auto">
@@ -589,7 +930,7 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {filteredUsers?.map((u, idx) => (
+                      {paginatedUsers?.map((u) => (
                         <tr
                           key={u.id}
                           className="group hover:bg-slate-50/80 backdrop-blur-sm transition-all duration-200"
@@ -621,7 +962,7 @@ export default function AdminDashboard() {
                                 <ShoppingCart
                                   size={14}
                                   className="text-blue-500"
-                                />
+                                />{" "}
                                 Cart ({u.cartCount})
                               </button>
                               <button
@@ -631,7 +972,7 @@ export default function AdminDashboard() {
                                 }}
                                 className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200 transition-colors"
                               >
-                                <Heart size={14} className="text-red-500" />
+                                <Heart size={14} className="text-red-500" />{" "}
                                 Wishlist ({u.wishlistCount})
                               </button>
                             </div>
@@ -648,16 +989,37 @@ export default function AdminDashboard() {
                       ))}
                     </tbody>
                   </table>
+                  {/* Pagination Control for Users */}
+                  <div className="flex items-center justify-between px-8 py-4 border-t border-slate-100 bg-slate-50">
+                    <button
+                      disabled={userPage === 1}
+                      onClick={() => setUserPage((prev) => prev - 1)}
+                      className="px-4 py-2 text-sm font-bold bg-white border border-slate-200 text-slate-600 rounded-lg disabled:opacity-50 hover:bg-slate-100 transition-colors shadow-sm"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-sm text-slate-500 font-medium">
+                      Page {userPage} of {totalUserPages}
+                    </span>
+                    <button
+                      disabled={userPage === totalUserPages}
+                      onClick={() => setUserPage((prev) => prev + 1)}
+                      className="px-4 py-2 text-sm font-bold bg-white border border-slate-200 text-slate-600 rounded-lg disabled:opacity-50 hover:bg-slate-100 transition-colors shadow-sm"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
 
+            {/* Orders Tab */}
             {activeTab === "orders" && (
               <div
                 key="orders"
                 className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
               >
-                <div className="p-8 border-b border-slate-100">
+                <div className="p-8 border-b border-slate-100 bg-slate-50/50">
                   <h3 className="text-xl font-bold">Order Management</h3>
                 </div>
                 <div className="overflow-x-auto">
@@ -672,7 +1034,7 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {filteredOrders?.map((o) => (
+                      {paginatedOrders?.map((o) => (
                         <tr key={o.id} className="hover:bg-slate-50">
                           <td className="px-8 py-5">
                             <div className="flex flex-col">
@@ -711,7 +1073,7 @@ export default function AdminDashboard() {
                               onChange={(e) =>
                                 handleStatusChange(o.id, e.target.value)
                               }
-                              className="bg-transparent text-sm font-bold py-1 pr-2 cursor-pointer focus:outline-none"
+                              className="bg-transparent text-sm font-bold py-1 pr-2 cursor-pointer focus:outline-none focus:text-purple-600 border border-slate-200 rounded px-2 hover:bg-white"
                             >
                               <option value="Pending">Pending</option>
                               <option value="Accepted">Accepted</option>
@@ -731,12 +1093,201 @@ export default function AdminDashboard() {
                       ))}
                     </tbody>
                   </table>
+                  {/* Pagination Control for Orders */}
+                  <div className="flex items-center justify-between px-8 py-4 border-t border-slate-100 bg-slate-50">
+                    <button
+                      disabled={orderPage === 1}
+                      onClick={() => setOrderPage((prev) => prev - 1)}
+                      className="px-4 py-2 text-sm font-bold bg-white border border-slate-200 text-slate-600 rounded-lg disabled:opacity-50 hover:bg-slate-100 transition-colors shadow-sm"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-sm text-slate-500 font-medium">
+                      Page {orderPage} of {totalOrderPages}
+                    </span>
+                    <button
+                      disabled={orderPage === totalOrderPages}
+                      onClick={() => setOrderPage((prev) => prev + 1)}
+                      className="px-4 py-2 text-sm font-bold bg-white border border-slate-200 text-slate-600 rounded-lg disabled:opacity-50 hover:bg-slate-100 transition-colors shadow-sm"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* --- MODALS SECTION --- */}
+
+      {/* Add/Edit Product Modal */}
+      {isProductModalOpen && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <h3 className="text-xl font-black text-slate-800">
+                {editingProduct ? "Edit Product" : "Add New Product"}
+              </h3>
+              <button
+                onClick={() => setIsProductModalOpen(false)}
+                className="p-2 hover:bg-slate-200 text-slate-500 rounded-xl transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleSaveProduct} className="p-6 space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                  Product Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  required
+                  type="text"
+                  value={productForm.title}
+                  onChange={(e) =>
+                    setProductForm({ ...productForm, title: e.target.value })
+                  }
+                  placeholder="e.g., Premium Cotton T-Shirt"
+                  className="w-full px-4 py-3 border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none rounded-xl transition-all placeholder:text-slate-400"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                    Price ($) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    step="0.01"
+                    value={productForm.price}
+                    onChange={(e) =>
+                      setProductForm({ ...productForm, price: e.target.value })
+                    }
+                    placeholder="0.00"
+                    className="w-full px-4 py-3 border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none rounded-xl transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                    Old Price ($){" "}
+                    <span className="text-slate-400 font-normal">
+                      (Optional)
+                    </span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={productForm.oldPrice}
+                    onChange={(e) =>
+                      setProductForm({
+                        ...productForm,
+                        oldPrice: e.target.value,
+                      })
+                    }
+                    placeholder="0.00"
+                    className="w-full px-4 py-3 border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none rounded-xl transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                  Image URL <span className="text-red-500">*</span>
+                </label>
+                <input
+                  required
+                  type="text"
+                  value={productForm.image}
+                  onChange={(e) =>
+                    setProductForm({ ...productForm, image: e.target.value })
+                  }
+                  placeholder="https://example.com/image.png"
+                  className="w-full px-4 py-3 border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none rounded-xl transition-all placeholder:text-slate-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                  Badge{" "}
+                  <span className="text-slate-400 font-normal">(Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={productForm.badge}
+                  onChange={(e) =>
+                    setProductForm({ ...productForm, badge: e.target.value })
+                  }
+                  placeholder="e.g., Sale, New, Hot"
+                  className="w-full px-4 py-3 border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none rounded-xl transition-all placeholder:text-slate-400"
+                />
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsProductModalOpen(false)}
+                  className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 disabled:opacity-50 transition-colors shadow-md shadow-purple-200 flex justify-center items-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>{" "}
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Product"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Product Delete Confirmation Modal */}
+      {productDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center animate-in fade-in zoom-in duration-200">
+            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">
+              Delete Product?
+            </h3>
+            <p className="text-slate-500 mb-6 text-sm">
+              Are you sure you want to delete{" "}
+              <span className="font-bold text-slate-800">
+                "{productDeleteConfirm.title}"
+              </span>
+              ? This action removes it from the store.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setProductDeleteConfirm(null)}
+                className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteProduct(productDeleteConfirm.id)}
+                className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors shadow-md shadow-red-200"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedUser && (
         <div
@@ -844,7 +1395,6 @@ export default function AdminDashboard() {
                 <X size={20} className="text-slate-500" />
               </button>
             </div>
-
             <div className="p-6 overflow-y-auto space-y-8">
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
                 <div>
@@ -862,7 +1412,6 @@ export default function AdminDashboard() {
                   </p>
                 </div>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h4 className="flex items-center gap-2 font-bold text-slate-800 mb-4 text-sm uppercase tracking-wide">
@@ -877,7 +1426,7 @@ export default function AdminDashboard() {
                           {selectedOrder.customer.name}
                         </span>
                       ) : (
-                        <span className="flex items-center gap-1.5 text-red-600 font-medium italic">
+                        <span className="text-red-600 italic">
                           Deleted Account
                         </span>
                       )}
@@ -911,7 +1460,6 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
-
               <div>
                 <h4 className="flex items-center gap-2 font-bold text-slate-800 mb-4 text-sm uppercase tracking-wide">
                   <Package size={16} className="text-purple-500" /> Order Items
@@ -966,9 +1514,11 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* User Delete Confirmation Modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl text-center">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center animate-in fade-in zoom-in duration-200">
             <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <Trash2 size={32} />
             </div>
@@ -981,13 +1531,13 @@ export default function AdminDashboard() {
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-200 transition-colors"
+                className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDeleteUser(deleteConfirm)}
-                className="flex-1 px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors"
+                className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors shadow-md shadow-red-200"
               >
                 Delete
               </button>

@@ -15,6 +15,7 @@ import {
   Eye,
 } from "lucide-react";
 import db from "@/app/db.json";
+import shopProducts from "@/app/shop.json";
 import Toast from "@/app/components/products/Toast";
 import QuickViewModal from "@/app/components/products/QuickViewModal";
 
@@ -29,7 +30,7 @@ export default function ShopPage() {
   const dispatch = useDispatch();
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
   const { cartItems } = useSelector((state: RootState) => state.cart);
-  const allProducts = db.shop.productShop;
+  const allProducts = shopProducts;
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("Default Sorting");
   const [isSortOpen, setIsSortOpen] = useState(false);

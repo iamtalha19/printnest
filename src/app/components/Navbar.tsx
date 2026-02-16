@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Search,
   ShoppingCart,
@@ -10,6 +11,7 @@ import {
   Trash2,
   X,
   LogOut,
+  LayoutDashboard,
 } from "lucide-react";
 import db from "@/app/db.json";
 import { useSelector, useDispatch } from "react-redux";
@@ -17,12 +19,12 @@ import { RootState } from "@/app/redux/Store";
 import { removeFromCart, clearCart } from "@/app/redux/CartSlice";
 import { toggleWishlist, clearWishlist } from "@/app/redux/WishListSlice";
 import { logout } from "@/app/redux/AuthSlice";
-import { useRouter } from "next/navigation";
 
 function Navbar() {
   const navbarData = db.navbar;
   const dispatch = useDispatch();
   const router = useRouter();
+  const pathname = usePathname();
   const { cartItems, totalQuantity } = useSelector(
     (state: RootState) => state.cart,
   );
@@ -82,6 +84,33 @@ function Navbar() {
           </div>
         </div>
         <div className="flex items-center gap-4 relative">
+          {mounted && user?.isAdmin && (
+            <div className="hidden lg:flex items-center bg-white/60 backdrop-blur-md p-1 rounded-xl border border-slate-200/50 shadow-sm mr-2">
+              <Link
+                href="/"
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all duration-300 ${
+                  !pathname.includes("/admin")
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                }`}
+              >
+                <User size={14} />
+                User Preview
+              </Link>
+              <Link
+                href="/admin/dashboard"
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all duration-300 ${
+                  pathname.includes("/admin")
+                    ? "bg-purple-600 text-white shadow-md"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                }`}
+              >
+                <LayoutDashboard size={14} />
+                Admin Preview
+              </Link>
+            </div>
+          )}
+
           <div
             className="relative"
             onMouseEnter={() => setIsCartOpen(true)}
