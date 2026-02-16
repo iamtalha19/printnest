@@ -91,7 +91,7 @@ export default function MyAccountPage() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch("/api/orders");
+      const res = await fetch("/api/public/orders");
       if (res.ok) {
         const data = await res.json();
         setOrders(data.orders || []);

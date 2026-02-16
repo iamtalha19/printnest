@@ -104,7 +104,7 @@ export default function CheckoutPage() {
         items: cartItems,
         totalAmount: subtotal,
       };
-      const response = await fetch("/api/place-order", {
+      const response = await fetch("/api/public/place-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

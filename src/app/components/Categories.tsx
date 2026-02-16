@@ -75,7 +75,7 @@ function Categories() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("/api/categories");
+        const response = await fetch("/api/public/content?section=categories");
         const data = await response.json();
         setCategoriesData(data);
       } catch (error) {

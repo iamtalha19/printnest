@@ -28,7 +28,7 @@ export default function BlogPostPage() {
   useEffect(() => {
     const fetchBlogPost = async () => {
       try {
-        const response = await fetch("/api/blog");
+        const response = await fetch("/api/public/content?section=blog");
         const data = await response.json();
 
         const foundPost = data.posts.find(
