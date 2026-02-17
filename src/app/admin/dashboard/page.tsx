@@ -27,6 +27,7 @@ import {
   Plus,
   Edit,
   MessageSquare,
+  User as UserIcon,
 } from "lucide-react";
 import AdminReviewList from "../components/AdminReviewList";
 import db from "@/app/data/db.json";
@@ -78,6 +79,15 @@ interface DashboardStats {
   revenueData: any[];
   ratingDistribution: Record<string, number>;
   topReviewedProducts: { name: string; image: string; count: number }[];
+  totalReviews: number;
+  productSentiment: {
+    name: string;
+    image: string;
+    good: number;
+    bad: number;
+    neutral: number;
+    total: number;
+  }[];
 }
 
 const PageHeader = ({ title, breadcrumb }: any) => (
@@ -458,7 +468,7 @@ export default function AdminDashboard() {
                   active={activeTab === "reviews"}
                   onClick={() => setActiveTab("reviews")}
                   icon={<MessageSquare size={18} />}
-                  label="Reviews"
+                  label={`Reviews (${stats.totalReviews})`}
                 />
                 <NavButton
                   active={activeTab === "users"}
@@ -472,6 +482,12 @@ export default function AdminDashboard() {
                   icon={<ClipboardList size={18} />}
                   label={`Orders (${stats.totalOrders})`}
                 />
+                <Link
+                  href="/account"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-xl mb-1 transition-colors"
+                >
+                  <UserIcon size={18} /> Switch to User View
+                </Link>
                 <Link
                   href="/api/auth/logout"
                   className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl mt-2 transition-colors"
@@ -769,6 +785,86 @@ export default function AdminDashboard() {
                         </p>
                       )}
                     </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 mb-6 bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
+                  <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    Product Review Sentiment
+                    <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-200" />
+                  </h3>
+                  <div className="space-y-6">
+                    {stats.productSentiment?.map((item, index) => {
+                      const goodPercent = (item.good / item.total) * 100;
+                      const badPercent = (item.bad / item.total) * 100;
+                      const neutralPercent = (item.neutral / item.total) * 100;
+
+                      return (
+                        <div key={index} className="space-y-2">
+                          <div className="flex justify-between items-center text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded bg-slate-100 overflow-hidden relative shrink-0">
+                                {item.image ? (
+                                  <Image
+                                    src={item.image}
+                                    alt={item.name}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
+                                    ?
+                                  </div>
+                                )}
+                              </div>
+                              <span className="font-medium text-slate-700">
+                                {item.name}
+                              </span>
+                            </div>
+                            <span className="text-slate-500 text-xs">
+                              {item.total} reviews
+                            </span>
+                          </div>
+                          <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex">
+                            {goodPercent > 0 && (
+                              <div
+                                style={{ width: `${goodPercent}%` }}
+                                className="h-full bg-green-500 hover:bg-green-600 transition-colors"
+                                title={`Good: ${item.good}`}
+                              />
+                            )}
+                            {neutralPercent > 0 && (
+                              <div
+                                style={{ width: `${neutralPercent}%` }}
+                                className="h-full bg-gray-400 hover:bg-gray-500 transition-colors"
+                                title={`Neutral: ${item.neutral}`}
+                              />
+                            )}
+                            {badPercent > 0 && (
+                              <div
+                                style={{ width: `${badPercent}%` }}
+                                className="h-full bg-red-500 hover:bg-red-600 transition-colors"
+                                title={`Bad: ${item.bad}`}
+                              />
+                            )}
+                          </div>
+                          <div className="flex justify-between text-[10px] text-slate-400 px-1">
+                            <span className="text-green-600">
+                              Good: {item.good}
+                            </span>
+                            <span className="text-red-500">
+                              Bad: {item.bad}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {(!stats.productSentiment ||
+                      stats.productSentiment.length === 0) && (
+                      <p className="text-center text-slate-400 text-sm py-8">
+                        No sentiment data available.
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -1222,6 +1318,9 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
+            )}
+            {activeTab === "reviews" && (
+              <AdminReviewList onReviewDeleted={fetchStats} />
             )}
             {activeTab === "users" && (
               <div

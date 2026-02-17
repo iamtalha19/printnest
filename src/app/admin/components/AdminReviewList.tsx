@@ -22,7 +22,13 @@ interface Product {
   image: string;
 }
 
-export default function AdminReviewList() {
+interface AdminReviewListProps {
+  onReviewDeleted?: () => void;
+}
+
+export default function AdminReviewList({
+  onReviewDeleted,
+}: AdminReviewListProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,6 +87,7 @@ export default function AdminReviewList() {
       if (response.ok) {
         setReviews(reviews.filter((r) => r.id !== reviewId));
         showToast("Review deleted successfully", "remove");
+        if (onReviewDeleted) onReviewDeleted();
       } else {
         showToast("Failed to delete review", "remove");
       }

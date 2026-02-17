@@ -116,6 +116,30 @@ export async function GET() {
         };
       });
 
+    const sentimentMap: Record<string, { good: number; bad: number; neutral: number }> = {};
+    reviews.forEach((r: any) => {
+      const pid = r.productId;
+      if (!sentimentMap[pid]) {
+        sentimentMap[pid] = { good: 0, bad: 0, neutral: 0 };
+      }
+      if (r.rating >= 4) sentimentMap[pid].good++;
+      else if (r.rating <= 2) sentimentMap[pid].bad++;
+      else sentimentMap[pid].neutral++;
+    });
+
+    const productSentiment = Object.entries(sentimentMap)
+      .map(([productId, counts]) => {
+         const product = products.find((p: any) => p.id === parseInt(productId));
+         return {
+           name: product?.title || `Product ${productId}`,
+           image: product?.image || "",
+           ...counts,
+           total: counts.good + counts.bad + counts.neutral
+         };
+      })
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
+
     return NextResponse.json({
       totalUsers,
       totalOrders,
@@ -127,6 +151,8 @@ export async function GET() {
       products,
       ratingDistribution,
       topReviewedProducts,
+      totalReviews: reviews.length,
+      productSentiment,
     });
   } catch (error) {
     console.error("Admin stats error:", error);

@@ -65,12 +65,6 @@ export default function MyAccountPage() {
   });
 
   useEffect(() => {
-    if (isAuthenticated && user?.isAdmin) {
-      router.push("/admin/dashboard");
-    }
-  }, [isAuthenticated, user, router]);
-
-  useEffect(() => {
     if (isAuthenticated && !user?.isAdmin) {
       fetchOrders();
     }
@@ -397,6 +391,14 @@ export default function MyAccountPage() {
                   icon={<ShoppingCart size={18} />}
                   label={`Cart (${cartItems.length})`}
                 />
+                {user?.isAdmin && (
+                  <Link
+                    href="/admin/dashboard"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-purple-600 hover:bg-purple-50 rounded-xl mb-1 transition-colors"
+                  >
+                    <LayoutDashboard size={18} /> Switch to Admin View
+                  </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl transition-colors mt-2"

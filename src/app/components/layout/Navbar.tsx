@@ -84,33 +84,6 @@ function Navbar() {
           </div>
         </div>
         <div className="flex items-center gap-4 relative">
-          {mounted && user?.isAdmin && (
-            <div className="hidden lg:flex items-center bg-white/60 backdrop-blur-md p-1 rounded-xl border border-slate-200/50 shadow-sm mr-2">
-              <Link
-                href="/"
-                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all duration-300 ${
-                  !pathname.includes("/admin")
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
-                }`}
-              >
-                <User size={14} />
-                User Preview
-              </Link>
-              <Link
-                href="/admin/dashboard"
-                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all duration-300 ${
-                  pathname.includes("/admin")
-                    ? "bg-purple-600 text-white shadow-md"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
-                }`}
-              >
-                <LayoutDashboard size={14} />
-                Admin Preview
-              </Link>
-            </div>
-          )}
-
           <div
             className="relative"
             onMouseEnter={() => setIsCartOpen(true)}
@@ -201,12 +174,29 @@ function Navbar() {
                   Signed in as <br />
                   <span className="text-slate-800 text-sm">{user?.name}</span>
                 </div>
-                <Link
-                  href={user?.isAdmin ? "/admin/dashboard" : "/account"}
-                  className="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md transition-colors"
-                >
-                  {user?.isAdmin ? "Admin Dashboard" : "My Account"}
-                </Link>
+                {user?.isAdmin ? (
+                  <>
+                    <Link
+                      href="/admin/dashboard"
+                      className="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md transition-colors"
+                    >
+                      Admin Dashboard
+                    </Link>
+                    <Link
+                      href="/account"
+                      className="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md transition-colors"
+                    >
+                      User Dashboard
+                    </Link>
+                  </>
+                ) : (
+                  <Link
+                    href="/account"
+                    className="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md transition-colors"
+                  >
+                    My Account
+                  </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-md transition-colors mt-1"
