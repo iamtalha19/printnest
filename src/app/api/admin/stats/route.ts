@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { getUsers, getAllOrders, getProducts} from "@/app/lib/db";
+import { getUsers, getAllOrders, getProducts, getReviews } from "@/app/lib/db";
 
 const SECRET_KEY = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.EMAIL_USER;
@@ -89,6 +89,33 @@ export async function GET() {
       };
     });
 
+    const reviews = await getReviews();
+    const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    reviews.forEach((r: any) => {
+      if (r.rating >= 1 && r.rating <= 5) {
+        // @ts-ignore
+        ratingDistribution[r.rating]++;
+      }
+    });
+
+    const reviewCounts: Record<string, number> = {};
+    reviews.forEach((r: any) => {
+      const pid = r.productId;
+      reviewCounts[pid] = (reviewCounts[pid] || 0) + 1;
+    });
+
+    const topReviewedProducts = Object.entries(reviewCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([productId, count]) => {
+        const product = products.find((p: any) => p.id === parseInt(productId));
+        return {
+          name: product?.title || `Product ${productId}`,
+          image: product?.image || "",
+          count,
+        };
+      });
+
     return NextResponse.json({
       totalUsers,
       totalOrders,
@@ -98,6 +125,8 @@ export async function GET() {
       revenueData,
       topProducts,
       products,
+      ratingDistribution,
+      topReviewedProducts,
     });
   } catch (error) {
     console.error("Admin stats error:", error);

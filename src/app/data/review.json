@@ -1,0 +1,47 @@
+[
+  {
+    "userId": "1770965906901",
+    "userName": "Talha",
+    "rating": 1,
+    "comment": "bad product",
+    "date": "2026-02-17",
+    "id": "1771306713454",
+    "productId": 3
+  },
+  {
+    "userId": "1770965906901",
+    "userName": "Talha",
+    "rating": 5,
+    "comment": "good product",
+    "date": "2026-02-17",
+    "id": "1771306693783",
+    "productId": 18
+  },
+  {
+    "userId": "1771220237834",
+    "userName": "Usman",
+    "rating": 3,
+    "comment": "average product",
+    "date": "2026-02-17",
+    "id": "1771304595755",
+    "productId": 1
+  },
+  {
+    "id": "1771304079433",
+    "userId": "1770965906901",
+    "userName": "Talha",
+    "rating": 5,
+    "comment": "nice product",
+    "date": "2026-02-17",
+    "productId": 1
+  },
+  {
+    "id": "1771304060697",
+    "userId": "1770965906901",
+    "userName": "Talha",
+    "rating": 5,
+    "comment": "good product",
+    "date": "2026-02-17",
+    "productId": 1
+  }
+]

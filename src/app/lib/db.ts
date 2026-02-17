@@ -4,6 +4,7 @@ import path from 'path';
 const DB_PATH = path.join(process.cwd(), 'src/app/data/logindb.json');
 const SHOP_DB_PATH = path.join(process.cwd(), 'src/app/data/shop.json');
 const MAIN_DB_PATH = path.join(process.cwd(), 'src/app/data/db.json');
+const REVIEW_DB_PATH = path.join(process.cwd(), 'src/app/data/review.json');
 
 export interface SavedCard {
   id: string;
@@ -169,8 +170,8 @@ export async function deleteProductRecord(productId: number) {
 
 export async function getReviews() {
   try {
-    const data = await fs.readFile(MAIN_DB_PATH, 'utf-8');
-    return JSON.parse(data).testimonials?.testimonials || [];
+    const data = await fs.readFile(REVIEW_DB_PATH, 'utf-8');
+    return JSON.parse(data) || [];
   } catch (error) {
     return [];
   }
@@ -178,10 +179,7 @@ export async function getReviews() {
 
 async function saveReviews(reviews: any[]) {
   try {
-    const data = JSON.parse(await fs.readFile(MAIN_DB_PATH, 'utf-8'));
-    if (!data.testimonials) data.testimonials = { header: {}, testimonials: [] };
-    data.testimonials.testimonials = reviews;
-    await fs.writeFile(MAIN_DB_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    await fs.writeFile(REVIEW_DB_PATH, JSON.stringify(reviews, null, 2), 'utf-8');
   } catch (error) {
     console.error("Failed to save reviews", error);
   }
@@ -194,9 +192,11 @@ export async function addReview(review: any) {
   return review;
 }
 
-export async function updateReview(index: number, data: any) {
+export async function updateReviewById(id: string, data: any) {
   const reviews = await getReviews();
-  if (index >= 0 && index < reviews.length) {
+  const index = reviews.findIndex((r: any) => r.id === id);
+  
+  if (index !== -1) {
     reviews[index] = { ...reviews[index], ...data };
     await saveReviews(reviews);
     return reviews[index];
@@ -204,9 +204,11 @@ export async function updateReview(index: number, data: any) {
   return null;
 }
 
-export async function deleteReviewRecord(index: number) {
+export async function deleteReviewById(id: string) {
   const reviews = await getReviews();
-  if (index >= 0 && index < reviews.length) {
+  const index = reviews.findIndex((r: any) => r.id === id);
+  
+  if (index !== -1) {
     reviews.splice(index, 1);
     await saveReviews(reviews);
     return true;

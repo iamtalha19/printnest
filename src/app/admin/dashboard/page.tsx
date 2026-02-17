@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Users,
+  Star,
   ShoppingBag,
   DollarSign,
   ChevronRight,
@@ -25,7 +26,9 @@ import {
   Clock,
   Plus,
   Edit,
+  MessageSquare,
 } from "lucide-react";
+import AdminReviewList from "../components/AdminReviewList";
 import db from "@/app/data/db.json";
 
 interface UserData {
@@ -73,6 +76,8 @@ interface DashboardStats {
   products: any[];
   topProducts: any[];
   revenueData: any[];
+  ratingDistribution: Record<string, number>;
+  topReviewedProducts: { name: string; image: string; count: number }[];
 }
 
 const PageHeader = ({ title, breadcrumb }: any) => (
@@ -214,7 +219,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    "overview" | "users" | "orders" | "products"
+    "overview" | "users" | "orders" | "products" | "reviews"
   >("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
@@ -450,6 +455,12 @@ export default function AdminDashboard() {
                   label={`Products (${stats.products.length})`}
                 />
                 <NavButton
+                  active={activeTab === "reviews"}
+                  onClick={() => setActiveTab("reviews")}
+                  icon={<MessageSquare size={18} />}
+                  label="Reviews"
+                />
+                <NavButton
                   active={activeTab === "users"}
                   onClick={() => setActiveTab("users")}
                   icon={<Users size={18} />}
@@ -472,7 +483,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="lg:flex-1">
-            {["users", "orders", "products"].includes(activeTab) && (
+            {["users", "orders", "products", "reviews"].includes(activeTab) && (
               <div className="mb-6">
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-linear-to-r from-purple-600 to-blue-600 rounded-xl opacity-0 group-focus-within:opacity-20 blur transition duration-300" />
@@ -498,6 +509,11 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 </div>
+              </div>
+            )}
+            {activeTab === "reviews" && (
+              <div className="animate-in fade-in duration-300">
+                <AdminReviewList />
               </div>
             )}
             {activeTab === "overview" && (
@@ -608,6 +624,149 @@ export default function AdminDashboard() {
                             </p>
                           </div>
                         ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
+                    <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                      Review Rating Distribution
+                      <div className="h-2 w-2 bg-yellow-400 rounded-full animate-pulse shadow-lg shadow-yellow-200" />
+                    </h3>
+                    <div className="space-y-4">
+                      {[5, 4, 3, 2, 1].map((rating) => {
+                        const count = stats.ratingDistribution?.[rating] || 0;
+                        const totalReviews = Object.values(
+                          stats.ratingDistribution || {},
+                        ).reduce((a, b) => a + b, 0);
+                        const percentage = totalReviews
+                          ? (count / totalReviews) * 100
+                          : 0;
+
+                        return (
+                          <div key={rating} className="flex items-center gap-3">
+                            <span className="flex items-center gap-1 w-12 text-sm font-medium text-slate-600">
+                              {rating}{" "}
+                              <Star
+                                size={12}
+                                className="fill-yellow-400 text-yellow-400"
+                              />
+                            </span>
+                            <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-yellow-400 rounded-full transition-all duration-1000 ease-out"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-slate-500 w-12 text-right">
+                              {count} ({percentage.toFixed(0)}%)
+                            </span>
+                          </div>
+                        );
+                      })}
+                      <div className="pt-4 text-center">
+                        <div className="text-3xl font-bold text-slate-700">
+                          {(
+                            Object.entries(
+                              stats.ratingDistribution || {},
+                            ).reduce(
+                              (acc, [stars, count]) =>
+                                acc + Number(stars) * count,
+                              0,
+                            ) /
+                            (Object.values(
+                              stats.ratingDistribution || {},
+                            ).reduce((a, b) => a + b, 0) || 1)
+                          ).toFixed(1)}
+                        </div>
+
+                        <div className="flex justify-center text-yellow-400 gap-0.5 my-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={14}
+                              className={
+                                i <
+                                Math.round(
+                                  Object.entries(
+                                    stats.ratingDistribution || {},
+                                  ).reduce(
+                                    (acc, [stars, count]) =>
+                                      acc + Number(stars) * count,
+                                    0,
+                                  ) /
+                                    (Object.values(
+                                      stats.ratingDistribution || {},
+                                    ).reduce((a, b) => a + b, 0) || 1),
+                                )
+                                  ? "fill-current"
+                                  : "text-gray-300"
+                              }
+                            />
+                          ))}
+                        </div>
+                        <p className="text-xs text-slate-400">Average Rating</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
+                    <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                      Top Reviewed Products
+                      <div className="h-2 w-2 bg-blue-400 rounded-full animate-pulse shadow-lg shadow-blue-200" />
+                    </h3>
+                    <div className="space-y-4">
+                      {stats.topReviewedProducts?.map((product, index) => {
+                        const maxReviews =
+                          Math.max(
+                            ...(stats.topReviewedProducts?.map(
+                              (p) => p.count,
+                            ) || [0]),
+                          ) || 1;
+                        const percentage = (product.count / maxReviews) * 100;
+
+                        return (
+                          <div key={index} className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden relative shrink-0">
+                              {product.image ? (
+                                <Image
+                                  src={product.image}
+                                  alt={product.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-xs font-bold text-slate-400">
+                                  ?
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="font-medium text-slate-700 line-clamp-1">
+                                  {product.name}
+                                </span>
+                                <span className="font-bold text-slate-900">
+                                  {product.count}
+                                </span>
+                              </div>
+                              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out"
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {(!stats.topReviewedProducts ||
+                        stats.topReviewedProducts.length === 0) && (
+                        <p className="text-center text-slate-400 text-sm py-8">
+                          No reviews yet.
+                        </p>
                       )}
                     </div>
                   </div>

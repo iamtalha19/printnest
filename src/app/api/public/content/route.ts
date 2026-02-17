@@ -1,10 +1,22 @@
 import { NextResponse } from "next/server";
 import db from "@/app/data/db.json";
+import { getProducts } from "@/app/lib/db";
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const section = searchParams.get("section");
+
+    if (section === "products") {
+      const shopProducts = await getProducts();
+      const dbProducts = db.products.products || [];
+      const combinedProducts = {
+        ...db.products,
+        products: [...shopProducts, ...dbProducts]
+      };
+      
+      return NextResponse.json(combinedProducts);
+    }
 
     if (section && section in db) {
       return NextResponse.json(db[section as keyof typeof db]);

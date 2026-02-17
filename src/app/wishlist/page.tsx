@@ -9,7 +9,7 @@ import { toggleWishlist, WishlistItem } from "@/app/redux/WishListSlice";
 import { ChevronRight, ShoppingCart, Trash2 } from "lucide-react";
 import db from "@/app/data/db.json";
 import Toast from "@/app/components/products/Toast";
-import Loading from "@/app/components/Loading";
+import Loading from "@/app/components/ui/Loading";
 const pageConfig = {
   backgroundImage: db.cart.backgroundImage,
   breadcrumbs: {
