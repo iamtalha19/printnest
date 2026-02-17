@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { updateOrderStatus } from "@/app/lib/db";
+import { updateOrderStatus, deleteOrder } from "@/app/lib/db";
 import nodemailer from "nodemailer";
 
 const SECRET_KEY = process.env.JWT_SECRET;
@@ -90,6 +90,40 @@ export async function PATCH(
     });
   } catch (error) {
     console.error("Update order status error:", error);
+    return NextResponse.json(
+      { message: "Internal Error" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    if (!token) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const decoded = jwt.verify(token, SECRET_KEY!) as { email: string };
+    if (decoded.email !== ADMIN_EMAIL) {
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
+    const { id } = await params;
+    const deleted = await deleteOrder(id);
+
+    if (!deleted) {
+      return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Order deleted successfully" });
+  } catch (error) {
+    console.error("Delete order error:", error);
     return NextResponse.json(
       { message: "Internal Error" },
       { status: 500 },

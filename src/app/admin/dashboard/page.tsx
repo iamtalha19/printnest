@@ -253,6 +253,9 @@ export default function AdminDashboard() {
     badge: "",
   });
   const [productDeleteConfirm, setProductDeleteConfirm] = useState<any>(null);
+  const [orderDeleteConfirm, setOrderDeleteConfirm] = useState<Order | null>(
+    null,
+  );
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -383,6 +386,22 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       alert("Error deleting product");
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        await fetchStats();
+        setOrderDeleteConfirm(null);
+      } else {
+        alert("Failed to delete order");
+      }
+    } catch (error) {
+      alert("Error deleting order");
     }
   };
 
@@ -1487,12 +1506,20 @@ export default function AdminDashboard() {
                             </select>
                           </td>
                           <td className="px-8 py-5 text-right">
-                            <button
-                              onClick={() => setSelectedOrder(o)}
-                              className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-slate-900 px-3 py-1.5 rounded-lg hover:bg-purple-600"
-                            >
-                              <Eye size={14} /> View
-                            </button>
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => setSelectedOrder(o)}
+                                className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-slate-900 px-3 py-1.5 rounded-lg hover:bg-purple-600"
+                              >
+                                <Eye size={14} /> View
+                              </button>
+                              <button
+                                onClick={() => setOrderDeleteConfirm(o)}
+                                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -1903,6 +1930,40 @@ export default function AdminDashboard() {
               </button>
               <button
                 onClick={() => handleDeleteUser(deleteConfirm)}
+                className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {orderDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={32} />
+            </div>
+            <h3 className="text-xl font-bold mb-2">Delete Order?</h3>
+            <p className="text-slate-500 mb-2 text-sm">
+              Order{" "}
+              <span className="font-mono font-bold">
+                #{orderDeleteConfirm.id.slice(-8).toUpperCase()}
+              </span>
+            </p>
+            <p className="text-slate-400 mb-6 text-xs">
+              This will permanently remove this order and update all graphs and
+              statistics.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setOrderDeleteConfirm(null)}
+                className="flex-1 px-4 py-3 bg-slate-100 font-bold rounded-xl hover:bg-slate-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteOrder(orderDeleteConfirm.id)}
                 className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700"
               >
                 Delete

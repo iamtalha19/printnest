@@ -122,6 +122,18 @@ export async function updateOrderStatus(orderId: string, status: string) {
   return null;
 }
 
+export async function deleteOrder(orderId: string) {
+  const db = await getDb();
+  const orderIndex = db.orders?.findIndex((o) => o.id === orderId);
+
+  if (orderIndex !== undefined && orderIndex !== -1) {
+    db.orders.splice(orderIndex, 1);
+    await saveDb(db);
+    return true;
+  }
+  return false;
+}
+
 export async function getProducts() {
   try {
     const data = await fs.readFile(SHOP_DB_PATH, 'utf-8');
