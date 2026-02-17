@@ -39,26 +39,6 @@ _Transform ideas into reality with custom printing solutions_
 
 ---
 
-## 🎥 Live Demo
-
-> **Note:** Live demo link will be added upon deployment
-
-### Screenshots
-
-<div align="center">
-
-| Home Page                                                                 | Product Catalog                                                                 | Admin Dashboard                                                                  |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| ![Home](https://via.placeholder.com/300x200/4F46E5/ffffff?text=Home+Page) | ![Shop](https://via.placeholder.com/300x200/7C3AED/ffffff?text=Product+Catalog) | ![Admin](https://via.placeholder.com/300x200/EC4899/ffffff?text=Admin+Dashboard) |
-
-| Shopping Cart                                                                 | Checkout                                                                     | Order Tracking                                                                   |
-| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| ![Cart](https://via.placeholder.com/300x200/10B981/ffffff?text=Shopping+Cart) | ![Checkout](https://via.placeholder.com/300x200/F59E0B/ffffff?text=Checkout) | ![Orders](https://via.placeholder.com/300x200/06B6D4/ffffff?text=Order+Tracking) |
-
-</div>
-
----
-
 ## ✨ Key Features
 
 <table>
