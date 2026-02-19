@@ -48,6 +48,7 @@ export default function MyAccountPage() {
   );
   const cartItems = useSelector((state: RootState) => state.cart.cartItems);
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -65,7 +66,11 @@ export default function MyAccountPage() {
   });
 
   useEffect(() => {
-    if (isAuthenticated && !user?.isAdmin) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
       fetchOrders();
     }
   }, [isAuthenticated, user]);
@@ -163,6 +168,8 @@ export default function MyAccountPage() {
       alert("Failed to update profile");
     }
   };
+
+  if (!mounted) return null;
 
   if (!isAuthenticated) {
     return (
