@@ -261,7 +261,6 @@ export default function AdminDashboard() {
     type: "success" | "error";
   } | null>(null);
 
-  // Revenue filter state
   const [revenueFilter, setRevenueFilter] = useState<
     "week" | "month" | "current-month" | "custom"
   >("week");
@@ -655,13 +654,11 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2 bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
-                    {/* Header with dropdown */}
                     <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
                       <h3 className="font-bold text-slate-800 flex items-center gap-2">
                         Revenue Overview
                         <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-300" />
                       </h3>
-                      {/* Filter Dropdown */}
                       <div className="relative">
                         <button
                           onClick={() => setShowRevenueDropdown((v) => !v)}
@@ -749,7 +746,6 @@ export default function AdminDashboard() {
                       </div>
                     </div>
 
-                    {/* Custom date range inputs */}
                     {revenueFilter === "custom" && (
                       <div className="flex flex-wrap items-center gap-3 mb-5 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                         <div className="flex flex-col gap-1">
@@ -795,7 +791,6 @@ export default function AdminDashboard() {
                       </div>
                     )}
 
-                    {/* Chart */}
                     {revenueLoading ? (
                       <div className="flex items-center justify-center h-48">
                         <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
@@ -824,7 +819,6 @@ export default function AdminDashboard() {
                               ) || 1;
                             const height = `${(d.revenue / maxRev) * 100}%`;
                             const isLong = total > 10;
-                            // Show label every N bars to avoid overlap
                             const step =
                               total <= 7
                                 ? 1
@@ -1867,7 +1861,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-      {/* Toast Notification */}
       {toast && (
         <div
           className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl text-white text-sm font-semibold animate-in slide-in-from-bottom-4 duration-300 max-w-sm ${
