@@ -83,7 +83,6 @@ export async function GET(request: Request) {
 
     const recentOrders = [...orders]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 10)
       .map((order) => {
         const customer = users.find((user) => user.id === order.userId);
         return {
