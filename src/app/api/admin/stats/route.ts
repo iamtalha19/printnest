@@ -6,7 +6,7 @@ import { getUsers, getAllOrders, getProducts, getReviews } from "@/app/lib/db";
 const SECRET_KEY = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.EMAIL_USER;
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
@@ -29,13 +29,31 @@ export async function GET() {
       0,
     );
 
-    const last7Days = [...Array(7)].map((_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      return d;
-    }).reverse();
+    const { searchParams } = new URL(request.url);
+    const startDateParam = searchParams.get("startDate");
+    const endDateParam = searchParams.get("endDate");
 
-    const revenueData = last7Days.map(d => {
+    let rangeStart: Date;
+    let rangeEnd: Date;
+
+    if (startDateParam && endDateParam) {
+      rangeStart = new Date(startDateParam);
+      rangeEnd = new Date(endDateParam);
+      rangeEnd.setHours(23, 59, 59, 999);
+    } else {
+      rangeEnd = new Date();
+      rangeStart = new Date();
+      rangeStart.setDate(rangeStart.getDate() - 6);
+    }
+    const dayRange: Date[] = [];
+    const cursor = new Date(rangeStart);
+    cursor.setHours(0, 0, 0, 0);
+    while (cursor <= rangeEnd) {
+      dayRange.push(new Date(cursor));
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    const revenueData = dayRange.map(d => {
       const dayOrders = orders.filter(o => {
         const orderDate = new Date(o.date);
         return orderDate.getDate() === d.getDate() &&

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/redux/Store";
 import { useRouter } from "next/navigation";
@@ -256,6 +256,27 @@ export default function AdminDashboard() {
   const [orderDeleteConfirm, setOrderDeleteConfirm] = useState<Order | null>(
     null,
   );
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+
+  // Revenue filter state
+  const [revenueFilter, setRevenueFilter] = useState<
+    "week" | "month" | "current-month" | "custom"
+  >("week");
+  const [showRevenueDropdown, setShowRevenueDropdown] = useState(false);
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState("");
+  const [filteredRevenueData, setFilteredRevenueData] = useState<any[]>([]);
+  const [revenueLoading, setRevenueLoading] = useState(false);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (filteredRevenueData.length <= 10 && chartContainerRef.current) {
+      chartContainerRef.current.scrollLeft = 0;
+    }
+  }, [filteredRevenueData]);
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -278,11 +299,52 @@ export default function AdminDashboard() {
       if (res.ok) {
         const data = await res.json();
         setStats(data);
+        setFilteredRevenueData(data.revenueData);
       }
     } catch (error) {
       console.error("Failed to fetch admin stats");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRevenueData = async (startDate: string, endDate: string) => {
+    setRevenueLoading(true);
+    try {
+      const res = await fetch(
+        `/api/admin/stats?startDate=${startDate}&endDate=${endDate}`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setFilteredRevenueData(data.revenueData);
+      }
+    } catch (error) {
+      console.error("Failed to fetch revenue data");
+    } finally {
+      setRevenueLoading(false);
+    }
+  };
+
+  const applyRevenueFilter = (
+    filter: "week" | "month" | "current-month" | "custom",
+    start?: string,
+    end?: string,
+  ) => {
+    const today = new Date();
+    const fmt = (d: Date) => d.toISOString().split("T")[0];
+    if (filter === "week") {
+      const s = new Date(today);
+      s.setDate(s.getDate() - 6);
+      fetchRevenueData(fmt(s), fmt(today));
+    } else if (filter === "month") {
+      const s = new Date(today);
+      s.setDate(s.getDate() - 29);
+      fetchRevenueData(fmt(s), fmt(today));
+    } else if (filter === "current-month") {
+      const s = new Date(today.getFullYear(), today.getMonth(), 1);
+      fetchRevenueData(fmt(s), fmt(today));
+    } else if (filter === "custom" && start && end) {
+      fetchRevenueData(start, end);
     }
   };
 
@@ -302,6 +364,14 @@ export default function AdminDashboard() {
     }
   };
 
+  const showToast = (
+    message: string,
+    type: "success" | "error" = "success",
+  ) => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
+
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
       const res = await fetch(`/api/admin/orders/${orderId}`, {
@@ -311,9 +381,15 @@ export default function AdminDashboard() {
       });
       if (res.ok) {
         fetchStats();
+        showToast(
+          `Order status updated to "${newStatus}". Customer has been notified via email.`,
+          "success",
+        );
+      } else {
+        showToast("Failed to update order status.", "error");
       }
     } catch (error) {
-      alert("Error updating status");
+      showToast("Error updating status.", "error");
     }
   };
 
@@ -579,42 +655,243 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2 bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
-                    <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
-                      Revenue Overview (Last 7 Days)
-                      <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-300" />
-                    </h3>
-                    <div className="flex items-end gap-3 h-48 w-full">
-                      {stats.revenueData.map((d: any, i: number) => {
-                        const maxRev =
-                          Math.max(
-                            ...stats.revenueData.map((d: any) => d.revenue),
-                          ) || 1;
-                        const height = `${(d.revenue / maxRev) * 100}%`;
-                        return (
-                          <div
-                            key={i}
-                            className="flex-1 flex flex-col items-center gap-2 group h-full justify-end"
+                    {/* Header with dropdown */}
+                    <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+                      <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                        Revenue Overview
+                        <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-300" />
+                      </h3>
+                      {/* Filter Dropdown */}
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowRevenueDropdown((v) => !v)}
+                          className="flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition-all shadow-sm"
+                        >
+                          <span>
+                            {revenueFilter === "week"
+                              ? "Last 7 Days"
+                              : revenueFilter === "month"
+                                ? "Last 30 Days"
+                                : revenueFilter === "current-month"
+                                  ? "Current Month"
+                                  : "Custom Range"}
+                          </span>
+                          <svg
+                            className={`w-4 h-4 transition-transform ${showRevenueDropdown ? "rotate-180" : ""}`}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                           >
-                            <div className="w-full bg-slate-50 rounded-t-lg relative flex items-end h-[85%] border-b-2 border-slate-100">
-                              <div
-                                className="w-full bg-linear-to-t from-purple-600 to-blue-500 rounded-t-lg transition-all duration-700 ease-out group-hover:from-purple-700 group-hover:to-blue-600 shadow-lg group-hover:shadow-xl"
-                                style={{
-                                  height: height === "0%" ? "5%" : height,
-                                }}
-                              ></div>
-                              <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-bold whitespace-nowrap shadow-xl">
-                                ${d.revenue.toFixed(2)}
-                              </div>
-                            </div>
-                            <span className="text-xs text-slate-500 font-medium">
-                              {new Date(d.date).toLocaleDateString(undefined, {
-                                weekday: "short",
-                              })}
-                            </span>
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </button>
+                        {showRevenueDropdown && (
+                          <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                            <button
+                              onClick={() => {
+                                setRevenueFilter("week");
+                                setShowRevenueDropdown(false);
+                                applyRevenueFilter("week");
+                              }}
+                              className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "week" ? "bg-purple-50 text-purple-700" : "text-slate-700 hover:bg-slate-50"}`}
+                            >
+                              <span className="text-base">📅</span> Last 7 Days
+                              {revenueFilter === "week" && (
+                                <span className="ml-auto w-2 h-2 bg-purple-500 rounded-full" />
+                              )}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setRevenueFilter("month");
+                                setShowRevenueDropdown(false);
+                                applyRevenueFilter("month");
+                              }}
+                              className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "month" ? "bg-purple-50 text-purple-700" : "text-slate-700 hover:bg-slate-50"}`}
+                            >
+                              <span className="text-base">🗓️</span> Last 30 Days
+                              {revenueFilter === "month" && (
+                                <span className="ml-auto w-2 h-2 bg-purple-500 rounded-full" />
+                              )}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setRevenueFilter("current-month");
+                                setShowRevenueDropdown(false);
+                                applyRevenueFilter("current-month");
+                              }}
+                              className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "current-month" ? "bg-purple-50 text-purple-700" : "text-slate-700 hover:bg-slate-50"}`}
+                            >
+                              <span className="text-base">📆</span> Current
+                              Month
+                              {revenueFilter === "current-month" && (
+                                <span className="ml-auto w-2 h-2 bg-purple-500 rounded-full" />
+                              )}
+                            </button>
+                            <div className="border-t border-slate-100" />
+                            <button
+                              onClick={() => {
+                                setRevenueFilter("custom");
+                              }}
+                              className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "custom" ? "bg-purple-50 text-purple-700" : "text-slate-700 hover:bg-slate-50"}`}
+                            >
+                              <span className="text-base">✏️</span> Custom Range
+                              {revenueFilter === "custom" && (
+                                <span className="ml-auto w-2 h-2 bg-purple-500 rounded-full" />
+                              )}
+                            </button>
                           </div>
-                        );
-                      })}
+                        )}
+                      </div>
                     </div>
+
+                    {/* Custom date range inputs */}
+                    {revenueFilter === "custom" && (
+                      <div className="flex flex-wrap items-center gap-3 mb-5 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                            From
+                          </label>
+                          <input
+                            type="date"
+                            value={customStart}
+                            max={customEnd || undefined}
+                            onChange={(e) => setCustomStart(e.target.value)}
+                            className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                            To
+                          </label>
+                          <input
+                            type="date"
+                            value={customEnd}
+                            min={customStart || undefined}
+                            onChange={(e) => setCustomEnd(e.target.value)}
+                            className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+                          />
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (customStart && customEnd) {
+                              applyRevenueFilter(
+                                "custom",
+                                customStart,
+                                customEnd,
+                              );
+                              setShowRevenueDropdown(false);
+                            }
+                          }}
+                          disabled={!customStart || !customEnd}
+                          className="mt-4 px-5 py-2 bg-linear-to-r from-purple-600 to-blue-600 text-white text-sm font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Chart */}
+                    {revenueLoading ? (
+                      <div className="flex items-center justify-center h-48">
+                        <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    ) : (
+                      <div
+                        ref={chartContainerRef}
+                        className={`w-full ${filteredRevenueData.length > 10 ? "overflow-x-auto pb-6" : "overflow-hidden"}`}
+                      >
+                        <div
+                          className="flex items-end gap-1.5 h-48"
+                          style={{
+                            minWidth:
+                              filteredRevenueData.length > 10
+                                ? `${filteredRevenueData.length * 28}px`
+                                : "100%",
+                          }}
+                        >
+                          {filteredRevenueData.map((d: any, i: number) => {
+                            const total = filteredRevenueData.length;
+                            const maxRev =
+                              Math.max(
+                                ...filteredRevenueData.map(
+                                  (d: any) => d.revenue,
+                                ),
+                              ) || 1;
+                            const height = `${(d.revenue / maxRev) * 100}%`;
+                            const isLong = total > 10;
+                            // Show label every N bars to avoid overlap
+                            const step =
+                              total <= 7
+                                ? 1
+                                : total <= 14
+                                  ? 2
+                                  : total <= 21
+                                    ? 3
+                                    : 5;
+                            const showLabel = i % step === 0 || i === total - 1;
+                            return (
+                              <div
+                                key={i}
+                                className="flex-1 flex flex-col items-center gap-2 group h-full justify-end"
+                                style={{
+                                  minWidth: isLong ? "28px" : undefined,
+                                }}
+                              >
+                                <div className="w-full bg-slate-50 rounded-t-lg relative flex items-end h-[85%] border-b-2 border-slate-100">
+                                  <div
+                                    className="w-full bg-linear-to-t from-purple-600 to-blue-500 rounded-t-lg transition-all duration-700 ease-out group-hover:from-purple-700 group-hover:to-blue-600 shadow-lg group-hover:shadow-xl"
+                                    style={{
+                                      height: height === "0%" ? "5%" : height,
+                                    }}
+                                  ></div>
+                                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-bold whitespace-nowrap shadow-xl">
+                                    {new Date(d.date).toLocaleDateString(
+                                      undefined,
+                                      isLong
+                                        ? { month: "short", day: "numeric" }
+                                        : {
+                                            weekday: "short",
+                                            month: "short",
+                                            day: "numeric",
+                                          },
+                                    )}{" "}
+                                    — ${d.revenue.toFixed(2)}
+                                  </div>
+                                </div>
+                                {isLong ? (
+                                  <span
+                                    className="text-xs text-slate-500 font-medium whitespace-nowrap origin-top-right"
+                                    style={{
+                                      transform: "rotate(-45deg)",
+                                      display: "block",
+                                      transformOrigin: "top center",
+                                      marginTop: "2px",
+                                    }}
+                                  >
+                                    {new Date(d.date).toLocaleDateString(
+                                      undefined,
+                                      { month: "short", day: "numeric" },
+                                    )}
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
+                                    {new Date(d.date).toLocaleDateString(
+                                      undefined,
+                                      { weekday: "short" },
+                                    )}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
@@ -660,6 +937,327 @@ export default function AdminDashboard() {
                           </div>
                         ))
                       )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
+                    <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                      Order Status Distribution
+                      <div className="h-2 w-2 bg-purple-500 rounded-full animate-pulse shadow-lg shadow-purple-300" />
+                    </h3>
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-48 h-48 mb-6">
+                        {(() => {
+                          const pending = stats.recentOrders.filter(
+                            (o) => o.status === "Pending",
+                          ).length;
+                          const accepted = stats.recentOrders.filter(
+                            (o) => o.status === "Accepted",
+                          ).length;
+                          const completed = stats.recentOrders.filter(
+                            (o) => o.status === "Completed",
+                          ).length;
+                          const cancelled = stats.recentOrders.filter(
+                            (o) => o.status === "Cancelled",
+                          ).length;
+                          const total =
+                            pending + accepted + completed + cancelled || 1;
+                          const CIRC = 502.4;
+                          const pPending = (pending / total) * CIRC;
+                          const pAccepted = (accepted / total) * CIRC;
+                          const pCompleted = (completed / total) * CIRC;
+                          const pCancelled = (cancelled / total) * CIRC;
+                          return (
+                            <svg
+                              viewBox="0 0 200 200"
+                              className="w-full h-full -rotate-90"
+                            >
+                              <circle
+                                cx="100"
+                                cy="100"
+                                r="80"
+                                fill="none"
+                                stroke="#e2e8f0"
+                                strokeWidth="40"
+                              />
+                              {pending > 0 && (
+                                <circle
+                                  cx="100"
+                                  cy="100"
+                                  r="80"
+                                  fill="none"
+                                  stroke="#fbbf24"
+                                  strokeWidth="40"
+                                  strokeDasharray={`${pPending} ${CIRC}`}
+                                  strokeDashoffset="0"
+                                />
+                              )}
+                              {accepted > 0 && (
+                                <circle
+                                  cx="100"
+                                  cy="100"
+                                  r="80"
+                                  fill="none"
+                                  stroke="#3b82f6"
+                                  strokeWidth="40"
+                                  strokeDasharray={`${pAccepted} ${CIRC}`}
+                                  strokeDashoffset={`-${pPending}`}
+                                />
+                              )}
+                              {completed > 0 && (
+                                <circle
+                                  cx="100"
+                                  cy="100"
+                                  r="80"
+                                  fill="none"
+                                  stroke="#10b981"
+                                  strokeWidth="40"
+                                  strokeDasharray={`${pCompleted} ${CIRC}`}
+                                  strokeDashoffset={`-${pPending + pAccepted}`}
+                                />
+                              )}
+                              {cancelled > 0 && (
+                                <circle
+                                  cx="100"
+                                  cy="100"
+                                  r="80"
+                                  fill="none"
+                                  stroke="#ef4444"
+                                  strokeWidth="40"
+                                  strokeDasharray={`${pCancelled} ${CIRC}`}
+                                  strokeDashoffset={`-${pPending + pAccepted + pCompleted}`}
+                                />
+                              )}
+                            </svg>
+                          );
+                        })()}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center">
+                            <p className="text-3xl font-bold text-slate-900">
+                              {stats.totalOrders}
+                            </p>
+                            <p className="text-xs text-slate-500">Total</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 w-full text-xs">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-amber-400" />
+                          <span className="text-slate-600">
+                            Pending (
+                            {
+                              stats.recentOrders.filter(
+                                (o) => o.status === "Pending",
+                              ).length
+                            }
+                            )
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-blue-500" />
+                          <span className="text-slate-600">
+                            Accepted (
+                            {
+                              stats.recentOrders.filter(
+                                (o) => o.status === "Accepted",
+                              ).length
+                            }
+                            )
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                          <span className="text-slate-600">
+                            Completed (
+                            {
+                              stats.recentOrders.filter(
+                                (o) => o.status === "Completed",
+                              ).length
+                            }
+                            )
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-rose-500" />
+                          <span className="text-slate-600">
+                            Cancelled (
+                            {
+                              stats.recentOrders.filter(
+                                (o) => o.status === "Cancelled",
+                              ).length
+                            }
+                            )
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
+                    <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                      Average Order Value Trend
+                      <div className="h-2 w-2 bg-amber-500 rounded-full animate-pulse shadow-lg shadow-amber-300" />
+                    </h3>
+                    <div className="h-48 flex flex-col justify-between">
+                      <div className="flex-1 relative">
+                        <svg
+                          className="w-full h-full"
+                          viewBox="0 0 300 150"
+                          preserveAspectRatio="none"
+                        >
+                          <defs>
+                            <linearGradient
+                              id="aovGradient"
+                              x1="0%"
+                              y1="0%"
+                              x2="0%"
+                              y2="100%"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="#f59e0b"
+                                stopOpacity="0.3"
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="#f59e0b"
+                                stopOpacity="0.05"
+                              />
+                            </linearGradient>
+                          </defs>
+                          {(() => {
+                            const aovData = stats.revenueData.map((d: any) => {
+                              const ordersOnDay =
+                                stats.recentOrders.filter(
+                                  (o: any) =>
+                                    new Date(o.date).toDateString() ===
+                                    new Date(d.date).toDateString(),
+                                ).length || 1;
+                              return {
+                                value: d.revenue / ordersOnDay,
+                                date: d.date,
+                              };
+                            });
+                            const maxAOV =
+                              Math.max(...aovData.map((d) => d.value)) || 100;
+                            const points = aovData
+                              .map((d, i) => {
+                                const x = (i / (aovData.length - 1)) * 300;
+                                const y = 150 - (d.value / maxAOV) * 140;
+                                return `${x},${y}`;
+                              })
+                              .join(" ");
+                            const areaPoints = `0,150 ${points} 300,150`;
+                            return (
+                              <>
+                                <polyline
+                                  points={areaPoints}
+                                  fill="url(#aovGradient)"
+                                  stroke="none"
+                                />
+                                <polyline
+                                  points={points}
+                                  fill="none"
+                                  stroke="#f59e0b"
+                                  strokeWidth="3"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="drop-shadow-lg"
+                                />
+                                {aovData.map((d, i) => {
+                                  const x = (i / (aovData.length - 1)) * 300;
+                                  const y = 150 - (d.value / maxAOV) * 140;
+                                  return (
+                                    <g key={i}>
+                                      <circle
+                                        cx={x}
+                                        cy={y}
+                                        r="4"
+                                        fill="#f59e0b"
+                                        className="hover:r-6 transition-all cursor-pointer"
+                                      />
+                                      <circle
+                                        cx={x}
+                                        cy={y}
+                                        r="8"
+                                        fill="white"
+                                        fillOpacity="0.3"
+                                        className="opacity-0 hover:opacity-100 transition-opacity"
+                                      />
+                                    </g>
+                                  );
+                                })}
+                              </>
+                            );
+                          })()}
+                        </svg>
+                      </div>
+                      <div className="grid grid-cols-7 gap-1 mt-4">
+                        {stats.revenueData.map((d: any, i: number) => (
+                          <div key={i} className="text-center">
+                            <span className="text-xs text-slate-500 font-medium">
+                              {
+                                new Date(d.date).toLocaleDateString(undefined, {
+                                  weekday: "short",
+                                })[0]
+                              }
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-4 flex items-center justify-between px-2">
+                        <div className="text-center">
+                          <p className="text-xs text-slate-500 font-medium">
+                            Min AOV
+                          </p>
+                          <p className="text-sm font-bold text-amber-600">
+                            $
+                            {Math.min(
+                              ...stats.revenueData.map((d: any) => {
+                                const orders =
+                                  stats.recentOrders.filter(
+                                    (o: any) =>
+                                      new Date(o.date).toDateString() ===
+                                      new Date(d.date).toDateString(),
+                                  ).length || 1;
+                                return d.revenue / orders;
+                              }),
+                            ).toFixed(2)}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-slate-500 font-medium">
+                            Avg AOV
+                          </p>
+                          <p className="text-sm font-bold text-amber-600">
+                            $
+                            {(stats.totalRevenue / stats.totalOrders).toFixed(
+                              2,
+                            )}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-slate-500 font-medium">
+                            Max AOV
+                          </p>
+                          <p className="text-sm font-bold text-amber-600">
+                            $
+                            {Math.max(
+                              ...stats.revenueData.map((d: any) => {
+                                const orders =
+                                  stats.recentOrders.filter(
+                                    (o: any) =>
+                                      new Date(o.date).toDateString() ===
+                                      new Date(d.date).toDateString(),
+                                  ).length || 1;
+                                return d.revenue / orders;
+                              }),
+                            ).toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -884,289 +1482,6 @@ export default function AdminDashboard() {
                         No sentiment data available.
                       </p>
                     )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
-                    <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
-                      Order Status Distribution
-                      <div className="h-2 w-2 bg-purple-500 rounded-full animate-pulse shadow-lg shadow-purple-300" />
-                    </h3>
-                    <div className="flex flex-col items-center">
-                      <div className="relative w-48 h-48 mb-6">
-                        <svg
-                          viewBox="0 0 200 200"
-                          className="w-full h-full -rotate-90"
-                        >
-                          <circle
-                            cx="100"
-                            cy="100"
-                            r="80"
-                            fill="none"
-                            stroke="#fbbf24"
-                            strokeWidth="40"
-                            strokeDasharray={`${(stats.recentOrders.filter((o) => o.status === "Pending").length / stats.totalOrders) * 502.4} 502.4`}
-                          />
-                          <circle
-                            cx="100"
-                            cy="100"
-                            r="80"
-                            fill="none"
-                            stroke="#3b82f6"
-                            strokeWidth="40"
-                            strokeDasharray={`${(stats.recentOrders.filter((o) => o.status === "Accepted").length / stats.totalOrders) * 502.4} 502.4`}
-                            strokeDashoffset={`-${(stats.recentOrders.filter((o) => o.status === "Pending").length / stats.totalOrders) * 502.4}`}
-                          />
-                          <circle
-                            cx="100"
-                            cy="100"
-                            r="80"
-                            fill="none"
-                            stroke="#10b981"
-                            strokeWidth="40"
-                            strokeDasharray={`${(stats.recentOrders.filter((o) => o.status === "Completed").length / stats.totalOrders) * 502.4} 502.4`}
-                            strokeDashoffset={`-${((stats.recentOrders.filter((o) => o.status === "Pending").length + stats.recentOrders.filter((o) => o.status === "Accepted").length) / stats.totalOrders) * 502.4}`}
-                          />
-                          <circle
-                            cx="100"
-                            cy="100"
-                            r="80"
-                            fill="none"
-                            stroke="#ef4444"
-                            strokeWidth="40"
-                            strokeDasharray={`${(stats.recentOrders.filter((o) => o.status === "Cancelled").length / stats.totalOrders) * 502.4} 502.4`}
-                            strokeDashoffset={`-${((stats.recentOrders.filter((o) => o.status === "Pending").length + stats.recentOrders.filter((o) => o.status === "Accepted").length + stats.recentOrders.filter((o) => o.status === "Completed").length) / stats.totalOrders) * 502.4}`}
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center">
-                            <p className="text-3xl font-bold text-slate-900">
-                              {stats.totalOrders}
-                            </p>
-                            <p className="text-xs text-slate-500">Total</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3 w-full text-xs">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-amber-400" />
-                          <span className="text-slate-600">
-                            Pending (
-                            {
-                              stats.recentOrders.filter(
-                                (o) => o.status === "Pending",
-                              ).length
-                            }
-                            )
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-blue-500" />
-                          <span className="text-slate-600">
-                            Accepted (
-                            {
-                              stats.recentOrders.filter(
-                                (o) => o.status === "Accepted",
-                              ).length
-                            }
-                            )
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                          <span className="text-slate-600">
-                            Completed (
-                            {
-                              stats.recentOrders.filter(
-                                (o) => o.status === "Completed",
-                              ).length
-                            }
-                            )
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-rose-500" />
-                          <span className="text-slate-600">
-                            Cancelled (
-                            {
-                              stats.recentOrders.filter(
-                                (o) => o.status === "Cancelled",
-                              ).length
-                            }
-                            )
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
-                    <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
-                      Average Order Value Trend
-                      <div className="h-2 w-2 bg-amber-500 rounded-full animate-pulse shadow-lg shadow-amber-300" />
-                    </h3>
-                    <div className="h-48 flex flex-col justify-between">
-                      <div className="flex-1 relative">
-                        <svg
-                          className="w-full h-full"
-                          viewBox="0 0 300 150"
-                          preserveAspectRatio="none"
-                        >
-                          <defs>
-                            <linearGradient
-                              id="aovGradient"
-                              x1="0%"
-                              y1="0%"
-                              x2="0%"
-                              y2="100%"
-                            >
-                              <stop
-                                offset="0%"
-                                stopColor="#f59e0b"
-                                stopOpacity="0.3"
-                              />
-                              <stop
-                                offset="100%"
-                                stopColor="#f59e0b"
-                                stopOpacity="0.05"
-                              />
-                            </linearGradient>
-                          </defs>
-                          {(() => {
-                            const aovData = stats.revenueData.map(
-                              (d: any, i: number) => {
-                                const ordersOnDay =
-                                  stats.recentOrders.filter(
-                                    (o: any) =>
-                                      new Date(o.date).toDateString() ===
-                                      new Date(d.date).toDateString(),
-                                  ).length || 1;
-                                return {
-                                  value: d.revenue / ordersOnDay,
-                                  date: d.date,
-                                };
-                              },
-                            );
-                            const maxAOV =
-                              Math.max(...aovData.map((d) => d.value)) || 100;
-                            const points = aovData
-                              .map((d, i) => {
-                                const x = (i / (aovData.length - 1)) * 300;
-                                const y = 150 - (d.value / maxAOV) * 140;
-                                return `${x},${y}`;
-                              })
-                              .join(" ");
-                            const areaPoints = `0,150 ${points} 300,150`;
-                            return (
-                              <>
-                                <polyline
-                                  points={areaPoints}
-                                  fill="url(#aovGradient)"
-                                  stroke="none"
-                                />
-                                <polyline
-                                  points={points}
-                                  fill="none"
-                                  stroke="#f59e0b"
-                                  strokeWidth="3"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="drop-shadow-lg"
-                                />
-                                {aovData.map((d, i) => {
-                                  const x = (i / (aovData.length - 1)) * 300;
-                                  const y = 150 - (d.value / maxAOV) * 140;
-                                  return (
-                                    <g key={i}>
-                                      <circle
-                                        cx={x}
-                                        cy={y}
-                                        r="4"
-                                        fill="#f59e0b"
-                                        className="hover:r-6 transition-all cursor-pointer"
-                                      />
-                                      <circle
-                                        cx={x}
-                                        cy={y}
-                                        r="8"
-                                        fill="white"
-                                        fillOpacity="0.3"
-                                        className="opacity-0 hover:opacity-100 transition-opacity"
-                                      />
-                                    </g>
-                                  );
-                                })}
-                              </>
-                            );
-                          })()}
-                        </svg>
-                      </div>
-                      <div className="grid grid-cols-7 gap-1 mt-4">
-                        {stats.revenueData.map((d: any, i: number) => (
-                          <div key={i} className="text-center">
-                            <span className="text-xs text-slate-500 font-medium">
-                              {
-                                new Date(d.date).toLocaleDateString(undefined, {
-                                  weekday: "short",
-                                })[0]
-                              }
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-4 flex items-center justify-between px-2">
-                        <div className="text-center">
-                          <p className="text-xs text-slate-500 font-medium">
-                            Min AOV
-                          </p>
-                          <p className="text-sm font-bold text-amber-600">
-                            $
-                            {Math.min(
-                              ...stats.revenueData.map((d: any) => {
-                                const orders =
-                                  stats.recentOrders.filter(
-                                    (o: any) =>
-                                      new Date(o.date).toDateString() ===
-                                      new Date(d.date).toDateString(),
-                                  ).length || 1;
-                                return d.revenue / orders;
-                              }),
-                            ).toFixed(2)}
-                          </p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-xs text-slate-500 font-medium">
-                            Avg AOV
-                          </p>
-                          <p className="text-sm font-bold text-amber-600">
-                            $
-                            {(stats.totalRevenue / stats.totalOrders).toFixed(
-                              2,
-                            )}
-                          </p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-xs text-slate-500 font-medium">
-                            Max AOV
-                          </p>
-                          <p className="text-sm font-bold text-amber-600">
-                            $
-                            {Math.max(
-                              ...stats.revenueData.map((d: any) => {
-                                const orders =
-                                  stats.recentOrders.filter(
-                                    (o: any) =>
-                                      new Date(o.date).toDateString() ===
-                                      new Date(d.date).toDateString(),
-                                  ).length || 1;
-                                return d.revenue / orders;
-                              }),
-                            ).toFixed(2)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -1552,6 +1867,27 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+      {/* Toast Notification */}
+      {toast && (
+        <div
+          className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl text-white text-sm font-semibold animate-in slide-in-from-bottom-4 duration-300 max-w-sm ${
+            toast.type === "success" ? "bg-emerald-600" : "bg-red-600"
+          }`}
+        >
+          {toast.type === "success" ? (
+            <CheckCircle size={18} className="shrink-0" />
+          ) : (
+            <X size={18} className="shrink-0" />
+          )}
+          <span>{toast.message}</span>
+          <button
+            onClick={() => setToast(null)}
+            className="ml-2 opacity-70 hover:opacity-100 transition-opacity shrink-0"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
       {isProductModalOpen && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
