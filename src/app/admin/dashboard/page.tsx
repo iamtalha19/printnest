@@ -621,11 +621,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
             )}
-            {activeTab === "reviews" && (
-              <div className="animate-in fade-in duration-300">
-                <AdminReviewList />
-              </div>
-            )}
+
             {activeTab === "overview" && (
               <div
                 key="overview"
@@ -697,7 +693,7 @@ export default function AdminDashboard() {
                               }}
                               className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "week" ? "bg-purple-50 text-purple-700" : "text-slate-700 hover:bg-slate-50"}`}
                             >
-                              <span className="text-base">📅</span> Last 7 Days
+                              <span className="text-base">??</span> Last 7 Days
                               {revenueFilter === "week" && (
                                 <span className="ml-auto w-2 h-2 bg-purple-500 rounded-full" />
                               )}
@@ -710,7 +706,7 @@ export default function AdminDashboard() {
                               }}
                               className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "month" ? "bg-purple-50 text-purple-700" : "text-slate-700 hover:bg-slate-50"}`}
                             >
-                              <span className="text-base">🗓️</span> Last 30 Days
+                              <span className="text-base">???</span> Last 30 Days
                               {revenueFilter === "month" && (
                                 <span className="ml-auto w-2 h-2 bg-purple-500 rounded-full" />
                               )}
@@ -723,7 +719,7 @@ export default function AdminDashboard() {
                               }}
                               className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "current-month" ? "bg-purple-50 text-purple-700" : "text-slate-700 hover:bg-slate-50"}`}
                             >
-                              <span className="text-base">📆</span> Current
+                              <span className="text-base">??</span> Current
                               Month
                               {revenueFilter === "current-month" && (
                                 <span className="ml-auto w-2 h-2 bg-purple-500 rounded-full" />
@@ -736,7 +732,7 @@ export default function AdminDashboard() {
                               }}
                               className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "custom" ? "bg-purple-50 text-purple-700" : "text-slate-700 hover:bg-slate-50"}`}
                             >
-                              <span className="text-base">✏️</span> Custom Range
+                              <span className="text-base">??</span> Custom Range
                               {revenueFilter === "custom" && (
                                 <span className="ml-auto w-2 h-2 bg-purple-500 rounded-full" />
                               )}
@@ -1798,7 +1794,7 @@ export default function AdminDashboard() {
                             )}
                           </td>
                           <td className="px-8 py-5 font-bold text-sm">
-                            ${o.total}
+                            {o.total}
                           </td>
                           <td className="px-8 py-5">
                             <select
@@ -1999,70 +1995,78 @@ export default function AdminDashboard() {
       {selectedUser && (
         <div
           onClick={() => setSelectedUser(null)}
-          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
         >
           <div
             onClick={(e) => e.stopPropagation()}
             className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
           >
-            <div className="p-6 border-b flex justify-between items-start bg-slate-50">
+            <div className="p-5 border-b border-slate-100 flex justify-between items-start">
               <div>
-                <h3 className="text-xl font-black">
-                  {selectedUser.name}'s Storage
+                <h3 className="text-lg font-black text-slate-900">
+                  {selectedUser.name}&apos;s{" "}
+                  {viewType === "cart" ? "Cart" : "Wishlist"}
                 </h3>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-xs text-slate-400 mt-0.5">
                   {selectedUser.email}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedUser(null)}
-                className="p-2 hover:bg-slate-200 rounded-lg"
+                className="p-1.5 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 hover:text-slate-700"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
-            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3">
+            <div className="p-4 max-h-[60vh] overflow-y-auto space-y-2">
               {(viewType === "cart"
                 ? selectedUser.cart
                 : selectedUser.wishlist
               )?.map((item: any, i: number) => (
                 <div
                   key={i}
-                  className="flex gap-4 p-3 bg-slate-50 rounded-xl border"
+                  className="flex items-center gap-4 p-3 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all group"
                 >
-                  <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border relative overflow-hidden">
+                  <div className="w-14 h-14 bg-white rounded-xl border border-slate-100 shrink-0 relative overflow-hidden">
                     {item.image ? (
                       <Image
                         src={item.image}
-                        alt=""
+                        alt={item.name || item.title || ""}
                         fill
-                        className="object-contain"
+                        className="object-contain p-1.5 group-hover:scale-105 transition-transform duration-200"
                       />
                     ) : (
-                      <Package size={20} className="text-slate-300" />
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Package size={18} className="text-slate-300" />
+                      </div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold truncate">
+                    <p className="text-sm font-bold text-slate-800 truncate">
                       {item.name || item.title}
                     </p>
-                    <p className="text-xs text-slate-500">
-                      {viewType === "cart" && `Qty: ${item.quantity} × `}$
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {viewType === "cart" && `Qty: ${item.quantity} × `}
                       {item.price}
                     </p>
                   </div>
                   {viewType === "cart" && (
-                    <p className="font-bold text-sm text-purple-600">
-                      ${item.totalPrice}
+                    <p className="font-bold text-sm text-purple-600 shrink-0">
+                      {item.totalPrice}
                     </p>
                   )}
                 </div>
               ))}
               {(viewType === "cart" ? selectedUser.cart : selectedUser.wishlist)
                 ?.length === 0 && (
-                <p className="text-center text-slate-400 italic py-4">
-                  No items found.
-                </p>
+                <div className="flex flex-col items-center justify-center py-10 text-slate-400">
+                  {viewType === "cart" ? (
+                    <ShoppingCart size={36} className="mb-2 text-slate-200" />
+                  ) : (
+                    <Heart size={36} className="mb-2 text-slate-200" />
+                  )}
+                  <p className="text-sm italic">No items found.</p>
+                </div>
               )}
             </div>
           </div>
@@ -2110,7 +2114,7 @@ export default function AdminDashboard() {
                   <p className="text-xs text-slate-500 font-bold uppercase mb-1">
                     Total Amount
                   </p>
-                  <p className="text-2xl font-bold">${selectedOrder.total}</p>
+                  <p className="text-2xl font-bold">{selectedOrder.total}</p>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -2198,10 +2202,10 @@ export default function AdminDashboard() {
                             {item.quantity}
                           </td>
                           <td className="px-4 py-3 text-right text-slate-600">
-                            ${item.price}
+                            {item.price}
                           </td>
                           <td className="px-4 py-3 text-right font-bold">
-                            ${item.totalPrice}
+                            {item.totalPrice}
                           </td>
                         </tr>
                       ))}

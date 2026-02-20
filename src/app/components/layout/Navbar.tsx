@@ -260,7 +260,7 @@ function Navbar() {
                             {item.title}
                           </p>
                           <p className="text-xs text-slate-500">
-                            ${item.price}
+                            {item.price}
                           </p>
                         </div>
                         <button

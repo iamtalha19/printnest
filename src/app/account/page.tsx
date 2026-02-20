@@ -674,7 +674,7 @@ export default function MyAccountPage() {
                             {item.title}
                           </h4>
                           <p className="text-purple-600 font-medium text-sm">
-                            ${item.price}
+                            {item.price}
                           </p>
                         </div>
                         <button

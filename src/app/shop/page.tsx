@@ -373,11 +373,11 @@ function SimpleProductCard({
           </h3>
           <div className="flex items-center justify-center gap-2">
             <span className="text-sm font-bold text-blue-900">
-              ${product.price}
+              {product.price}
             </span>
             {product.oldPrice && (
               <span className="text-xs text-red-400 line-through">
-                ${product.oldPrice}
+                {product.oldPrice}
               </span>
             )}
           </div>
